@@ -1,0 +1,49 @@
+{
+  "private": true,
+  "name": "my-nextron-app",
+  "description": "My application description",
+  "version": "1.0.0",
+  "author": "Yoshihide Shiono <shiono.yoshihide@gmail.com>",
+  "main": "app/background.js",
+  "scripts": {
+    "dev": "nextron",
+    "build": "nextron build",
+    "start": "yarn clear && yarn dev",
+    "postinstall": "electron-builder install-app-deps",
+    "clear": "rm -rf ./app ./dist ./renderer/.next"
+  },
+  "dependencies": {
+    "@headlessui/react": "^1.7.17",
+    "@texttree/notepad-rcl": "^2.0.1",
+    "@texttree/tn-quote": "^0.5.0",
+    "@texttree/translation-words-helpers": "^0.2.4",
+    "@texttree/v-cana-rcl": "file:.yalc/@texttree/v-cana-rcl",
+    "axios": "^1.5.1",
+    "decompress": "^4.2.1",
+    "electron-serve": "^1.1.0",
+    "electron-store": "^8.1.0",
+    "fs-extra": "^11.1.1",
+    "github-markdown-css": "^5.3.0",
+    "jszip": "^3.10.1",
+    "localforage": "^1.10.0",
+    "prop-types": "^15.8.1",
+    "react-markdown": "^9.0.0",
+    "recoil": "^0.7.7",
+    "rehype-raw": "^7.0.0",
+    "remark-gfm": "^4.0.0",
+    "usfm-js": "^3.4.2",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@svgr/webpack": "^8.1.0",
+    "autoprefixer": "^10.4.16",
+    "electron": "^26.2.2",
+    "electron-builder": "^24.6.4",
+    "next": "^12.3.4",
+    "nextron": "^8.11.3",
+    "postcss": "^8.4.31",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "tailwindcss": "^3.3.3"
+  }
+}
