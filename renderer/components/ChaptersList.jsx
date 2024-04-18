@@ -1,5 +1,5 @@
-import Link from 'next/link';
-import React from 'react';
+import Link from "next/link";
+import React from "react";
 
 function ChapterList({ id, chapters, steps, mutate }) {
   console.log({ id, chapters, steps });
@@ -32,7 +32,7 @@ function ChapterList({ id, chapters, steps, mutate }) {
         {chapters.map(([chapter, step]) => (
           <tr key={chapter}>
             <td className="border-b border-slate-100 p-4 pl-8 text-slate-500">
-              <Link href={`/project/${id}/${chapter}/${step}`}>
+              <Link href={`/project/${id}/${chapter}/${step}`} legacyBehavior>
                 <a className="font-bold underline">Chapter {chapter}</a>
               </Link>
             </td>
@@ -43,7 +43,8 @@ function ChapterList({ id, chapters, steps, mutate }) {
               {step > 0 && (
                 <div
                   className="btn-blue text-base"
-                  onClick={() => handleBackStep(chapter, step)}>
+                  onClick={() => handleBackStep(chapter, step)}
+                >
                   Go to step {step}
                 </div>
               )}
@@ -51,7 +52,8 @@ function ChapterList({ id, chapters, steps, mutate }) {
             <td className="border-b border-slate-100 p-4 pl-8 text-slate-500">
               <div
                 className="btn-blue text-base"
-                onClick={() => handleDownloadChapter(chapter)}>
+                onClick={() => handleDownloadChapter(chapter)}
+              >
                 Download
               </div>
             </td>

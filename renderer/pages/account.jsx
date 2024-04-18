@@ -17,9 +17,15 @@ function Home() {
         <title>V-CANA</title>
       </Head>
       <div className="text-2xl w-full">
-        <StartPage />
-        {/* <ProjectsList projects={projects} /> */}
-
+        <h2 className="mt-6 mb-6 text-4xl">Projects</h2>
+        {/* <StartPage /> */}
+        <Link href="/home" legacyBehavior>
+          <a className="btn-blue mt-3 text-base">Go to home</a>
+        </Link>
+        <ProjectsList projects={projects} />
+        <Link href="/create" legacyBehavior>
+          <a className="btn-blue mt-3 text-base">Create New</a>
+        </Link>
         {/* <Link href="/createbp">
           <a className="btn-blue mt-3 text-base">Создать book package</a>
         </Link> */}

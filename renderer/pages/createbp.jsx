@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import Head from 'next/head';
-import Link from 'next/link';
-import { books } from '../helpers/books';
+import React, { useState } from "react";
+import Head from "next/head";
+import Link from "next/link";
+import { books } from "../helpers/books";
 
 function Create() {
-  const [fileUrl, setFileUrl] = useState('');
+  const [fileUrl, setFileUrl] = useState("");
   const [resources, setResources] = useState([]);
 
   const onSubmit = (e) => {
@@ -13,7 +13,7 @@ function Create() {
     // data.append('fileUrl', fileUrl);
     // console.log(data.entries());
     for (let [k, v] of data.entries()) {
-      axios.get('https://git.door43.org/unfoldingWord');
+      axios.get("https://git.door43.org/unfoldingWord");
       // надо скачать сначала манифесты, потом узнать и скачать файлы literal, simplified, twl, tn, tq
       // потом скачать архив, почистить вордсы
       // скачать полностью лексикон, академию
@@ -29,7 +29,7 @@ function Create() {
         <title>V-CANA</title>
       </Head>
       <div className="text-lg w-full p-4">
-        <Link href={'/home'}>
+        <Link href={"/home"} legacyBehavior>
           <a className="border py-2 px-3 rounded-md bg-slate-300">Back</a>
         </Link>
         <br />
@@ -56,20 +56,21 @@ function Create() {
               setFileUrl(url);
               setResources(resources);
               console.log({ resources });
-            }}>
+            }}
+          >
             Выбрать конфиг проекта
           </button>
           <input type="text" readOnly name="fileUrl" value={fileUrl} />
           {resources.length
             ? resources.map((resource) => (
                 <div key={resource.name}>
-                  <label className={resource.isMain ? 'font-bold' : ''}>
+                  <label className={resource.isMain ? "font-bold" : ""}>
                     {resource.name}
                     <input name={resource.name} />
                   </label>
                 </div>
               ))
-            : ''}
+            : ""}
 
           <br />
           <select name="bookKey">
@@ -83,7 +84,7 @@ function Create() {
           <input
             className="btn-blue text-base mt-3"
             type="submit"
-            value={'Create'}
+            value={"Create"}
           />
         </form>
       </div>

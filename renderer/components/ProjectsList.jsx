@@ -1,5 +1,5 @@
-import Link from 'next/link';
-import React from 'react';
+import Link from "next/link";
+import React from "react";
 
 function ProjectsList({ projects }) {
   console.log(projects);
@@ -29,7 +29,7 @@ function ProjectsList({ projects }) {
         {projects.map((project) => (
           <tr key={project.id}>
             <td className="border-b border-slate-100 p-4 pl-8 text-slate-500">
-              <Link href={'project/' + project.id}>
+              <Link href={"project/" + project.id} legacyBehavior>
                 <a className="font-bold underline">
                   {project.book.name} ({project.book.code})
                 </a>
