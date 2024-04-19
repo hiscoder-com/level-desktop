@@ -32,8 +32,8 @@ process.once('loaded', () => {
     removeWord: (projectid, wordid) =>
       ipcRenderer.sendSync('remove-word', projectid, wordid),
     getNotes: () => ipcRenderer.sendSync('get-notes'),
-    addNote: (projectid, noteid, isfolder, sorting) =>
-      ipcRenderer.sendSync('add-note', projectid, noteid, isfolder, sorting),
+    addNote: (projectid, noteid) =>
+      ipcRenderer.sendSync('add-note', projectid, noteid),
     updateNote: (projectid, note) =>
       ipcRenderer.sendSync('update-note', projectid, note),
     getNote: (projectid, noteid) =>
@@ -42,8 +42,6 @@ process.once('loaded', () => {
       ipcRenderer.sendSync('remove-note', projectid, noteid),
     removeAllNotes: (projectid) =>
       ipcRenderer.sendSync('remove-all-notes', projectid),
-    updateNotes: (projectid, notes) =>
-      ipcRenderer.sendSync('update-notes', projectid, notes),
     setItem: (key, val) => ipcRenderer.send('set-item', key, val),
     getUsfm: (id, resource, chapter = false) =>
       ipcRenderer.sendSync('get-usfm', id, resource, chapter),

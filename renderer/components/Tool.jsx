@@ -4,7 +4,7 @@ import BlindEditor from "./BlindEditor";
 import Dictionary from "./Dictionary";
 import Editor from "./Editor";
 import Info from "./Info";
-import PersonalNotes from "./PersonalNotes";
+import PersonalNotes2 from "./PersonalNotes2";
 import TN from "./TN";
 import TQ from "./TQ";
 import TWL from "./TWL";
@@ -65,7 +65,7 @@ function Tool({ config, toolName }) {
       break;
 
     case "personalNotes":
-      CurrentTool = PersonalNotes;
+      CurrentTool = PersonalNotes2;
       break;
 
     case "audio":

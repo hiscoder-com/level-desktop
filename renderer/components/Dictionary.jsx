@@ -308,6 +308,12 @@ function Alphabet({ alphabet, getAll, setCurrentPage, setSearchQuery, t }) {
       >
         {t("ShowAll")}
       </div>
+      <TNContent
+        note={{
+          text: "**If your language does not use this passive form, you could express the idea in active form or in another way that is natural in your language**\n\n Alternate translation: “of the people whom God has chosen”",
+          title: "# of the chosen people of God",
+        }}
+      />
     </div>
   );
 }
