@@ -162,17 +162,16 @@ ipcMain.on('get-notes', (event) => {
   event.sender.send('notify', 'Loaded');
 });
 
-ipcMain.on('add-note', (event, projectid, noteid) => {
+ipcMain.on('add-note', (event, projectid, noteid, isfolder, sorting) => {
   const date = new Date();
   const title = date.toLocaleString();
   notesLS.set(noteid, {
     id: noteid,
-    title: title,
-    user_id: 1,
-    data: {},
+    title,
     parent_id: null,
-    is_folder: false,
+    is_folder: isfolder,
     created_at: date.getTime(),
+    sorting
   });
   const data = {
     id: noteid,
@@ -180,8 +179,9 @@ ipcMain.on('add-note', (event, projectid, noteid) => {
     title,
     data: {
       blocks: [],
-      version: '2.8.1',
+      version: '2.29.1',
     },
+    sorting
   };
   fs.writeFileSync(
     path.join(projectUrl, projectid, 'personal-notes', noteid + '.json'),
@@ -193,7 +193,9 @@ ipcMain.on('add-note', (event, projectid, noteid) => {
 });
 
 ipcMain.on('update-note', (event, projectid, note) => {
-  notesLS.set(`${note.id}.name`, note.title);
+  notesLS.set(`${note.id}.title`, note.title);
+
+
   fs.writeFileSync(
     path.join(projectUrl, projectid, 'personal-notes', note.id + '.json'),
     JSON.stringify(note, null, 2),
@@ -229,6 +231,22 @@ ipcMain.on('remove-all-notes', (event, projectid) => {
   );
   event.returnValue = projectid;
   event.sender.send('notify', 'Removed');
+});
+
+ipcMain.on('update-notes', (event, projectid, notes) => {
+  notes.forEach((note) => {
+    notesLS.set(`${note.id}.title`, note.title.slice(0, -1) + note.sorting);
+    notesLS.set(`${note.id}.parent_id`, note.parent_id);
+    notesLS.set(`${note.id}.sorting`, note.sorting);
+    fs.writeFileSync(
+      path.join(projectUrl, projectid, 'personal-notes', note.id + '.json'),
+      JSON.stringify(note, null, 2),
+      { encoding: 'utf-8' }
+    );
+
+  });
+  event.returnValue = projectid;
+  event.sender.send('notify', 'Updated');
 });
 
 ipcMain.on('get-chapter', (event, projectid, chapter) => {
@@ -335,8 +353,8 @@ ipcMain.on('get-tq', (event, id, resource, mainResource, chapter) => {
     const verse = el.Reference.split(':').slice(-1)[0];
     const tq = {
       id: `${el.ID}-v${verse}`,
-      title: el.Question,
-      text: el.Response,
+      question: el.Question,
+      answer: el.Response,
     };
     if (!questions[verse]) {
       questions[verse] = [tq];
