@@ -42,7 +42,7 @@ function ChapterList({ id, chapters, steps, mutate }) {
             <td className="border-b border-slate-100 p-4 pl-8 text-slate-500">
               {step > 0 && (
                 <div
-                  className="btn-blue text-base"
+                  className="btn-primary text-base"
                   onClick={() => handleBackStep(chapter, step)}
                 >
                   Go to step {step}
@@ -51,7 +51,7 @@ function ChapterList({ id, chapters, steps, mutate }) {
             </td>
             <td className="border-b border-slate-100 p-4 pl-8 text-slate-500">
               <div
-                className="btn-blue text-base"
+                className="btn-primary text-base"
                 onClick={() => handleDownloadChapter(chapter)}
               >
                 Download

@@ -17,18 +17,17 @@ function Home() {
         <title>V-CANA</title>
       </Head>
       <div className="text-2xl w-full">
-        <h2 className="mt-6 mb-6 text-4xl">Projects</h2>
+        <h2 className="mt-6 mb-6 text-4xl ">Projects</h2>
         {/* <StartPage /> */}
         <Link href="/home" legacyBehavior>
-          <a className="btn-blue mt-3 text-base">Go to home</a>
+          <a className="btn-primary text-base">Go to home</a>
         </Link>
-        <ProjectsList projects={projects} />
+        <div className="py-4">
+          <ProjectsList projects={projects} />
+        </div>
         <Link href="/create" legacyBehavior>
-          <a className="btn-blue mt-3 text-base">Create New</a>
+          <a className="btn-primary text-base">Import</a>
         </Link>
-        {/* <Link href="/createbp">
-          <a className="btn-blue mt-3 text-base">Создать book package</a>
-        </Link> */}
       </div>
     </>
   );

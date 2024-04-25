@@ -7,7 +7,7 @@ import { useSetRecoilState } from "recoil";
 import { inactiveState } from "../helpers/atoms";
 import Recorder from "./Recorder";
 
-export default function Audio() {
+export default function Retelling() {
   const setInactive = useSetRecoilState(inactiveState);
   const router = useRouter();
 

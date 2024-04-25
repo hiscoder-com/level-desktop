@@ -31,7 +31,7 @@ const translateIcon = <Pencil className="w-5 inline" />;
 const icons = {
   personalNotes: <Notepad className="w-5 inline" />,
   dictionary: <Dict className="w-5 inline" />,
-  audio: <Audio className="w-5 inline" />,
+  retelling: <Audio className="w-5 inline" />,
   info: <Info className="w-5 inline" />,
   blindEditor: translateIcon,
   editor: translateIcon,
@@ -148,7 +148,7 @@ function Panel({ tools, mainResource, id, chapter, toolNames }) {
               "blindEditor",
               "teamNotes",
               "personalNotes",
-              "audio",
+              "retelling",
               "dictionary",
               "info",
             ].includes(tool.name) ? (

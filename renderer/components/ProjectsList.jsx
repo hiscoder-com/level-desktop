@@ -48,7 +48,7 @@ function ProjectsList({ projects }) {
               {new Date(project.createdAt).toLocaleDateString()}
             </td>
             <td className="border-b border-slate-100 p-4 pl-8 text-slate-500">
-              <div className="btn-blue">Download</div>
+              <div className="btn-primary">Download</div>
             </td>
           </tr>
         ))}

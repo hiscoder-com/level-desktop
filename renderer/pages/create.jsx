@@ -4,7 +4,7 @@ import Link from "next/link";
 
 function Create() {
   const [fileUrl, setFileUrl] = React.useState(false);
-
+  console.log(fileUrl);
   const onSubmit = (e) => {
     e.preventDefault();
     window.electronAPI.addProject(fileUrl);
@@ -16,14 +16,14 @@ function Create() {
         <title>V-CANA</title>
       </Head>
       <div className="text-2xl w-full">
-        <Link href={"/home"} legacyBehavior>
-          <a>Back</a>
+        <Link href={"/account"} legacyBehavior>
+          <a className="btn-primary text-base">Back</a>
         </Link>
         <br />
         <h2>Создать проект</h2>
         <form onSubmit={onSubmit}>
           <button
-            className="btn-blue text-base mt-3"
+            className="btn-primary text-base mt-3"
             onClick={async (e) => {
               e.preventDefault();
               const filePath = await window.electronAPI.openFile();
@@ -35,7 +35,7 @@ function Create() {
           <p>{fileUrl || "Не выбран"}</p>
 
           <input
-            className="btn-blue text-base mt-3"
+            className="btn-primary text-base mt-3"
             type="submit"
             value={"Create"}
           />

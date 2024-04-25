@@ -1,4 +1,4 @@
-import Audio from "./Audio";
+import Retelling from "./Retelling";
 import Bible from "./Bible";
 import BlindEditor from "./BlindEditor";
 import Dictionary from "./Dictionary";
@@ -68,8 +68,8 @@ function Tool({ config, toolName }) {
       CurrentTool = PersonalNotes;
       break;
 
-    case "audio":
-      CurrentTool = Audio;
+    case "retelling":
+      CurrentTool = Retelling;
       break;
 
     case "dictionary":
@@ -85,14 +85,14 @@ function Tool({ config, toolName }) {
   }
   return (
     <>
-      <div className="pt-2.5 px-4 h-10 font-bold bg-blue-300 rounded-t-lg truncate">
+      <div className="pt-2.5 px-4 h-10 font-bold bg-th-primary-200 text-th-text-secondary-100 rounded-t-lg truncate">
         {/* {![
           'translate',
           'commandTranslate',
           'draftTranslate',
           'teamNotes',
           'personalNotes',
-          'audio',
+          'retelling',
           'dictionary',
         ].includes(toolName) &&
           `${t(`books:${config?.reference?.book}`)} ${
