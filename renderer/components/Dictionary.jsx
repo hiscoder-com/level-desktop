@@ -2,6 +2,11 @@ import { useEffect, useMemo, useState } from "react";
 
 import dynamic from "next/dynamic";
 
+import { Disclosure } from "@headlessui/react";
+
+import Modal from "./Modal";
+import { useGetDictionary } from "../hooks/useGetDictionary";
+
 import RightArrow from "../public/icons/right-arrow.svg";
 import LeftArrow from "../public/icons/left-arrow.svg";
 import Close from "../public/icons/close.svg";
@@ -9,10 +14,8 @@ import Trash from "../public/icons/trash.svg";
 import Plus from "../public/icons/plus.svg";
 import Down from "../public/icons/arrow-down.svg";
 import Back from "../public/icons/left.svg";
-
-import { useGetDictionary } from "../hooks/useGetDictionary";
-import Modal from "./Modal";
-import { Disclosure } from "@headlessui/react";
+import Export from "../public/icons/export.svg";
+import Import from "../public/icons/import.svg";
 
 const t = (str) => str;
 
@@ -23,9 +26,16 @@ const Redactor = dynamic(
   }
 );
 
+const MenuButtons = dynamic(
+  () => import("@texttree/v-cana-rcl").then((mod) => mod.MenuButtons),
+  {
+    ssr: false,
+  }
+);
+
 const countWordsOnPage = 10;
 
-function Dictionary({ config: { id }, toolName }) {
+function Dictionary({ config: { id } }) {
   const isRtl = false;
   const [currentPage, setCurrentPage] = useState(0);
   const [isOpenModal, setIsOpenModal] = useState(false);
@@ -112,7 +122,92 @@ function Dictionary({ config: { id }, toolName }) {
     mutate();
     // getWords(searchQuery, currentPage);
   };
+  const importWords = async () => {
+    return;
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = ".json";
 
+    fileInput.addEventListener("change", async (event) => {
+      try {
+        const file = event.target.files[0];
+        if (!file) {
+          throw new Error(t("error:NoFileSelected"));
+        }
+        return;
+        const fileContents = await file.text();
+
+        if (!fileContents.trim()) {
+          throw new Error(t("error:EmptyFileContent"));
+        }
+
+        const importedData = JSON.parse(fileContents);
+        if (importedData.type !== "dictionary") {
+          throw new Error(t("error:ContentError"));
+        }
+
+        for (const word of importedData.data) {
+          const newWord = {
+            id: generateUniqueId(allWords),
+            project_id: project?.id,
+            title: checkAndAppendNewTitle(word.title, allWords),
+            data: word.data,
+            created_at: word.created_at,
+            changed_at: word.changed_at,
+            deleted_at: word.deleted_at,
+          };
+
+          bulkNode(newWord);
+        }
+        getAll();
+        mutate();
+        mutateProject();
+        setAlphabetProject(project?.dictionaries_alphabet);
+      } catch (error) {
+        toast.error(error.message);
+      }
+    });
+
+    fileInput.click();
+  };
+  function exportWords() {
+    return;
+    try {
+      if (!allWords || !allWords.length) {
+        throw new Error(t("error:NoData"));
+      }
+
+      const data = allWords.map((word) => {
+        return {
+          title: word.dict_title,
+          data: word.dict_data,
+          created_at: word.dict_created_at,
+          changed_at: word.dict_changed_at,
+          deleted_at: word.dict_deleted_at,
+        };
+      });
+
+      const jsonString = JSON.stringify({ type: "dictionary", data }, null, 2);
+
+      const blob = new Blob([jsonString], { type: "application/json" });
+
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+
+      const currentDate = new Date();
+      const formattedDate = currentDate.toISOString().split("T")[0];
+
+      const fileName = `dictionary_${formattedDate}.json`;
+
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+
+      document.body.removeChild(link);
+    } catch (error) {
+      toast.error(error.message);
+    }
+  }
   const showError = (err, placeholder) => {
     if (err?.response?.data?.error) {
       setErrorText(`${t("WordExist")} "${placeholder}"`);
@@ -134,15 +229,58 @@ function Dictionary({ config: { id }, toolName }) {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeWord]);
+
+  const dropMenuClassNames = {
+    container: {
+      className:
+        "absolute border rounded z-[100] whitespace-nowrap bg-white shadow",
+    },
+    item: {
+      className: "cursor-pointer bg-th-secondary-100 hover:bg-th-secondary-200",
+    },
+  };
+  const dropMenuItems = {
+    dots: [
+      {
+        id: "export",
+        buttonContent: (
+          <span className="flex items-center gap-2.5 py-1 pr-7 pl-2.5">
+            <Export className="w-5 h-5" /> {"Export"}
+          </span>
+        ),
+        action: () => exportWords(databaseNotes),
+      },
+      {
+        id: "import",
+        buttonContent: (
+          <span className="flex items-center gap-2.5 py-1 pr-7 pl-2.5">
+            <Import className="w-5 h-5" /> {"Import"}
+          </span>
+        ),
+        action: () => importWords(true),
+      },
+    ],
+  };
+
+  const icons = {
+    dots: (
+      <div className="flex items-center justify-center w-6 h-6 space-x-1">
+        {[...Array(3).keys()].map((key) => (
+          <div key={key} className="h-1 w-1 bg-white rounded-full" />
+        ))}
+      </div>
+    ),
+  };
+
   return (
     <div className="relative h-full">
-      <div className="flex gap-4 w-full items-center">
+      <div className="flex gap-2.5 w-full items-center">
         <div className="relative w-full flex items-center ">
           <input
             className="input-primary"
             value={searchQuery}
             onChange={(e) => {
-              // setCurrentPageWords(0);
+              setCurrentPage(0);
               setSearchQuery(e.target.value);
             }}
             placeholder={t("common:Search")}
@@ -156,9 +294,25 @@ function Dictionary({ config: { id }, toolName }) {
             />
           )}
         </div>
-        <button className="btn-tertiary p-3" onClick={addWord}>
-          <Plus className="w-6 h-6 stroke-th-text-secondary stroke-2" />
-        </button>
+        <div className="flex gap-2 ltr:flex-row rtl:flex-row-reverse">
+          <MenuButtons
+            classNames={{
+              dropdown: dropMenuClassNames,
+              button: "btn-tertiary p-3",
+              container: "flex gap-2 relative",
+              buttonContainer: "relative",
+            }}
+            menuItems={dropMenuItems}
+            icons={icons}
+          />
+          <button
+            className="btn-tertiary p-3"
+            onClick={addWord}
+            title={t("common:AddWord")}
+          >
+            <Plus className="w-6 h-6 stroke-th-text-secondary-100 stroke-2" />
+          </button>
+        </div>
       </div>
       <Card>
         <div className="mt-4">
