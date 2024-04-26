@@ -16,6 +16,7 @@ import Down from "../public/icons/arrow-down.svg";
 import Back from "../public/icons/left.svg";
 import Export from "../public/icons/export.svg";
 import Import from "../public/icons/import.svg";
+import { generateUniqueId } from "../helpers/noteEditor";
 
 const t = (str) => str;
 
@@ -122,19 +123,27 @@ function Dictionary({ config: { id } }) {
     mutate();
     // getWords(searchQuery, currentPage);
   };
+
+  function checkAndAppendNewTitle(title, allWords) {
+    const existingTitles = allWords.map((word) => word.title.toLowerCase());
+    let newTitle = title;
+
+    while (existingTitles.includes(newTitle.toLowerCase())) {
+      newTitle += "_new";
+    }
+    return newTitle;
+  }
   const importWords = async () => {
-    return;
+    // return;
     const fileInput = document.createElement("input");
     fileInput.type = "file";
     fileInput.accept = ".json";
-
     fileInput.addEventListener("change", async (event) => {
       try {
         const file = event.target.files[0];
         if (!file) {
           throw new Error(t("error:NoFileSelected"));
         }
-        return;
         const fileContents = await file.text();
 
         if (!fileContents.trim()) {
@@ -142,48 +151,42 @@ function Dictionary({ config: { id } }) {
         }
 
         const importedData = JSON.parse(fileContents);
+
         if (importedData.type !== "dictionary") {
           throw new Error(t("error:ContentError"));
         }
 
         for (const word of importedData.data) {
           const newWord = {
-            id: generateUniqueId(allWords),
-            project_id: project?.id,
-            title: checkAndAppendNewTitle(word.title, allWords),
+            id: generateUniqueId(dictionary.map(({ id }) => id)),
+            title: checkAndAppendNewTitle(word.title, dictionary),
             data: word.data,
-            created_at: word.created_at,
-            changed_at: word.changed_at,
-            deleted_at: word.deleted_at,
           };
-
-          bulkNode(newWord);
+          window.electronAPI.importWord(id, newWord);
         }
         getAll();
         mutate();
-        mutateProject();
-        setAlphabetProject(project?.dictionaries_alphabet);
       } catch (error) {
-        toast.error(error.message);
+        console.log(error.message);
       }
     });
 
     fileInput.click();
   };
   function exportWords() {
-    return;
     try {
-      if (!allWords || !allWords.length) {
+      if (!dictionary || !dictionary.length) {
         throw new Error(t("error:NoData"));
       }
-
-      const data = allWords.map((word) => {
+      const wordIds = dictionary.map(({ id }) => id);
+      const words = window.electronAPI.getWordsWithData(id, wordIds);
+      const data = words.map((word) => {
         return {
-          title: word.dict_title,
-          data: word.dict_data,
-          created_at: word.dict_created_at,
-          changed_at: word.dict_changed_at,
-          deleted_at: word.dict_deleted_at,
+          is_folder: word.is_folder,
+          parent: word.parent,
+          title: word.title,
+          data: word.data,
+          created_at: word.created_at,
         };
       });
 
@@ -248,7 +251,7 @@ function Dictionary({ config: { id } }) {
             <Export className="w-5 h-5" /> {"Export"}
           </span>
         ),
-        action: () => exportWords(databaseNotes),
+        action: () => exportWords(),
       },
       {
         id: "import",
