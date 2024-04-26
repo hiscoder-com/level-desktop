@@ -35,6 +35,12 @@ const NotesEditor = dynamic(
     ssr: false,
   }
 );
+// const Redactor = dynamic(
+//   () => import("@texttree/notepad-rcl").then((mod) => mod.Redactor),
+//   {
+//     ssr: false,
+//   }
+// );
 // const generateUniqueId = dynamic(
 //   () =>
 //     import("@texttree/v-cana-rcl/dist/utils/helper").then(
@@ -132,7 +138,6 @@ export default function PersonalNotes({ config: { id }, toolName }) {
   const [currentNodeProps, setCurrentNodeProps] = useState(null);
   const [noteToDel, setNoteToDel] = useState(null);
   const { data: notes, mutate } = useGetPersonalNotes(id);
-  // console.log(generateUniqueId);
   const saveNote = () => {
     window.electronAPI.updateNote(id, activeNote);
   };
@@ -146,13 +151,14 @@ export default function PersonalNotes({ config: { id }, toolName }) {
   useEffect(() => {
     if (activeNote?.id) {
       const currentNote = window.electronAPI.getNote(id, activeNote?.id);
+      console.log("{ currentNote }", JSON.parse(currentNote));
+      console.log(activeNote, "before");
       setActiveNote(JSON.parse(currentNote));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeNote?.id]);
 
   const handleRenameNode = (newTitle, id) => {
-    console.log(newTitle, id);
     // if (!newTitle.trim()) {
     //   newTitle = t("EmptyTitle");
     // }
@@ -410,6 +416,33 @@ export default function PersonalNotes({ config: { id }, toolName }) {
         handleSaveNote={saveNote}
         isContextMenu
       />
+      {/* <Redactor
+        classes={{
+          title: "p-2 my-4 mr-12 bg-cyan-50 font-bold rounded-lg shadow-md",
+          redactor:
+            "pb-20 pt-4 my-4 bg-cyan-50 overflow-hidden break-words rounded-lg shadow-md",
+        }}
+        activeNote={{
+          id: "00la142ik",
+          createdAt: 1714074557727,
+          title: "12",
+          data: {
+            time: 1714074567618,
+            blocks: [
+              {
+                id: "wTr00FVQab",
+                type: "paragraph",
+                data: {
+                  text: "43r34t5egtet",
+                },
+              },
+            ],
+            version: "2.29.1",
+          },
+          sorting: 1,
+        }}
+        setActiveNote={setActiveNote}
+      /> */}
       {/* {!activeNote ? (
         <div>
           <div className="flex justify-end">

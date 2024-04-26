@@ -105,14 +105,14 @@ ipcMain.on('add-word', (event, projectid, wordid) => {
   const title = date.toLocaleString();
   dictionaryLS.set(wordid, {
     id: wordid,
-    name: title,
+    title,
     parent: null,
-    folder: false,
-    createdAt: date.getTime(),
+    is_folder: false,
+    created_at: date.getTime(),
   });
   const data = {
     id: wordid,
-    createdAt: date.getTime(),
+    created_at: date.getTime(),
     title,
     data: {
       blocks: [],
@@ -129,7 +129,7 @@ ipcMain.on('add-word', (event, projectid, wordid) => {
 });
 
 ipcMain.on('update-word', (event, projectid, word) => {
-  dictionaryLS.set(`${word.id}.name`, word.title);
+  dictionaryLS.set(`${word.id}.title`, word.title);
   fs.writeFileSync(
     path.join(projectUrl, projectid, 'dictionary', word.id + '.json'),
     JSON.stringify(word, null, 2),
@@ -175,7 +175,7 @@ ipcMain.on('add-note', (event, projectid, noteid, isfolder, sorting) => {
   });
   const data = {
     id: noteid,
-    createdAt: date.getTime(),
+    created_at: date.getTime(),
     title,
     data: {
       blocks: [],
