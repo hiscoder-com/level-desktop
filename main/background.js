@@ -105,14 +105,14 @@ ipcMain.on('add-word', (event, projectid, wordid) => {
   const title = date.toLocaleString();
   dictionaryLS.set(wordid, {
     id: wordid,
-    name: title,
+    title,
     parent: null,
-    folder: false,
-    createdAt: date.getTime(),
+    is_folder: false,
+    created_at: date.getTime(),
   });
   const data = {
     id: wordid,
-    createdAt: date.getTime(),
+    created_at: date.getTime(),
     title,
     data: {
       blocks: [],
@@ -128,8 +128,33 @@ ipcMain.on('add-word', (event, projectid, wordid) => {
   event.sender.send('notify', 'Updated');
 });
 
+ipcMain.on('import-word', (event, projectid, newword) => {
+  const { id, title, parent, is_folder, created_at, data: content } = newword;
+  const date = new Date();
+  dictionaryLS.set(id, {
+    id,
+    title,
+    parent,
+    is_folder,
+    created_at: date.getTime(),
+  });
+  const data = {
+    id,
+    created_at: date.getTime(),
+    title,
+    data: content
+  };
+  fs.writeFileSync(
+    path.join(projectUrl, projectid, 'dictionary', id + '.json'),
+    JSON.stringify(data, null, 2),
+    { encoding: 'utf-8' }
+  );
+  event.returnValue = id;
+  event.sender.send('notify', 'Updated');
+});
+
 ipcMain.on('update-word', (event, projectid, word) => {
-  dictionaryLS.set(`${word.id}.name`, word.title);
+  dictionaryLS.set(`${word.id}.title`, word.title);
   fs.writeFileSync(
     path.join(projectUrl, projectid, 'dictionary', word.id + '.json'),
     JSON.stringify(word, null, 2),
@@ -145,6 +170,19 @@ ipcMain.on('get-word', (event, projectid, wordid) => {
     { encoding: 'utf-8' }
   );
   event.returnValue = data;
+  event.sender.send('notify', 'Loaded');
+});
+ipcMain.on('get-words-with-data', (event, projectid, wordids) => {
+  let words = [];
+  wordids.forEach((wordid) => {
+    const data = fs.readFileSync(
+      path.join(projectUrl, projectid, 'dictionary', wordid + '.json'),
+      { encoding: 'utf-8' }
+    );
+    words.push(JSON.parse(data));
+  });
+
+  event.returnValue = words;
   event.sender.send('notify', 'Loaded');
 });
 
@@ -175,7 +213,7 @@ ipcMain.on('add-note', (event, projectid, noteid, isfolder, sorting) => {
   });
   const data = {
     id: noteid,
-    createdAt: date.getTime(),
+    created_at: date.getTime(),
     title,
     data: {
       blocks: [],

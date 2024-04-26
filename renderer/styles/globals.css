@@ -294,7 +294,7 @@
 }
 
 .btn-tertiary {
-  @apply mb-4 right-0 bg-th-primary-100 text-th-text-secondary-100 font-bold rounded-xl cursor-pointer hover:opacity-70;
+  @apply right-0 bg-th-primary-100 text-th-text-secondary-100 font-bold rounded-xl cursor-pointer hover:opacity-70;
 }
 
 .btn-quaternary {
@@ -340,7 +340,7 @@
 }
 
 .input-primary {
-  @apply input-base py-2 text-th-text-primary border-th-secondary-300 focus:border-th-primary-200 placeholder:text-th-secondary-300;
+  @apply input-base py-3 text-th-text-primary border-th-secondary-300 focus:border-th-primary-200 placeholder:text-th-secondary-300;
 }
 
 .input-base-label {

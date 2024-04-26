@@ -29,6 +29,10 @@ process.once('loaded', () => {
       ipcRenderer.sendSync('update-word', projectid, word),
     getWord: (projectid, wordid) =>
       ipcRenderer.sendSync('get-word', projectid, wordid),
+    getWordsWithData: (projectid, wordids) =>
+      ipcRenderer.sendSync('get-words-with-data', projectid, wordids),
+    importWord: (projectid, newword) =>
+      ipcRenderer.sendSync('import-word', projectid, newword),
     removeWord: (projectid, wordid) =>
       ipcRenderer.sendSync('remove-word', projectid, wordid),
     getNotes: () => ipcRenderer.sendSync('get-notes'),

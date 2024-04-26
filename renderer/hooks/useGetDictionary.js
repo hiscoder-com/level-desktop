@@ -12,7 +12,7 @@ export function useGetDictionary({ id }) {
           numeric: true,
           ignorePunctuation: true,
           sensitivity: 'base',
-        }).compare(a.name.toLocaleLowerCase(), b.name.toLocaleLowerCase())
+        }).compare(a.title.toLocaleLowerCase(), b.title.toLocaleLowerCase())
       )
     );
     const alphabetMap = new Map(
@@ -22,11 +22,11 @@ export function useGetDictionary({ id }) {
             numeric: true,
             ignorePunctuation: true,
             sensitivity: 'base',
-          }).compare(a.name.toLocaleLowerCase(), b.name.toLocaleLowerCase())
+          }).compare(a.title.toLocaleLowerCase(), b.title.toLocaleLowerCase())
         )
         .map((el) => [
-          el.name.toLocaleUpperCase()[0],
-          el.name.toLocaleUpperCase()[0],
+          el.title.toLocaleUpperCase()[0],
+          el.title.toLocaleUpperCase()[0],
         ])
     );
     setAlphabet(Array.from(alphabetMap.values()));

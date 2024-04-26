@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@headlessui/react": "1.7.19",
-    "@texttree/notepad-rcl": "2.4.1",
+    "@texttree/notepad-rcl": "^2.4.1",
     "@texttree/tn-quote": "^0.5.0",
     "@texttree/translation-words-helpers": "^0.2.4",
     "@texttree/v-cana-rcl": "file:.yalc/@texttree/v-cana-rcl",
@@ -42,7 +42,7 @@
     "autoprefixer": "^10.4.19",
     "electron": "^30.0.0",
     "electron-builder": "^24.13.3",
-    "next": "14.2.2",
+    "next": "12.3.4",
     "nextron": "^8.15.0",
     "postcss": "^8.4.38",
     "react": "^18.2.0",
