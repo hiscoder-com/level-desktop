@@ -475,11 +475,12 @@ export default function PersonalNotes({ config: { id }, config, toolName }) {
             value={term}
             onChange={(event) => setTerm(event.target.value)}
             placeholder={t("Search")}
+            readOnly={activeNote}
           />
           {term && (
             <Close
               className="absolute р-6 w-6 z-10 cursor-pointer right-2 rtl:left-1"
-              onClick={() => setTerm("")}
+              onClick={() => !activeNote && setTerm("")}
             />
           )}
         </div>
@@ -492,6 +493,7 @@ export default function PersonalNotes({ config: { id }, config, toolName }) {
           }}
           menuItems={dropMenuItems}
           icons={icons}
+          disabled={activeNote}
         />
       </div>
       {!activeNote || !Object.keys(activeNote)?.length ? (

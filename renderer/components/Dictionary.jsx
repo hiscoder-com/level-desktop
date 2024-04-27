@@ -287,13 +287,16 @@ function Dictionary({ config: { id } }) {
               setSearchQuery(e.target.value);
             }}
             placeholder={t("common:Search")}
+            readOnly={activeWord}
           />
           {searchQuery && (
             <Close
               className={`absolute р-6 w-6 z-10 cursor-pointer ${
                 isRtl ? "left-2" : "right-2 "
               }`}
-              onClick={getAll}
+              onClick={() => {
+                !activeWord && getAll();
+              }}
             />
           )}
         </div>
@@ -307,11 +310,13 @@ function Dictionary({ config: { id } }) {
             }}
             menuItems={dropMenuItems}
             icons={icons}
+            disabled={activeWord}
           />
           <button
             className="btn-tertiary p-3"
             onClick={addWord}
             title={t("common:AddWord")}
+            disabled={activeWord}
           >
             <Plus className="w-6 h-6 stroke-th-text-secondary-100 stroke-2" />
           </button>
@@ -325,6 +330,7 @@ function Dictionary({ config: { id } }) {
             setSearchQuery={setSearchQuery}
             setCurrentPage={setCurrentPage}
             t={t}
+            disabled={activeWord}
           />
         </div>
       </Card>
@@ -461,21 +467,22 @@ function Dictionary({ config: { id } }) {
 
 export default Dictionary;
 
-function Alphabet({ alphabet, setCurrentPage, setSearchQuery, t }) {
+function Alphabet({ alphabet, setCurrentPage, setSearchQuery, t, disabled }) {
   return (
     <div className="flex flex-wrap py-3 px-4 bg-th-secondary-100 rounded-lg w-full font-bold">
       {alphabet &&
         alphabet.map((letter) => (
-          <div
+          <button
             onClick={() => {
               setCurrentPage(0);
               setSearchQuery(letter.toLowerCase());
             }}
-            className="px-1.5 cursor-pointer hover:opacity-50"
+            className="px-1.5 cursor-pointer hover:opacity-50 "
             key={letter}
+            disabled={disabled}
           >
             {letter}
-          </div>
+          </button>
         ))}
     </div>
   );
