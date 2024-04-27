@@ -2,9 +2,8 @@ import { useEffect, useState } from "react";
 
 import dynamic from "next/dynamic";
 
-import Close from "../public/icons/close.svg";
-import Trash from "../public/icons/trash.svg";
 import Back from "../public/icons/left.svg";
+import Trash from "../public/icons/trash.svg";
 import FileIcon from "../public/icons/file-icon.svg";
 import CloseFolder from "../public/icons/close-folder.svg";
 import OpenFolder from "../public/icons/open-folder.svg";
@@ -13,13 +12,13 @@ import ArrowRight from "../public/icons/folder-arrow-right.svg";
 import Export from "../public/icons/export.svg";
 import Import from "../public/icons/import.svg";
 import Rename from "../public/icons/rename.svg";
-import Progress from "../public/icons/progress.svg";
+import Close from "../public/icons/close.svg";
 import Plus from "../public/icons/plus.svg";
+import Progress from "../public/icons/progress.svg";
 
 import { useGetPersonalNotes } from "../hooks/useGetPersonalNotes";
 import Modal from "./Modal";
-import { generateUniqueId } from "../helpers/noteEditor";
-// import { generateUniqueId } from "@texttree/v-cana-rcl";
+import { convertNotesToTree, generateUniqueId } from "../helpers/noteEditor";
 
 const t = (str) => str;
 
@@ -29,27 +28,25 @@ const MenuButtons = dynamic(
     ssr: false,
   }
 );
-const NotesEditor = dynamic(
-  () => import("@texttree/v-cana-rcl").then((mod) => mod.NotesEditor),
+
+const ContextMenu = dynamic(
+  () => import("@texttree/notepad-rcl").then((mod) => mod.ContextMenu),
   {
     ssr: false,
   }
 );
-// const Redactor = dynamic(
-//   () => import("@texttree/notepad-rcl").then((mod) => mod.Redactor),
-//   {
-//     ssr: false,
-//   }
-// );
-// const generateUniqueId = dynamic(
-//   () =>
-//     import("@texttree/v-cana-rcl/dist/utils/helper").then(
-//       (mod) => mod.generateUniqueId
-//     ),
-//   {
-//     ssr: false,
-//   }
-// );
+const Redactor = dynamic(
+  () => import("@texttree/notepad-rcl").then((mod) => mod.Redactor),
+  {
+    ssr: false,
+  }
+);
+const TreeView = dynamic(
+  () => import("@texttree/notepad-rcl").then((mod) => mod.TreeView),
+  {
+    ssr: false,
+  }
+);
 
 const icons = {
   file: <FileIcon className="w-6 h-6" />,
@@ -66,126 +63,211 @@ const icons = {
     </div>
   ),
 };
-const classes = {
-  container: "relative",
-  back: "flex w-fit p-1 cursor-pointer hover:opacity-70 rounded-full bg-gray-300",
-  redactor: {
-    title: "p-2 my-4 font-bold rounded-lg shadow-md",
-    redactor:
-      "pb-20 pt-4 px-4 my-4 overflow-hidden break-words rounded-lg shadow-md",
-  },
-  treeView: {
-    nodeWrapper: "flex px-5 leading-[47px] text-lg cursor-pointer rounded-lg",
-    nodeTextBlock: "items-center truncate",
-  },
-  search: {
-    input:
-      "py-2 text-black border-gray focus:border-gray placeholder:text-gray flex-1 px-4 w-full text-sm md:text-base rounded-lg border focus:outline-none",
-    container: "relative flex items-center mb-4",
-    close: "absolute р-6 w-6 right-1 z-10 cursor-pointer",
-  },
-};
-export const style = {
-  nodeWrapper: {
-    lineHeight: "47px",
-    display: "none",
-    fontSize: "18px",
-    cursor: "pointer",
-    paddingLeft: "20px",
-    paddingRight: "20px",
-    borderRadius: "10px",
-    display: "flex",
-    justifyContent: "space-between",
-    backgroundColor: "#EDEDED",
-    hoveredColor: "#D5D5D5",
-    selectedColor: "#bdbdbd",
-  },
-  nodeTextBlock: { alignItems: "center" },
-  nodeButtonBlock: { display: "flex", alignItems: "center", gap: "7px" },
-  searchContainer: {
-    // position: "relative",
-    // marginBottom: "20px",
-    // maxWidth: "500px",
-    // width: "80%",
-  },
-  searchInput: {
-    // border: "0",
-    // borderBottom: "1px solid #555",
-    // background: "transparent",
-    // width: "80%",
-    // padding: "24px 0 5px 0",
-    // fontSize: "14px",
-    // outline: "none",
-    // paddingRight: "40px",
-  },
-  searchLabel: {
-    // position: "absolute",
-    top: "0px",
-    left: "0px",
-    fontSize: "14px",
-    color: "#555",
-    transition: "all 0.5s ease-in-out",
-  },
-  renameButton: { paddingLeft: "30px" },
-  removeButton: { paddingLeft: "5px" },
-  renameInput: { width: "120px" },
-};
 
-export default function PersonalNotes({ config: { id }, toolName }) {
+export default function PersonalNotes({ config: { id }, config, toolName }) {
   const [noteId, setNoteId] = useState("");
+  const [contextMenuEvent, setContextMenuEvent] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hoveredNodeId, setHoveredNodeId] = useState(null);
+  const [isShowMenu, setIsShowMenu] = useState(false);
   const [activeNote, setActiveNote] = useState(null);
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [currentNodeProps, setCurrentNodeProps] = useState(null);
   const [noteToDel, setNoteToDel] = useState(null);
-  const { data: notes, mutate } = useGetPersonalNotes(id);
+  const { data: notesObject, mutate } = useGetPersonalNotes(id);
+  const notes = Object.values(notesObject);
+  const [dataForTreeView, setDataForTreeView] = useState(
+    convertNotesToTree(notes)
+  );
+  const [term, setTerm] = useState("");
+  // const isRtl = config?.isRtl || false;
+  const isRtl = false;
   const saveNote = () => {
     window.electronAPI.updateNote(id, activeNote);
   };
+  useEffect(() => {
+    console.log("object");
+    setDataForTreeView(convertNotesToTree(notes));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [notesObject]);
   const exportNotes = () => {
     // window.electronAPI.exportNotes(id);
   };
   const importNotes = () => {
     // window.electronAPI.importNotes(id);
   };
+  function parseNotesWithTopFolder(notes, user_id, deleted_at) {
+    const exportFolderId = generateUniqueId(allNotes);
+    const exportFolderDateTime = new Date().toISOString().replace(/[:.]/g, "-");
 
-  useEffect(() => {
-    if (activeNote?.id) {
-      const currentNote = window.electronAPI.getNote(id, activeNote?.id);
-      console.log("{ currentNote }", JSON.parse(currentNote));
-      console.log(activeNote, "before");
+    const exportFolder = {
+      id: exportFolderId,
+      user_id,
+      title: `export-${exportFolderDateTime}`,
+      data: null,
+      created_at: new Date().toISOString(),
+      changed_at: new Date().toISOString(),
+      deleted_at,
+      is_folder: true,
+      parent_id: null,
+      sorting: 0,
+    };
+
+    const parsedNotes = parseNotes(notes, user_id, exportFolderId);
+    return [exportFolder, ...parsedNotes];
+  }
+  function parseNotes(notes, user_id, parentId = null) {
+    return notes.reduce((acc, note) => {
+      const id = generateUniqueId(allNotes);
+      const parsedNote = {
+        id: id,
+        user_id,
+        title: note.title,
+        data: parseData(note.data),
+        created_at: note.created_at,
+        changed_at: new Date().toISOString(),
+        deleted_at: note.deleted_at,
+        is_folder: note.is_folder,
+        parent_id: parentId,
+        sorting: note.sorting,
+      };
+
+      acc.push(parsedNote);
+
+      if (note.children?.length > 0) {
+        const childNotes = parseNotes(note.children, user_id, id);
+        acc = acc.concat(childNotes);
+      }
+
+      return acc;
+    }, []);
+  }
+
+  function parseData(data) {
+    if (!data) {
+      return null;
+    }
+
+    return {
+      blocks: data.blocks || [],
+      version: data.version,
+      time: data.time,
+    };
+  }
+
+  // const importNotes = async () => {
+  //   const fileInput = document.createElement("input");
+  //   fileInput.type = "file";
+  //   fileInput.accept = ".json";
+
+  //   fileInput.addEventListener("change", async (event) => {
+  //     try {
+  //       const file = event.target.files[0];
+  //       if (!file) {
+  //         throw new Error(t("error:NoFileSelected"));
+  //       }
+
+  //       const fileContents = await file.text();
+  //       if (!fileContents.trim()) {
+  //         throw new Error(t("error:EmptyFileContent"));
+  //       }
+
+  //       const importedData = JSON.parse(fileContents);
+  //       if (importedData.type !== "personal_notes") {
+  //         throw new Error(t("error:ContentError"));
+  //       }
+  //       const parsedNotes = parseNotesWithTopFolder(
+  //         importedData.data,
+  //         user.id,
+  //         user.deleted_at
+  //       );
+
+  //       for (const note of parsedNotes) {
+  //         bulkNode(note);
+  //       }
+  //     } catch (error) {
+  //       toast.error(error.message);
+  //     }
+  //   });
+
+  //   fileInput.click();
+  // };
+
+  // function exportNotes() {
+  //   try {
+  //     if (!notes || !notes.length) {
+  //       throw new Error(t("error:NoData"));
+  //     }
+  //     const transformedData = formationJSONToTree(notes);
+  //     const jsonContent = JSON.stringify(
+  //       { type: "personal_notes", data: transformedData },
+  //       null,
+  //       2
+  //     );
+
+  //     const blob = new Blob([jsonContent], { type: "application/json" });
+
+  //     const downloadLink = document.createElement("a");
+  //     const currentDate = new Date();
+  //     const formattedDate = currentDate.toISOString().split("T")[0];
+
+  //     const fileName = `personal_notes_${formattedDate}.json`;
+
+  //     const url = URL.createObjectURL(blob);
+
+  //     downloadLink.href = url;
+  //     downloadLink.download = fileName;
+
+  //     document.body.appendChild(downloadLink);
+  //     downloadLink.click();
+  //     document.body.removeChild(downloadLink);
+
+  //     URL.revokeObjectURL(url);
+  //   } catch (error) {
+  //     toast.error(error.message);
+  //   }
+  // }
+
+  const changeNode = (noteId) => {
+    if (noteId) {
+      const currentNote = window.electronAPI.getNote(id, noteId);
       setActiveNote(JSON.parse(currentNote));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeNote?.id]);
+  };
 
-  const handleRenameNode = (newTitle, id) => {
-    // if (!newTitle.trim()) {
-    //   newTitle = t("EmptyTitle");
-    // }
+  const bulkNode = (note) => {
     // axios
-    //   .put(`/api/personal_notes/${id}`, { title: newTitle })
-    //   .then(() => {
-    //     console.log("Note renamed successfully");
-    //     removeCacheNote("personal_notes", id);
-    //     mutate();
+    //   .post("/api/personal_notes/bulk_insert", {
+    //     note: note,
     //   })
-    //   .catch((error) => {
-    //     console.log("Failed to rename note:", error);
-    //   });
+    //   .then(() => mutate())
+    //   .catch(console.log);
+    return;
+  };
+  const handleRenameNode = (newTitle, noteId) => {
+    if (!newTitle.trim()) {
+      newTitle = t("EmptyTitle");
+    }
+    console.log({ noteId });
+    console.log({ activeNote });
+    window.electronAPI.renameNote(id, newTitle, noteId);
+    mutate();
+  };
+  const removeNode = () => {
+    currentNodeProps?.tree.delete(currentNodeProps.node.id);
   };
   function getMaxSorting(notes) {
     if (!notes) return 0;
-    const maxSorting = Object.values(notes).reduce(
+    const maxSorting = notes.reduce(
       (max, note) => (note.sorting > max ? note.sorting : max),
       -1
     );
-    console.log({ maxSorting });
     return maxSorting + 1;
   }
   const addNote = (isFolder = false) => {
     const sorting = getMaxSorting(notes);
 
-    const noteId = generateUniqueId(Object.values(notes));
+    const noteId = generateUniqueId(notes);
     window.electronAPI.addNote(id, noteId, isFolder, sorting);
     mutate();
   };
@@ -213,9 +295,7 @@ export default function PersonalNotes({ config: { id }, toolName }) {
     window.electronAPI.removeAllNotes(id);
     mutate();
   };
-  const removeNode = () => {
-    currentNodeProps?.tree.delete(currentNodeProps.node.id);
-  };
+
   const handleRename = () => {
     currentNodeProps.node.edit();
   };
@@ -300,7 +380,7 @@ export default function PersonalNotes({ config: { id }, toolName }) {
   };
 
   const moveNode = ({ dragIds, parentId, index }) => {
-    const databaseNotes = Object.values(notes);
+    const databaseNotes = notes;
     const draggedNode = databaseNotes.find((node) => node.id === dragIds[0]);
     if (!draggedNode || index < 0) {
       return;
@@ -367,10 +447,24 @@ export default function PersonalNotes({ config: { id }, toolName }) {
       window.electronAPI.updateNotes(id, filteredDraggable.concat(draggedNode));
     }
   };
+  const handleRemoveNode = ({ ids }) => {
+    axios
+      .delete(`/api/personal_notes/${ids[0]}`)
+      .then(() => {
+        removeCacheNote("personal_notes", ids[0]);
+        mutate();
+      })
+      .catch(console.log);
+  };
   const handleDragDrop = ({ dragIds, parentId, index }) => {
     moveNode({ dragIds, parentId, index });
     mutate();
   };
+  const handleContextMenu = (event) => {
+    setIsShowMenu(true);
+    setContextMenuEvent({ event });
+  };
+
   const handleBack = () => {};
   const dropMenuItems = {
     dots: menuItems.menu,
@@ -382,132 +476,112 @@ export default function PersonalNotes({ config: { id }, toolName }) {
     container: menuItems.container,
     item: menuItems.item,
   };
+
   return (
     <>
-      <div className="flex justify-end w-full mb-2">
+      <div className="flex gap-2.5 w-full mb-2">
+        <div className="relative flex items-center mb-4 w-full">
+          <input
+            className="input-primary w-full !pr-8"
+            value={term}
+            onChange={(event) => setTerm(event.target.value)}
+            placeholder={t("Search")}
+          />
+          {term && (
+            <Close
+              className="absolute р-6 w-6 z-10 cursor-pointer right-2 rtl:left-1"
+              onClick={() => setTerm("")}
+            />
+          )}
+        </div>
         <MenuButtons
           classNames={{
             dropdown: dropMenuClassNames,
-            button: "bg-gray-500 text-white p-2 rounded-lg",
-            container: "flex gap-2 relative",
+            button: "btn-tertiary p-3",
+            container: "flex gap-2.5 relative",
             buttonContainer: "relative",
           }}
           menuItems={dropMenuItems}
           icons={icons}
         />
       </div>
-      <NotesEditor
-        style={style}
-        notes={Object.values(notes)}
-        handleDragDrop={handleDragDrop}
-        setActiveNote={setActiveNote}
-        activeNote={activeNote}
-        setCurrentNodeProps={setCurrentNodeProps}
-        currentNodeProps={currentNodeProps}
-        handleRemoveNode={removeNote}
-        handleRenameNode={handleRenameNode}
-        // noteId={noteId}
-        // setNoteId={setNoteId}
-        menuItems={menuItems}
-        icons={icons}
-        classes={classes}
-        isSearch
-        handleBack={handleBack}
-        handleSaveNote={saveNote}
-        isContextMenu
-      />
-      {/* <Redactor
-        classes={{
-          title: "p-2 my-4 mr-12 bg-cyan-50 font-bold rounded-lg shadow-md",
-          redactor:
-            "pb-20 pt-4 my-4 bg-cyan-50 overflow-hidden break-words rounded-lg shadow-md",
-        }}
-        activeNote={{
-          id: "00la142ik",
-          createdAt: 1714074557727,
-          title: "12",
-          data: {
-            time: 1714074567618,
-            blocks: [
-              {
-                id: "wTr00FVQab",
-                type: "paragraph",
-                data: {
-                  text: "43r34t5egtet",
-                },
-              },
-            ],
-            version: "2.29.1",
-          },
-          sorting: 1,
-        }}
-        setActiveNote={setActiveNote}
-      /> */}
-      {/* {!activeNote ? (
-        <div>
-          <div className="flex justify-end">
-            <button
-              className="btn-gray-red mb-4 mr-4"
-              onClick={() => setIsOpenModal(true)}
-              disabled={!Object.values(notes)?.length}
-            >
-              {t("RemoveAll")}
-            </button>
-            <button
-              className="btn-cyan mb-4 text-xl font-bold"
-              onClick={addNote}
-            >
-              +
-            </button>
-          </div>
-          <div>
-            {Object.values(notes).map((el) => (
-              <div
-                key={el.id}
-                className="flex justify-between items-start group my-3 bg-cyan-50 rounded-lg cursor-pointer shadow-md"
-                onClick={() => {
-                  setNoteId(el.id);
+      {!activeNote || !Object.keys(activeNote)?.length ? (
+        <>
+          {!isLoading || notes?.length ? (
+            <>
+              <TreeView
+                term={term}
+                selection={noteId}
+                handleDeleteNode={handleRemoveNode}
+                classes={{
+                  nodeWrapper:
+                    "px-5 leading-[47px] text-lg cursor-pointer rounded-lg bg-th-secondary-100 hover:bg-th-secondary-200 ltr:flex",
+                  nodeTextBlock: "items-center truncate",
                 }}
-              >
-                <div className="p-2 mr-4 font-bold">{el.name}</div>
-                <button
-                  className="p-2 m-1 top-0 opacity-0 group-hover:opacity-100"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setIsOpenModal(true);
-                    setNoteToDel(el);
-                  }}
-                >
-                  <Trash className={"w-4 h-4 text-cyan-800"} />
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
+                data={dataForTreeView}
+                setSelectedNodeId={setNoteId}
+                selectedNodeId={noteId}
+                treeWidth={"w-full"}
+                icons={icons}
+                handleOnClick={(note) => {
+                  changeNode(note.node.data.id);
+                }}
+                handleContextMenu={handleContextMenu}
+                hoveredNodeId={hoveredNodeId}
+                setHoveredNodeId={setHoveredNodeId}
+                getCurrentNodeProps={setCurrentNodeProps}
+                handleRenameNode={handleRenameNode}
+                handleDragDrop={handleDragDrop}
+                openByDefault={false}
+                isRtl={isRtl}
+              />
+              <ContextMenu
+                setIsVisible={setIsShowMenu}
+                isVisible={isShowMenu}
+                nodeProps={currentNodeProps}
+                menuItems={menuItems.contextMenu}
+                clickMenuEvent={contextMenuEvent}
+                classes={{
+                  menuItem: menuItems.item.className,
+                  menuContainer: menuItems.container.className,
+                  emptyMenu: "p-2.5 cursor-pointer text-gray-300",
+                }}
+                isRtl={isRtl}
+              />
+            </>
+          ) : (
+            <Progress className="progress-custom-colors w-14 animate-spin stroke-th-primary-100 mx-auto" />
+          )}
+        </>
       ) : (
         <>
           <div
-            className="absolute top-0 right-0 w-10 pr-3 cursor-pointer"
+            className="flex w-fit p-1 cursor-pointer hover:opacity-70 rounded-full bg-th-secondary-100 absolute mt-2"
             onClick={() => {
               saveNote();
               setActiveNote(null);
-              setNoteId(null);
+              setIsShowMenu(false);
+              localStorage.setItem("activePersonalNote", JSON.stringify({}));
             }}
           >
-            <Close />
+            <Back className="w-8 stroke-th-primary-200" />
           </div>
           <Redactor
             classes={{
-              title: "p-2 my-4 mr-12 bg-cyan-50 font-bold rounded-lg shadow-md",
+              title: "bg-th-secondary-100 p-2 my-4 ml-12 font-bold rounded-lg",
               redactor:
-                "pb-20 pt-4 my-4 bg-cyan-50 overflow-hidden break-words rounded-lg shadow-md",
+                "p-4 my-4 pb-20 bg-th-secondary-100 overflow-hidden break-words rounded-lg",
             }}
             activeNote={activeNote}
             setActiveNote={setActiveNote}
-            placeholder={t("Новая заметка...")}
+            placeholder={t("TextNewNote")}
+            emptyTitle={t("EmptyTitle")}
+            isSelectableTitle
+            isRtl={isRtl}
           />
         </>
-      )} */}
+      )}
+
       <Modal isOpen={isOpenModal} closeHandle={() => setIsOpenModal(false)}>
         <div className="flex flex-col gap-7 items-center">
           <div className="text-center text-2xl">
