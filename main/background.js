@@ -243,6 +243,23 @@ ipcMain.on('update-note', (event, projectid, note) => {
   event.sender.send('notify', 'Updated');
 });
 
+ipcMain.on('rename-note', (event, projectid, title, noteid) => {
+  notesLS.set(`${noteid}.title`, title);
+  const data = fs.readFileSync(
+    path.join(projectUrl, projectid, 'personal-notes', noteid + '.json'),
+    { encoding: 'utf-8' }
+  );
+  const newNote = JSON.parse(data)
+
+  fs.writeFileSync(
+    path.join(projectUrl, projectid, 'personal-notes', noteid + '.json'),
+    JSON.stringify({ ...newNote, title }, null, 2),
+    { encoding: 'utf-8' }
+  );
+  event.returnValue = noteid;
+  event.sender.send('notify', 'Updated');
+});
+
 ipcMain.on('get-note', (event, projectid, noteid) => {
   const data = fs.readFileSync(
     path.join(projectUrl, projectid, 'personal-notes', noteid + '.json'),

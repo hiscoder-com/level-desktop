@@ -40,6 +40,8 @@ process.once('loaded', () => {
       ipcRenderer.sendSync('add-note', projectid, noteid, isfolder, sorting),
     updateNote: (projectid, note) =>
       ipcRenderer.sendSync('update-note', projectid, note),
+    renameNote: (projectid, title, noteid) =>
+      ipcRenderer.sendSync('rename-note', projectid, title, noteid),
     getNote: (projectid, noteid) =>
       ipcRenderer.sendSync('get-note', projectid, noteid),
     removeNote: (projectid, noteid) =>
