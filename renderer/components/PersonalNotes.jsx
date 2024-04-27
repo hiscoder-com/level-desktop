@@ -86,7 +86,6 @@ export default function PersonalNotes({ config: { id }, config, toolName }) {
     window.electronAPI.updateNote(id, activeNote);
   };
   useEffect(() => {
-    console.log("object");
     setDataForTreeView(convertNotesToTree(notes));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [notesObject]);
@@ -248,8 +247,6 @@ export default function PersonalNotes({ config: { id }, config, toolName }) {
     if (!newTitle.trim()) {
       newTitle = t("EmptyTitle");
     }
-    console.log({ noteId });
-    console.log({ activeNote });
     window.electronAPI.renameNote(id, newTitle, noteId);
     mutate();
   };
@@ -272,8 +269,8 @@ export default function PersonalNotes({ config: { id }, config, toolName }) {
     mutate();
   };
 
-  const removeNote = (noteId) => {
-    window.electronAPI.removeNote(id, noteId);
+  const handleRemoveNode = ({ ids }) => {
+    window.electronAPI.removeNote(id, ids[0]);
     mutate();
   };
 
@@ -332,7 +329,7 @@ export default function PersonalNotes({ config: { id }, config, toolName }) {
         id: "delete",
         buttonContent: (
           <span className="flex items-center gap-2.5 py-1 pr-7 pl-2.5">
-            <Trash /> {"Delete"}
+            <Trash className="w-5 h-5" /> {"Delete"}
           </span>
         ),
         action: () => setIsOpenModal(true),
@@ -343,7 +340,7 @@ export default function PersonalNotes({ config: { id }, config, toolName }) {
         id: "export",
         buttonContent: (
           <span className="flex items-center gap-2.5 py-1 pr-7 pl-2.5">
-            <Export /> {"Export"}
+            <Export className="w-4 h-4" /> {"Export"}
           </span>
         ),
         action: () => exportNotes(databaseNotes),
@@ -352,7 +349,7 @@ export default function PersonalNotes({ config: { id }, config, toolName }) {
         id: "import",
         buttonContent: (
           <span className="flex items-center gap-2.5 py-1 pr-7 pl-2.5">
-            <Import /> {"Import"}
+            <Import className="w-4 h-4" /> {"Import"}
           </span>
         ),
         action: () => importNotes(true),
@@ -361,7 +358,7 @@ export default function PersonalNotes({ config: { id }, config, toolName }) {
         id: "remove",
         buttonContent: (
           <span className="flex items-center gap-2.5 py-1 pr-7 pl-2.5">
-            <Trash /> {"Remove all"}
+            <Trash className="w-5 h-5" /> {"Remove all"}
           </span>
         ),
         action: () => {
@@ -447,15 +444,7 @@ export default function PersonalNotes({ config: { id }, config, toolName }) {
       window.electronAPI.updateNotes(id, filteredDraggable.concat(draggedNode));
     }
   };
-  const handleRemoveNode = ({ ids }) => {
-    axios
-      .delete(`/api/personal_notes/${ids[0]}`)
-      .then(() => {
-        removeCacheNote("personal_notes", ids[0]);
-        mutate();
-      })
-      .catch(console.log);
-  };
+
   const handleDragDrop = ({ dragIds, parentId, index }) => {
     moveNode({ dragIds, parentId, index });
     mutate();
@@ -585,36 +574,30 @@ export default function PersonalNotes({ config: { id }, config, toolName }) {
       <Modal isOpen={isOpenModal} closeHandle={() => setIsOpenModal(false)}>
         <div className="flex flex-col gap-7 items-center">
           <div className="text-center text-2xl">
-            {t("Уверены что хотите удалить ") +
+            {t("AreYouSureDelete") +
               " " +
-              t(noteToDel ? noteToDel?.name : t("Все заметки").toLowerCase()) +
+              t(
+                currentNodeProps
+                  ? currentNodeProps.node.data.name
+                  : t("AllNotes").toLowerCase()
+              ) +
               "?"}
           </div>
-          <div className="flex gap-7 w-1/2">
+          <div className="flex gap-7 w-1/2 text-th-text-primary">
             <button
-              className="btn-secondary flex-1"
+              className="btn-base flex-1 bg-th-secondary-10 hover:opacity-70"
               onClick={() => {
                 setIsOpenModal(false);
-                if (noteToDel) {
-                  removeNote(noteToDel.id);
-                  setNoteToDel(null);
-                } else {
-                  removeAllNotes();
-                }
+                currentNodeProps ? removeNode() : removeAllNotes();
               }}
             >
-              {t("Да")}
+              {t("Yes")}
             </button>
             <button
-              className="btn-secondary flex-1"
-              onClick={() => {
-                setIsOpenModal(false);
-                setTimeout(() => {
-                  setNoteToDel(null);
-                }, 1000);
-              }}
+              className="btn-base flex-1 bg-th-secondary-10 hover:opacity-70"
+              onClick={() => setIsOpenModal(false)}
             >
-              {t("Нет")}
+              {t("No")}
             </button>
           </div>
         </div>
