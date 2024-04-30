@@ -430,15 +430,14 @@ export default function PersonalNotes({ config: { id }, config, toolName }) {
   };
 
   const moveNode = ({ dragIds, parentId, index }) => {
-    const databaseNotes = notes;
-    const draggedNode = databaseNotes.find((node) => node.id === dragIds[0]);
+    const draggedNode = notes.find((node) => node.id === dragIds[0]);
     if (!draggedNode || index < 0) {
       return;
     }
     const newSorting = index;
     const oldSorting = draggedNode.sorting;
     const oldParentId = draggedNode.parent_id;
-    const filtered = databaseNotes.filter((note) => note.id !== dragIds[0]);
+    const filtered = notes.filter((note) => note.id !== dragIds[0]);
     if (parentId === oldParentId) {
       if (
         newSorting === oldSorting ||
@@ -472,7 +471,7 @@ export default function PersonalNotes({ config: { id }, config, toolName }) {
       const oldParentNotes = filtered.filter(
         (note) => note.parent_id === oldParentId
       );
-      const newParentNotes = databaseNotes.filter(
+      const newParentNotes = notes.filter(
         (note) => note.parent_id === parentId
       );
 

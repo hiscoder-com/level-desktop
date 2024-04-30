@@ -332,14 +332,8 @@ ipcMain.on('remove-all-notes', (event, projectid) => {
 
 ipcMain.on('update-notes', (event, projectid, notes) => {
   notes.forEach((note) => {
-    notesLS.set(`${note.id}.title`, note.title);
     notesLS.set(`${note.id}.parent_id`, note.parent_id);
     notesLS.set(`${note.id}.sorting`, note.sorting);
-    fs.writeFileSync(
-      path.join(projectUrl, projectid, 'personal-notes', note.id + '.json'),
-      JSON.stringify(note, null, 2),
-      { encoding: 'utf-8' }
-    );
 
   });
   event.returnValue = projectid;
