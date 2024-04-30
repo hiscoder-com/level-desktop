@@ -134,7 +134,6 @@ function Dictionary({ config: { id } }) {
     return newTitle;
   }
   const importWords = async () => {
-    // return;
     const fileInput = document.createElement("input");
     fileInput.type = "file";
     fileInput.accept = ".json";
@@ -291,9 +290,7 @@ function Dictionary({ config: { id } }) {
           />
           {searchQuery && (
             <Close
-              className={`absolute р-6 w-6 z-10 cursor-pointer ${
-                isRtl ? "left-2" : "right-2 "
-              }`}
+              className="absolute р-6 w-6 z-10 cursor-pointer right-2 rtl:left-1"
               onClick={() => {
                 !activeWord && getAll();
               }}

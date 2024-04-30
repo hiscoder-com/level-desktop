@@ -152,6 +152,31 @@ ipcMain.on('import-word', (event, projectid, newword) => {
   event.returnValue = id;
   event.sender.send('notify', 'Updated');
 });
+ipcMain.on('import-note', (event, projectid, note) => {
+  const { id, title, parent_id, is_folder, data: content, sorting } = note;
+  const date = new Date();
+  notesLS.set(id, {
+    id,
+    title,
+    parent_id,
+    is_folder,
+    created_at: date.getTime(),
+    sorting
+  });
+  const data = {
+    id,
+    created_at: date.getTime(),
+    title,
+    data: content, sorting, is_folder, parent_id
+  };
+  fs.writeFileSync(
+    path.join(projectUrl, projectid, 'personal-notes', id + '.json'),
+    JSON.stringify(data, null, 2),
+    { encoding: 'utf-8' }
+  );
+  event.returnValue = id;
+  event.sender.send('notify', 'Updated');
+});
 
 ipcMain.on('update-word', (event, projectid, word) => {
   dictionaryLS.set(`${word.id}.title`, word.title);
@@ -200,6 +225,24 @@ ipcMain.on('get-notes', (event) => {
   event.sender.send('notify', 'Loaded');
 });
 
+ipcMain.on('get-notes-with-data', (event, projectid) => {
+  let notes = [];
+  for (const noteId in notesLS.store) {
+    if (Object.hasOwnProperty.call(notesLS.store, noteId)) {
+      const note = notesLS.store[noteId]
+      const newNote = fs.readFileSync(
+        path.join(projectUrl, projectid, 'personal-notes', note.id + '.json'),
+        { encoding: 'utf-8' }
+      );
+      const { data } = JSON.parse(newNote)
+      notes.push({ ...note, data });
+    }
+  }
+
+  event.returnValue = notes;
+  event.sender.send('notify', 'Loaded');
+});
+
 ipcMain.on('add-note', (event, projectid, noteid, isfolder, sorting) => {
   const date = new Date();
   const title = date.toLocaleString();
@@ -219,7 +262,6 @@ ipcMain.on('add-note', (event, projectid, noteid, isfolder, sorting) => {
       blocks: [],
       version: '2.29.1',
     },
-    sorting
   };
   fs.writeFileSync(
     path.join(projectUrl, projectid, 'personal-notes', noteid + '.json'),
@@ -290,7 +332,7 @@ ipcMain.on('remove-all-notes', (event, projectid) => {
 
 ipcMain.on('update-notes', (event, projectid, notes) => {
   notes.forEach((note) => {
-    notesLS.set(`${note.id}.title`, note.title.slice(0, -1) + note.sorting);
+    notesLS.set(`${note.id}.title`, note.title);
     notesLS.set(`${note.id}.parent_id`, note.parent_id);
     notesLS.set(`${note.id}.sorting`, note.sorting);
     fs.writeFileSync(
