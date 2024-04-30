@@ -549,82 +549,85 @@ export default function PersonalNotes({ config: { id }, config, toolName }) {
           disabled={activeNote}
         />
       </div>
-      {!activeNote || !Object.keys(activeNote)?.length ? (
-        <>
-          {!isLoading || notes?.length ? (
-            <>
-              <TreeView
-                term={term}
-                selection={noteId}
-                handleDeleteNode={handleRemoveNode}
-                classes={{
-                  nodeWrapper:
-                    "px-5 leading-[47px] text-lg cursor-pointer rounded-lg bg-th-secondary-100 hover:bg-th-secondary-200 ltr:flex",
-                  nodeTextBlock: "items-center truncate",
-                }}
-                data={dataForTreeView}
-                setSelectedNodeId={setNoteId}
-                selectedNodeId={noteId}
-                treeWidth={"w-full"}
-                icons={icons}
-                handleOnClick={(note) => {
-                  changeNode(note.node.data.id);
-                }}
-                handleContextMenu={handleContextMenu}
-                hoveredNodeId={hoveredNodeId}
-                setHoveredNodeId={setHoveredNodeId}
-                getCurrentNodeProps={setCurrentNodeProps}
-                handleRenameNode={handleRenameNode}
-                handleDragDrop={handleDragDrop}
-                openByDefault={false}
-                isRtl={isRtl}
-              />
-              <ContextMenu
-                setIsVisible={setIsShowMenu}
-                isVisible={isShowMenu}
-                nodeProps={currentNodeProps}
-                menuItems={menuItems.contextMenu}
-                clickMenuEvent={contextMenuEvent}
-                classes={{
-                  menuItem: menuItems.item.className,
-                  menuContainer: menuItems.container.className,
-                  emptyMenu: "p-2.5 cursor-pointer text-gray-300",
-                }}
-                isRtl={isRtl}
-              />
-            </>
-          ) : (
-            <Progress className="progress-custom-colors w-14 animate-spin stroke-th-primary-100 mx-auto" />
-          )}
-        </>
-      ) : (
-        <>
-          <div
-            className="flex w-fit p-1 cursor-pointer hover:opacity-70 rounded-full bg-th-secondary-100 absolute mt-2"
-            onClick={() => {
-              saveNote();
-              setActiveNote(null);
-              setIsShowMenu(false);
-              localStorage.setItem("activePersonalNote", JSON.stringify({}));
-            }}
-          >
-            <Back className="w-8 stroke-th-primary-200" />
-          </div>
-          <Redactor
-            classes={{
-              title: "bg-th-secondary-100 p-2 my-4 ml-12 font-bold rounded-lg",
-              redactor:
-                "p-4 my-4 pb-20 bg-th-secondary-100 overflow-hidden break-words rounded-lg",
-            }}
-            activeNote={activeNote}
-            setActiveNote={setActiveNote}
-            placeholder={t("TextNewNote")}
-            emptyTitle={t("EmptyTitle")}
-            isSelectableTitle
-            isRtl={isRtl}
-          />
-        </>
-      )}
+      <div className="relative">
+        {!activeNote || !Object.keys(activeNote)?.length ? (
+          <>
+            {!isLoading || notes?.length ? (
+              <>
+                <TreeView
+                  term={term}
+                  selection={noteId}
+                  handleDeleteNode={handleRemoveNode}
+                  classes={{
+                    nodeWrapper:
+                      "px-5 leading-[47px] text-lg cursor-pointer rounded-lg bg-th-secondary-100 hover:bg-th-secondary-200 ltr:flex",
+                    nodeTextBlock: "items-center truncate",
+                  }}
+                  data={dataForTreeView}
+                  setSelectedNodeId={setNoteId}
+                  selectedNodeId={noteId}
+                  treeWidth={"w-full"}
+                  icons={icons}
+                  handleOnClick={(note) => {
+                    changeNode(note.node.data.id);
+                  }}
+                  handleContextMenu={handleContextMenu}
+                  hoveredNodeId={hoveredNodeId}
+                  setHoveredNodeId={setHoveredNodeId}
+                  getCurrentNodeProps={setCurrentNodeProps}
+                  handleRenameNode={handleRenameNode}
+                  handleDragDrop={handleDragDrop}
+                  openByDefault={false}
+                  isRtl={isRtl}
+                />
+                <ContextMenu
+                  setIsVisible={setIsShowMenu}
+                  isVisible={isShowMenu}
+                  nodeProps={currentNodeProps}
+                  menuItems={menuItems.contextMenu}
+                  clickMenuEvent={contextMenuEvent}
+                  classes={{
+                    menuItem: menuItems.item.className,
+                    menuContainer: menuItems.container.className,
+                    emptyMenu: "p-2.5 cursor-pointer text-gray-300",
+                  }}
+                  isRtl={isRtl}
+                />
+              </>
+            ) : (
+              <Progress className="progress-custom-colors w-14 animate-spin stroke-th-primary-100 mx-auto" />
+            )}
+          </>
+        ) : (
+          <>
+            <div
+              className="flex w-fit p-1 cursor-pointer hover:opacity-70 rounded-full bg-th-secondary-100 absolute"
+              onClick={() => {
+                saveNote();
+                setActiveNote(null);
+                setIsShowMenu(false);
+                localStorage.setItem("activePersonalNote", JSON.stringify({}));
+              }}
+            >
+              <Back className="w-8 stroke-th-primary-200" />
+            </div>
+            <Redactor
+              classes={{
+                title:
+                  "bg-th-secondary-100 p-2 my-4 ml-12 font-bold rounded-lg",
+                redactor:
+                  "p-4 my-4 pb-20 bg-th-secondary-100 overflow-hidden break-words rounded-lg",
+              }}
+              activeNote={activeNote}
+              setActiveNote={setActiveNote}
+              placeholder={t("TextNewNote")}
+              emptyTitle={t("EmptyTitle")}
+              isSelectableTitle
+              isRtl={isRtl}
+            />
+          </>
+        )}
+      </div>
 
       <Modal isOpen={isOpenModal} closeHandle={() => setIsOpenModal(false)}>
         <div className="flex flex-col gap-7 items-center">
