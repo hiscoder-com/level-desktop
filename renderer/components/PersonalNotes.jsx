@@ -73,7 +73,6 @@ export default function PersonalNotes({ config: { id }, config, toolName }) {
   const [activeNote, setActiveNote] = useState(null);
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [currentNodeProps, setCurrentNodeProps] = useState(null);
-  const [noteToDel, setNoteToDel] = useState(null);
   const { data: notesObject, mutate } = useGetPersonalNotes(id);
   const notes = Object.values(notesObject);
   const [dataForTreeView, setDataForTreeView] = useState(
@@ -89,38 +88,30 @@ export default function PersonalNotes({ config: { id }, config, toolName }) {
     setDataForTreeView(convertNotesToTree(notes));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [notesObject]);
-  const exportNotes = () => {
-    // window.electronAPI.exportNotes(id);
-  };
-  const importNotes = () => {
-    // window.electronAPI.importNotes(id);
-  };
-  function parseNotesWithTopFolder(notes, user_id, deleted_at) {
-    const exportFolderId = generateUniqueId(allNotes);
+
+  function parseNotesWithTopFolder(notes, maxsorting = 0) {
+    const exportFolderId = generateUniqueId(notes.map(({ id }) => id));
     const exportFolderDateTime = new Date().toISOString().replace(/[:.]/g, "-");
 
     const exportFolder = {
       id: exportFolderId,
-      user_id,
       title: `export-${exportFolderDateTime}`,
       data: null,
       created_at: new Date().toISOString(),
       changed_at: new Date().toISOString(),
-      deleted_at,
       is_folder: true,
       parent_id: null,
-      sorting: 0,
+      sorting: maxsorting,
     };
 
-    const parsedNotes = parseNotes(notes, user_id, exportFolderId);
+    const parsedNotes = parseNotes(notes, exportFolderId);
     return [exportFolder, ...parsedNotes];
   }
-  function parseNotes(notes, user_id, parentId = null) {
+  function parseNotes(notes, parentId = null) {
     return notes.reduce((acc, note) => {
-      const id = generateUniqueId(allNotes);
+      const id = generateUniqueId(notes.map(({ id }) => id));
       const parsedNote = {
         id: id,
-        user_id,
         title: note.title,
         data: parseData(note.data),
         created_at: note.created_at,
@@ -134,7 +125,7 @@ export default function PersonalNotes({ config: { id }, config, toolName }) {
       acc.push(parsedNote);
 
       if (note.children?.length > 0) {
-        const childNotes = parseNotes(note.children, user_id, id);
+        const childNotes = parseNotes(note.children, id);
         acc = acc.concat(childNotes);
       }
 
@@ -154,78 +145,156 @@ export default function PersonalNotes({ config: { id }, config, toolName }) {
     };
   }
 
-  // const importNotes = async () => {
-  //   const fileInput = document.createElement("input");
-  //   fileInput.type = "file";
-  //   fileInput.accept = ".json";
+  function getMaxSorting(notes) {
+    if (!notes || notes.length === 0) return 0;
+    const maxSorting = notes.reduce(
+      (max, note) => (note.sorting > max ? note.sorting : max),
+      -1
+    );
+    return maxSorting + 1;
+  }
+  const getMaxSortingNullParent = (notes) => {
+    if (notes?.length === 0) {
+      return 0;
+    }
+    const notesNullParent = notes.filter(({ parent_id }) => !parent_id);
 
-  //   fileInput.addEventListener("change", async (event) => {
-  //     try {
-  //       const file = event.target.files[0];
-  //       if (!file) {
-  //         throw new Error(t("error:NoFileSelected"));
-  //       }
+    return getMaxSorting(notesNullParent);
+  };
+  const importNotes = async () => {
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = ".json";
 
-  //       const fileContents = await file.text();
-  //       if (!fileContents.trim()) {
-  //         throw new Error(t("error:EmptyFileContent"));
-  //       }
+    fileInput.addEventListener("change", async (event) => {
+      try {
+        const file = event.target.files[0];
+        if (!file) {
+          throw new Error(t("error:NoFileSelected"));
+        }
 
-  //       const importedData = JSON.parse(fileContents);
-  //       if (importedData.type !== "personal_notes") {
-  //         throw new Error(t("error:ContentError"));
-  //       }
-  //       const parsedNotes = parseNotesWithTopFolder(
-  //         importedData.data,
-  //         user.id,
-  //         user.deleted_at
-  //       );
+        const fileContents = await file.text();
+        if (!fileContents.trim()) {
+          throw new Error(t("error:EmptyFileContent"));
+        }
 
-  //       for (const note of parsedNotes) {
-  //         bulkNode(note);
-  //       }
-  //     } catch (error) {
-  //       toast.error(error.message);
-  //     }
-  //   });
+        const importedData = JSON.parse(fileContents);
+        if (importedData.type !== "personal_notes") {
+          throw new Error(t("error:ContentError"));
+        }
+        const maxSorting = getMaxSortingNullParent(notes);
+        const parsedNotes = parseNotesWithTopFolder(
+          importedData.data,
+          maxSorting
+        );
+        for (const note of parsedNotes) {
+          const newNote = {
+            id: generateUniqueId(parsedNotes.map(({ id }) => id)),
+            ...note,
+          };
+          window.electronAPI.importNote(id, newNote);
+        }
+        mutate();
+      } catch (error) {
+        console.log(error.message);
+      }
+    });
 
-  //   fileInput.click();
-  // };
+    fileInput.click();
+  };
+  function buildTree(items) {
+    if (!items) {
+      return;
+    }
 
-  // function exportNotes() {
-  //   try {
-  //     if (!notes || !notes.length) {
-  //       throw new Error(t("error:NoData"));
-  //     }
-  //     const transformedData = formationJSONToTree(notes);
-  //     const jsonContent = JSON.stringify(
-  //       { type: "personal_notes", data: transformedData },
-  //       null,
-  //       2
-  //     );
+    const tree = [];
+    const itemMap = {};
 
-  //     const blob = new Blob([jsonContent], { type: "application/json" });
+    items.forEach((item) => {
+      item.children = [];
+      itemMap[item.id] = item;
+    });
 
-  //     const downloadLink = document.createElement("a");
-  //     const currentDate = new Date();
-  //     const formattedDate = currentDate.toISOString().split("T")[0];
+    items.forEach((item) => {
+      if (item?.parent_id) {
+        const parentItem = itemMap[item.parent_id];
+        if (parentItem) {
+          parentItem.children.push(item);
+        } else {
+          console.error(
+            `Parent item with id ${item.parent_id} not found for item with id ${item.id}`
+          );
+        }
+      } else {
+        tree.push(item);
+      }
+    });
 
-  //     const fileName = `personal_notes_${formattedDate}.json`;
+    return tree;
+  }
+  function removeIdsFromTree(tree) {
+    function removeIdsFromItem(item) {
+      delete item.id;
+      delete item.parent_id;
+      delete item?.user_id;
+      delete item?.project_id;
 
-  //     const url = URL.createObjectURL(blob);
+      item?.data?.blocks?.forEach((block) => delete block.id);
+      item.children.forEach((child) => removeIdsFromItem(child));
+    }
 
-  //     downloadLink.href = url;
-  //     downloadLink.download = fileName;
+    if (!tree) {
+      return;
+    }
 
-  //     document.body.appendChild(downloadLink);
-  //     downloadLink.click();
-  //     document.body.removeChild(downloadLink);
+    tree.forEach((item) => removeIdsFromItem(item));
 
-  //     URL.revokeObjectURL(url);
-  //   } catch (error) {
-  //     toast.error(error.message);
-  //   }
-  // }
+    return tree;
+  }
+
+  function formationJSONToTree(data) {
+    const treeData = buildTree(data);
+    const transformedData = removeIdsFromTree(treeData);
+
+    return transformedData;
+  }
+  function exportNotes() {
+    try {
+      if (!notes || !notes.length) {
+        throw new Error(t("error:NoData"));
+      }
+      const notesWithData = window.electronAPI.getNotesWithData(id);
+
+      const transformedData = formationJSONToTree(notesWithData);
+
+      const jsonContent = JSON.stringify(
+        { type: "personal_notes", data: transformedData },
+        null,
+        2
+      );
+
+      const blob = new Blob([jsonContent], { type: "application/json" });
+
+      const downloadLink = document.createElement("a");
+      const currentDate = new Date();
+      const formattedDate = currentDate.toISOString().split("T")[0];
+
+      const fileName = `personal_notes_${formattedDate}.json`;
+
+      const url = URL.createObjectURL(blob);
+
+      downloadLink.href = url;
+      downloadLink.download = fileName;
+
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
 
   const changeNode = (noteId) => {
     if (noteId) {
@@ -234,15 +303,6 @@ export default function PersonalNotes({ config: { id }, config, toolName }) {
     }
   };
 
-  const bulkNode = (note) => {
-    // axios
-    //   .post("/api/personal_notes/bulk_insert", {
-    //     note: note,
-    //   })
-    //   .then(() => mutate())
-    //   .catch(console.log);
-    return;
-  };
   const handleRenameNode = (newTitle, noteId) => {
     if (!newTitle.trim()) {
       newTitle = t("EmptyTitle");
@@ -253,14 +313,7 @@ export default function PersonalNotes({ config: { id }, config, toolName }) {
   const removeNode = () => {
     currentNodeProps?.tree.delete(currentNodeProps.node.id);
   };
-  function getMaxSorting(notes) {
-    if (!notes) return 0;
-    const maxSorting = notes.reduce(
-      (max, note) => (note.sorting > max ? note.sorting : max),
-      -1
-    );
-    return maxSorting + 1;
-  }
+
   const addNote = (isFolder = false) => {
     const sorting = getMaxSorting(notes);
 
@@ -343,7 +396,7 @@ export default function PersonalNotes({ config: { id }, config, toolName }) {
             <Export className="w-4 h-4" /> {"Export"}
           </span>
         ),
-        action: () => exportNotes(databaseNotes),
+        action: () => exportNotes(),
       },
       {
         id: "import",

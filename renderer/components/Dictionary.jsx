@@ -134,7 +134,6 @@ function Dictionary({ config: { id } }) {
     return newTitle;
   }
   const importWords = async () => {
-    // return;
     const fileInput = document.createElement("input");
     fileInput.type = "file";
     fileInput.accept = ".json";

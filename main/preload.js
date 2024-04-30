@@ -31,11 +31,15 @@ process.once('loaded', () => {
       ipcRenderer.sendSync('get-word', projectid, wordid),
     getWordsWithData: (projectid, wordids) =>
       ipcRenderer.sendSync('get-words-with-data', projectid, wordids),
-    importWord: (projectid, newword) =>
-      ipcRenderer.sendSync('import-word', projectid, newword),
+    importWord: (projectid, note) =>
+      ipcRenderer.sendSync('import-word', projectid, note),
+    importNote: (projectid, note) =>
+      ipcRenderer.sendSync('import-note', projectid, note),
     removeWord: (projectid, wordid) =>
       ipcRenderer.sendSync('remove-word', projectid, wordid),
     getNotes: () => ipcRenderer.sendSync('get-notes'),
+    getNotesWithData: (projectid) =>
+      ipcRenderer.sendSync('get-notes-with-data', projectid),
     addNote: (projectid, noteid, isfolder, sorting) =>
       ipcRenderer.sendSync('add-note', projectid, noteid, isfolder, sorting),
     updateNote: (projectid, note) =>
