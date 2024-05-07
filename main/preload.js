@@ -17,6 +17,8 @@ process.once('loaded', () => {
       ipcRenderer.sendSync('get-chapter', projectid, chapter),
     updateChapter: (projectid, chapter, data) =>
       ipcRenderer.sendSync('update-chapter', projectid, chapter, data),
+    divideVerse: (projectid, chapter, verse, enabled) =>
+      ipcRenderer.send('divide-verse', projectid, chapter, verse, enabled),
     updateVerse: (projectid, chapter, verse, text) =>
       ipcRenderer.send('update-verse', projectid, chapter, verse, text),
     getItem: (key) => ipcRenderer.sendSync('get-item', key),

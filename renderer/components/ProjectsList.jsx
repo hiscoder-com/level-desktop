@@ -2,7 +2,6 @@ import Link from "next/link";
 import React from "react";
 
 function ProjectsList({ projects }) {
-  console.log(projects);
   return (
     <table className="border-collapse table-auto w-full text-sm">
       <thead>

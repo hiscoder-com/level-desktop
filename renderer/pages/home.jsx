@@ -1,11 +1,9 @@
 import React from "react";
 import Head from "next/head";
 
-import StartPage from "../components/StartPage/StartPage";
+import StartPage from "../components/StartPage";
 
 function Home() {
-  const [projects, setProjects] = React.useState([]);
-
   return (
     <>
       <Head>

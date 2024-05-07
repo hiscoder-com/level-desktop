@@ -8,6 +8,7 @@ import PersonalNotes from "./PersonalNotes";
 import TN from "./TN";
 import TQ from "./TQ";
 import TWL from "./TWL";
+import Divider from "./Divider";
 
 function Tool({ config, toolName }) {
   let CurrentTool;
@@ -16,6 +17,9 @@ function Tool({ config, toolName }) {
   switch (toolName) {
     case "bible":
       CurrentTool = Bible;
+      break;
+    case "divider":
+      CurrentTool = Divider;
       break;
 
     // case 'OBS Translation Questions':

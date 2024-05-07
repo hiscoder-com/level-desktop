@@ -386,6 +386,22 @@ ipcMain.on('update-verse', (event, projectid, chapter, verse, text) => {
   event.sender.send('notify', 'Updated');
 });
 
+ipcMain.on('divide-verse', (event, projectid, chapter, verse, enabled) => {
+  const chapterData = JSON.parse(
+    fs.readFileSync(
+      path.join(projectUrl, projectid, 'chapters', chapter + '.json'),
+      { encoding: 'utf-8' }
+    )
+  );
+  chapterData[verse].enabled = enabled;
+  fs.writeFileSync(
+    path.join(projectUrl, projectid, 'chapters', chapter + '.json'),
+    JSON.stringify(chapterData, null, 2),
+    { encoding: 'utf-8' }
+  );
+  event.sender.send('notify', 'Updated');
+});
+
 ipcMain.on('set-item', (event, key, val) => {
   storeLS.set(key, val);
   event.sender.send('notify', 'Updated');

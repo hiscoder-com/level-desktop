@@ -2,7 +2,6 @@ import React from "react";
 import Head from "next/head";
 import Link from "next/link";
 import ProjectsList from "../components/ProjectsList";
-import StartPage from "../components/StartPage/StartPage";
 
 function Home() {
   const [projects, setProjects] = React.useState([]);
@@ -18,7 +17,6 @@ function Home() {
       </Head>
       <div className="text-2xl w-full">
         <h2 className="mt-6 mb-6 text-4xl ">Projects</h2>
-        {/* <StartPage /> */}
         <Link href="/home" legacyBehavior>
           <a className="btn-primary text-base">Go to home</a>
         </Link>

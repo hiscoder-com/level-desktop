@@ -1,11 +1,18 @@
 import { useEffect, useState } from 'react';
 
-export function useGetTwlResource({ id, resource, mainResource, chapter }) {
+export function useGetTwlResource({ id, resource, mainResource, chapter, wholeChapter }) {
   const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState([]);
   useEffect(() => {
     const twl = window.electronAPI.getTWL(id, resource, mainResource, chapter);
-    setData(twl);
+    if (wholeChapter === false) {
+      const verses = window.electronAPI.getChapter(id, chapter);
+      const versesEnabled = Object.keys(verses).reduce((acc, key) => {
+        acc[key] = verses[key].enabled;
+        return acc;
+      }, {});
+      setData(twl.filter((v) => versesEnabled[v.verse]));
+    } else { setData(twl) }
     setIsLoading(false);
   }, [id, resource, chapter]);
 

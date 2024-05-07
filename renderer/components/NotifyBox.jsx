@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 
 function NotifyBox() {
   const [notify, setNotify] = useState(false);
   useEffect(() => {
     window.electronAPI.notify((data) => {
-      console.log({ notifydata: data });
       setNotify(data);
       setTimeout(() => {
         setNotify(false);

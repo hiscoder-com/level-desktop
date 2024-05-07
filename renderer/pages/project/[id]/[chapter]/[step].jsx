@@ -69,7 +69,6 @@ function StepPage() {
     }
   };
 
-  console.log(project);
   return (
     <div className="w-full">
       <Breadcrumbs
@@ -96,6 +95,7 @@ function StepPage() {
                 id={id}
                 chapter={chapter}
                 toolNames={project.resources}
+                stepConfig={project.steps[step]}
               />
             </div>
           ))}
@@ -127,8 +127,7 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-function Panel({ tools, mainResource, id, chapter, toolNames }) {
-  console.log(tools);
+function Panel({ tools, mainResource, id, chapter, toolNames, stepConfig }) {
   return (
     <Tab.Group>
       <Tab.List className="space-x-3 text-xs px-3 -mb-2 lg:-mb-7 flex overflow-auto">
@@ -173,6 +172,7 @@ function Panel({ tools, mainResource, id, chapter, toolNames }) {
                     id,
                     chapter,
                     ...tool.config,
+                    wholeChapter: stepConfig.whole_chapter,
                   }}
                   toolName={tool.name}
                 />

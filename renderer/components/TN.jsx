@@ -34,7 +34,7 @@ function filterNotes(newNote, verse, notes) {
 }
 
 function TN({
-  config: { resource, id, mainResource, chapter = false },
+  config: { resource, id, mainResource, chapter = false, wholeChapter },
   toolName,
 }) {
   const [currentScrollVerse, setCurrentScrollVerse] =
@@ -45,6 +45,7 @@ function TN({
     resource,
     mainResource,
     chapter,
+    wholeChapter,
   });
 
   useEffect(() => {

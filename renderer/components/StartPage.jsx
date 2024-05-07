@@ -1,9 +1,9 @@
 import { useTranslation } from "next-i18next";
 
-import VcanaLogo from "../../public/icons/vcana-logo-color.svg";
+import VcanaLogo from "../public/icons/vcana-logo-color.svg";
 import Link from "next/link";
 
-function StartPage({ defaultContentKey = null }) {
+function StartPage() {
   const { t } = useTranslation(["start-page", "projects", "users", "common"]);
 
   return (

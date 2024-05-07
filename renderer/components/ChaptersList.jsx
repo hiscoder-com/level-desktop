@@ -2,7 +2,6 @@ import Link from "next/link";
 import React from "react";
 
 function ChapterList({ id, chapters, steps, mutate }) {
-  console.log({ id, chapters, steps });
   const handleBackStep = (chapter, step) => {
     const backStep = window.electronAPI.goToStep(id, chapter, step - 1);
     if (backStep !== step) {
