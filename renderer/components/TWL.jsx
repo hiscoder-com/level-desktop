@@ -58,7 +58,7 @@ function filterNotes(newNote, verse, notes) {
 }
 
 function TWL({
-  config: { resource, id, mainResource, chapter = false },
+  config: { resource, id, mainResource, chapter = false, wholeChapter },
   toolName,
 }) {
   const [currentScrollVerse, setCurrentScrollVerse] =
@@ -70,12 +70,14 @@ function TWL({
     resource,
     mainResource,
     chapter,
+    wholeChapter,
   });
   const [wordObjects, setWordObjects] = useState([]);
   const [isLoadingTW, setIsLoadingTW] = useState(false);
   useEffect(() => {
     const getData = async () => {
       setIsLoadingTW(true);
+
       const zip = await getFile({
         id,
         resource,
@@ -119,7 +121,7 @@ function TWL({
     getData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
-
+  // console.log({ wordObjects });
   return (
     <div id="container_tw" className="overflow-y-auto h-full">
       {!word && (
@@ -173,80 +175,6 @@ function TWL({
 }
 
 export default TWL;
-
-// function TWLList({ setItem, data, toolName, isLoading }) {
-//   const [verses, setVerses] = useState([]);
-
-//   const [filter, setFilter] = useState(() => {
-//     return checkLSVal("filter_words", "disabled", "string");
-//   });
-//   const { highlightId, handleSaveScroll } = useScroll({
-//     toolName,
-//     isLoading,
-//     idPrefix: "idtwl",
-//   });
-
-//   useEffect(() => {
-//     window.electronAPI.setItem("filter_words", filter);
-//   }, [filter]);
-
-//   useEffect(() => {
-//     if (data) {
-//       setVerses(Object.entries(data));
-//     }
-//   }, [data]);
-
-//   return (
-//     <>
-//       {!word && (
-//         <div className="text-center mb-2">
-//           {<FilterRepeated filter={filter} setFilter={setFilter} />}
-//         </div>
-//       )}
-//       <TWords
-//         twords={wordObjects}
-//         nodeContentBack={
-//           <span>
-//             <Back className="w-8 stroke-th-primary-200" />
-//           </span>
-//         }
-//         classes={{
-//           main: "relative h-full",
-//           content: {
-//             container:
-//               "absolute top-0 bottom-0 pr-2 ,bg-th-secondary-10 overflow-auto left-0 right-0",
-//             header: "sticky flex top-0 pb-4 bg-th-secondary-10",
-//             backButton:
-//               "w-fit h-fit p-1 mr-2.5 cursor-pointer hover:opacity-70 rounded-full bg-th-secondary-100",
-//             title: "font-bold text-xl mt-1",
-//             text: "markdown-body",
-//           },
-//           list: {
-//             verseNumber: "text-2xl",
-//             container:
-//               "divide-y divide-th-text-primary divide-dashed h-full overflow-auto",
-//             verseBlock: "pl-7 flex-1",
-//             currentNote: "bg-th-secondary-100",
-//             word: "p-2 cursor-pointer rounded-lg hover:bg-th-secondary-100",
-//             verseWrapper: "p-4 flex mx-4",
-//             filtered: "text-th-secondary-300",
-//           },
-//         }}
-//         nodeLoading={<Placeholder />}
-//         isLoading={isLoadingTW || isLoading}
-//         scrollTopOffset={20}
-//         startHighlightIds={checkLSVal("highlightIds", {}, "object")}
-//         currentScrollVerse={currentScrollVerse}
-//         toolId={toolName}
-//         idContainerScroll={config.idContainerScroll}
-//         setCurrentScrollVerse={setCurrentScrollVerse}
-//         filter={filter}
-//         word={word}
-//         setWord={setWord}
-//       />
-//     </>
-//   );
-// }
 
 function FilterRepeated({ setFilter, filter }) {
   const options = [

@@ -17,14 +17,14 @@ export const obsCheckAdditionalVerses = (numVerse) => {
 };
 
 function Bible({
-  config: { resource, id, chapter = false, isDraft = false },
+  config: { resource, id, chapter = false, isDraft = false, wholeChapter },
   toolName,
 }) {
-  console.log({ resource, id, chapter, isDraft });
   const { isLoading, data } = useGetUsfmResource({
     id,
     resource,
     chapter,
+    wholeChapter,
   });
 
   const { handleSaveScroll, currentScrollVerse } = useScroll({

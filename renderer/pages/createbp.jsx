@@ -10,8 +10,6 @@ function Create() {
   const onSubmit = (e) => {
     e.preventDefault();
     const data = new FormData(e.target);
-    // data.append('fileUrl', fileUrl);
-    // console.log(data.entries());
     for (let [k, v] of data.entries()) {
       axios.get("https://git.door43.org/unfoldingWord");
       // надо скачать сначала манифесты, потом узнать и скачать файлы literal, simplified, twl, tn, tq
@@ -19,7 +17,6 @@ function Create() {
       // скачать полностью лексикон, академию
       // согласно literal создать структуру для книги с главами
       // надо ли все это делать на стороне апи или на клиенте. Ничего не мешает прям тут это провернуть, используя axios и jszip
-      console.log(k, v);
     }
   };
 
@@ -55,7 +52,6 @@ function Create() {
               const { url, resources } = await window.electronAPI.openConfig();
               setFileUrl(url);
               setResources(resources);
-              console.log({ resources });
             }}
           >
             Выбрать конфиг проекта

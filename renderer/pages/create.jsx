@@ -4,7 +4,6 @@ import Link from "next/link";
 
 function Create() {
   const [fileUrl, setFileUrl] = React.useState(false);
-  console.log(fileUrl);
   const onSubmit = (e) => {
     e.preventDefault();
     window.electronAPI.addProject(fileUrl);

@@ -1,14 +1,14 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from "react";
 
-import { useSetRecoilState } from 'recoil';
+import { useSetRecoilState } from "recoil";
 
-import Modal from './Modal';
+import Modal from "./Modal";
 
-import { checkedVersesBibleState } from '../helpers/atoms';
+import { checkedVersesBibleState } from "../helpers/atoms";
 
-import Pencil from '../public/icons/pencil.svg';
-import Check from '../public/icons/check.svg';
-import { obsCheckAdditionalVerses } from './Bible';
+import Pencil from "../public/icons/pencil.svg";
+import Check from "../public/icons/check.svg";
+import { obsCheckAdditionalVerses } from "./Bible";
 
 const t = (str) => str;
 
@@ -31,7 +31,9 @@ function BlindEditor({
   useEffect(() => {
     const savedVerses = Object.entries(
       window.electronAPI.getChapter(id, chapter)
-    ).map(([k, v]) => ({ num: k, verse: v.text }));
+    )
+      .map(([k, v]) => ({ num: k, verse: v.text, enabled: v.enabled }))
+      .filter((v) => v.enabled);
     setVerseObjects(savedVerses);
     let updatedArray = [];
     const _verseObjects = savedVerses;
@@ -46,7 +48,7 @@ function BlindEditor({
       return;
     }
     if (updatedArray.length === _verseObjects.length) {
-      setEnabledIcons(['0']);
+      setEnabledIcons(["0"]);
     } else {
       for (let index = 0; index < _verseObjects.length; index++) {
         if (
@@ -143,9 +145,9 @@ function BlindEditor({
           const nextNumVerse =
             index < verseObjects.length - 1
               ? verseObjects[index + 1].num.toString()
-              : '';
+              : "";
           const prevNumVerse =
-            index !== 0 ? verseObjects[index - 1].num.toString() : '';
+            index !== 0 ? verseObjects[index - 1].num.toString() : "";
           const disabledButton = !(
             (index === 0 && !enabledIcons.length) ||
             enabledIcons.includes(currentNumVerse)
@@ -166,18 +168,19 @@ function BlindEditor({
                     isTranslating,
                   })
                 }
-                className={`${isTranslating ? 'btn-cyan' : 'btn-white'}`}
-                disabled={disabledButton}>
+                className={`${isTranslating ? "btn-cyan" : "btn-white"}`}
+                disabled={disabledButton}
+              >
                 {isTranslated ? (
                   <Check className="w-4 h-4 stroke-2" />
                 ) : (
                   <Pencil
                     className={`w-5 h-5 stroke-2 ${
                       disabledButton
-                        ? 'fill-gray-200'
+                        ? "fill-gray-200"
                         : !isTranslating
-                        ? 'fill-cyan-600'
-                        : 'fill-white'
+                        ? "fill-cyan-600"
+                        : "fill-white"
                     }`}
                   />
                 )}
@@ -193,17 +196,17 @@ function BlindEditor({
                   rows={1}
                   className="resize-none focus:outline-none focus:inline-none w-full"
                   onChange={(e) => {
-                    e.target.style.height = 'inherit';
+                    e.target.style.height = "inherit";
                     e.target.style.height = `${e.target.scrollHeight}px`;
                     updateVerse(
                       index,
                       e.target.value
-                        .replace(/  +/g, ' ')
-                        .replace(/ +([\.\,\)\!\?\;\:])/g, '$1')
+                        .replace(/  +/g, " ")
+                        .replace(/ +([\.\,\)\!\?\;\:])/g, "$1")
                         .trim()
                     );
                   }}
-                  defaultValue={verseObject.verse ?? ''}
+                  defaultValue={verseObject.verse ?? ""}
                 />
               ) : (
                 <div className="whitespace-pre-line">{verseObject.verse}</div>
@@ -214,19 +217,20 @@ function BlindEditor({
         {isShowFinalButton && (
           <button
             onClick={() => {
-              setEnabledIcons(['201']);
+              setEnabledIcons(["201"]);
               setEnabledInputs([]);
               sendToDb(verseObjects.length - 1);
             }}
-            className="btn-white">
-            {t('Save')}
+            className="btn-white"
+          >
+            {t("Save")}
           </button>
         )}
       </div>
       <Modal isOpen={isOpenModal} closeHandle={() => setIsOpenModal(false)}>
         <div className="flex flex-col gap-7 items-center">
           <div className="text-center text-2xl">
-            {t('AreYouSureWantStartBlind')}
+            {t("AreYouSureWantStartBlind")}
           </div>
           <div className="flex gap-7 w-1/2">
             <button
@@ -239,15 +243,17 @@ function BlindEditor({
                     textAreaRef?.current[0].focus();
                   }
                 }, 1000);
-              }}>
-              {t('Yes')}
+              }}
+            >
+              {t("Yes")}
             </button>
             <button
               className="btn-secondary flex-1"
               onClick={() => {
                 setIsOpenModal(false);
-              }}>
-              {t('No')}
+              }}
+            >
+              {t("No")}
             </button>
           </div>
         </div>

@@ -121,7 +121,6 @@ function Dictionary({ config: { id } }) {
   const saveWord = async () => {
     window.electronAPI.updateWord(id, activeWord);
     mutate();
-    // getWords(searchQuery, currentPage);
   };
 
   function checkAndAppendNewTitle(title, allWords) {

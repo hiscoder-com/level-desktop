@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
-import { obsCheckAdditionalVerses } from './Bible';
+import { obsCheckAdditionalVerses } from "./Bible";
 
 function Editor({ config: { id, mainResource, chapter = false }, toolName }) {
   const [verseObjects, setVerseObjects] = useState([]);
@@ -8,7 +8,9 @@ function Editor({ config: { id, mainResource, chapter = false }, toolName }) {
   useEffect(() => {
     const savedVerses = Object.entries(
       window.electronAPI.getChapter(id, chapter)
-    ).map(([k, v]) => ({ num: k, verse: v.text }));
+    )
+      .map(([k, v]) => ({ num: k, verse: v.text, enabled: v.enabled }))
+      .filter((v) => v.enabled);
     setVerseObjects(savedVerses);
   }, [id, chapter]);
 
@@ -19,7 +21,6 @@ function Editor({ config: { id, mainResource, chapter = false }, toolName }) {
       return [...prev];
     });
   };
-
   return (
     <div>
       {verseObjects.map((verseObject, idx) => (
@@ -58,12 +59,12 @@ export function AutoSizeTextArea({ updateVerse, verseObject, idx }) {
         updateVerse(idx, verseObject.num, el.target.innerText.trim());
       }}
       onInput={(e) => {
-        if (['historyUndo', 'historyRedo'].includes(e.nativeEvent.inputType)) {
+        if (["historyUndo", "historyRedo"].includes(e.nativeEvent.inputType)) {
           updateVerse(idx, verseObject.num, e.target.innerText.trim());
         }
       }}
       className={`block w-full mx-3 focus:outline-none focus:inline-none whitespace-pre-line focus:bg-white  ${
-        verseObject.verse ? '' : 'bg-gray-300'
+        verseObject.verse ? "" : "bg-gray-300"
       }`}
       // eslint-disable-next-line prettier/prettier
     >
