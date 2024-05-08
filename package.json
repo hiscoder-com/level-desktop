@@ -15,6 +15,7 @@
   "dependencies": {
     "@headlessui/react": "1.7.19",
     "@texttree/notepad-rcl": "^2.4.1",
+    "@texttree/obs-format-convert-rcl": "^0.4.2",
     "@texttree/tn-quote": "^0.5.0",
     "@texttree/translation-words-helpers": "^0.2.4",
     "@texttree/v-cana-rcl": "0.1.0-alpha.0",

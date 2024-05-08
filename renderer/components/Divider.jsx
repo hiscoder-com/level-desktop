@@ -13,11 +13,16 @@ export const obsCheckAdditionalVerses = (numVerse) => {
   return String(numVerse);
 };
 
-function Bible({ config: { resource, id, chapter = false }, toolName }) {
+function Divider({
+  config: { resource, id, chapter = false },
+  toolName,
+  wholeChapter,
+}) {
   const { isLoading, data } = useGetUsfmResource({
     id,
     resource,
     chapter,
+    wholeChapter,
   });
 
   const { handleSaveScroll, currentScrollVerse } = useScroll({
@@ -43,7 +48,7 @@ function Bible({ config: { resource, id, chapter = false }, toolName }) {
   );
 }
 
-export default Bible;
+export default Divider;
 
 function Verses({
   verseObjects,
@@ -91,7 +96,7 @@ function Verses({
             checked={versesDivide[verseObject.verse]}
             onChange={() => {
               const checked = !versesDivide[verseObject.verse];
-              divideVerse(idx, verseObject.verse, checked);
+              divideVerse(verseObject.verse, checked);
             }}
           />
           <ReactMarkdown>
