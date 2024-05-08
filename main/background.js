@@ -222,7 +222,7 @@ ipcMain.on('remove-word', (event, projectid, wordid) => {
 
 ipcMain.on('get-notes', (event) => {
   event.returnValue = notesLS.store;
-  event.sender.send('notify', 'Loaded');
+  event.sender.send('notify', 'Removed');
 });
 
 ipcMain.on('get-notes-with-data', (event, projectid) => {
@@ -338,6 +338,22 @@ ipcMain.on('update-notes', (event, projectid, notes) => {
   });
   event.returnValue = projectid;
   event.sender.send('notify', 'Updated');
+});
+
+ipcMain.on('get-book', (event, projectid) => {
+
+  const book = {}
+  fs.readdirSync(path.join(projectUrl, projectid, 'chapters')).forEach(
+    (f) => {
+      const data = fs.readFileSync(
+        path.join(projectUrl, projectid, 'chapters', f),
+        { encoding: 'utf-8' }
+      );
+      book[f.split('.')[0]] = JSON.parse(data)
+    }
+  );
+  event.returnValue = book;
+  event.sender.send('notify', 'Loaded');
 });
 
 ipcMain.on('get-chapter', (event, projectid, chapter) => {

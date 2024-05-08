@@ -1,5 +1,18 @@
 import Link from "next/link";
 import React from "react";
+import { JsonToPdf } from "@texttree/obs-format-convert-rcl";
+const styles = {
+  currentPage: {
+    fontSize: 16,
+    alignment: "center",
+    bold: true,
+    margin: [0, 10, 0, 0],
+  },
+  chapterTitle: { fontSize: 20, bold: true, margin: [0, 26, 0, 15] },
+  verseNumber: { sup: true, bold: true, opacity: 0.8, margin: [0, 8, 8, 0] },
+  defaultPageHeader: { bold: true, width: "50%" },
+  text: { alignment: "justify" },
+};
 
 function ChapterList({ id, chapters, steps, mutate }) {
   const handleBackStep = (chapter, step) => {
@@ -8,7 +21,27 @@ function ChapterList({ id, chapters, steps, mutate }) {
       mutate();
     }
   };
-  const handleDownloadChapter = (chapter) => {};
+  const handleDownloadChapter = (chapter) => {
+    const savedVerses = Object.entries(
+      window.electronAPI.getChapter(id, chapter)
+    )
+      .map(([k, v]) => ({ verse: k, text: v.text, enabled: v.enabled }))
+      .filter((v) => v.enabled);
+    const filename = "chapter_" + chapter;
+    JsonToPdf({
+      data: [{ title: "Chapter " + chapter, verseObjects: savedVerses }],
+      styles,
+      filename,
+      showImages: false,
+      combineVerses: false,
+      showChapterTitlePage: false,
+      showVerseNumber: true,
+      bookPropertiesObs: {},
+      showPageFooters: false,
+    })
+      .then(() => console.log("PDF creation completed"))
+      .catch((error) => console.error("PDF creation failed:", error));
+  };
   return (
     <table className="border-collapse table-auto w-full text-sm">
       <thead>
