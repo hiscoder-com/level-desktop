@@ -78,8 +78,15 @@ app.on('window-all-closed', () => {
 });
 
 const storeProjects = new Store({ name: 'projects' });
+const storeAgreements = new Store({ name: 'agreements' });
 
 const storeLS = new Store({ name: 'localStorage' });
+
+ipcMain.on('get-agreements', (event) => {
+  const agreements = storeAgreements.get('agreements') || [];
+  event.returnValue = agreements;
+  event.sender.send('notify', 'Loaded');
+});
 
 ipcMain.on('get-projects', (event) => {
   const projects = storeProjects.get('projects') || [];
@@ -89,6 +96,11 @@ ipcMain.on('get-projects', (event) => {
 
 let notesLS;
 let dictionaryLS;
+ipcMain.on('update-agreements', (event, agreements) => {
+  storeAgreements.set('agreements', agreements);
+  event.sender.send('notify', 'Updated');
+  event.returnValue = agreements;
+});
 
 ipcMain.on('set-project-folder', (event, id) => {
   notesLS = new Store({ name: 'personal-notes', cwd: `projects/${id}` });
@@ -723,6 +735,8 @@ ipcMain.on('add-project', (event, url) => {
     event.sender.send('notify', 'Url not set');
   }
 });
+
+
 
 ipcMain.handle('dialog:openFile', handleFileOpen);
 ipcMain.handle('dialog:openConfig', handleConfigOpen);
