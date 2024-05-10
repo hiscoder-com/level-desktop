@@ -9,6 +9,7 @@ import TN from "./TN";
 import TQ from "./TQ";
 import TWL from "./TWL";
 import Divider from "./Divider";
+import TeamNotes from "./TeamNotes";
 
 function Tool({ config, toolName }) {
   let CurrentTool;
@@ -70,6 +71,10 @@ function Tool({ config, toolName }) {
 
     case "personalNotes":
       CurrentTool = PersonalNotes;
+      break;
+
+    case "teamNotes":
+      CurrentTool = TeamNotes;
       break;
 
     case "retelling":

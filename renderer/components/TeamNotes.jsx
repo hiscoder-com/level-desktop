@@ -16,7 +16,7 @@ import Close from "../public/icons/close.svg";
 import Plus from "../public/icons/plus.svg";
 import Progress from "../public/icons/progress.svg";
 
-import { useGetPersonalNotes } from "../hooks/useGetPersonalNotes";
+import { useGetTeamNotes } from "../hooks/useGetTeamNotes";
 import Modal from "./Modal";
 import { convertNotesToTree, generateUniqueId } from "../helpers/noteEditor";
 
@@ -64,7 +64,7 @@ const icons = {
   ),
 };
 
-export default function PersonalNotes({ config: { id }, config, toolName }) {
+export default function TeamNotes({ config: { id }, config, toolName }) {
   const [noteId, setNoteId] = useState("");
   const [contextMenuEvent, setContextMenuEvent] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -73,7 +73,7 @@ export default function PersonalNotes({ config: { id }, config, toolName }) {
   const [activeNote, setActiveNote] = useState(null);
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [currentNodeProps, setCurrentNodeProps] = useState(null);
-  const { data: notesObject, mutate } = useGetPersonalNotes(id);
+  const { data: notesObject, mutate } = useGetTeamNotes(id);
   const notes = Object.values(notesObject);
   const [dataForTreeView, setDataForTreeView] = useState(
     convertNotesToTree(notes)
@@ -82,7 +82,7 @@ export default function PersonalNotes({ config: { id }, config, toolName }) {
   // const isRtl = config?.isRtl || false;
   const isRtl = false;
   const saveNote = () => {
-    window.electronAPI.updateNote(id, activeNote, "personal-notes");
+    window.electronAPI.updateNote(id, activeNote, "team-notes");
   };
   useEffect(() => {
     setDataForTreeView(convertNotesToTree(notes));
@@ -192,7 +192,7 @@ export default function PersonalNotes({ config: { id }, config, toolName }) {
             id: generateUniqueId(parsedNotes.map(({ id }) => id)),
             ...note,
           };
-          window.electronAPI.importNote(id, newNote, "personal-notes");
+          window.electronAPI.importNote(id, newNote, "team-notes");
         }
         mutate();
       } catch (error) {
@@ -265,7 +265,7 @@ export default function PersonalNotes({ config: { id }, config, toolName }) {
       }
       const notesWithData = window.electronAPI.getNotesWithData(
         id,
-        "personal-notes"
+        "team-notes"
       );
 
       const transformedData = formationJSONToTree(notesWithData);
@@ -301,11 +301,7 @@ export default function PersonalNotes({ config: { id }, config, toolName }) {
 
   const changeNode = (noteId) => {
     if (noteId) {
-      const currentNote = window.electronAPI.getNote(
-        id,
-        noteId,
-        "personal-notes"
-      );
+      const currentNote = window.electronAPI.getNote(id, noteId, "team-notes");
       setActiveNote(JSON.parse(currentNote));
     }
   };
@@ -314,7 +310,7 @@ export default function PersonalNotes({ config: { id }, config, toolName }) {
     if (!newTitle.trim()) {
       newTitle = t("EmptyTitle");
     }
-    window.electronAPI.renameNote(id, newTitle, noteId, "personal-notes");
+    window.electronAPI.renameNote(id, newTitle, noteId, "team-notes");
     mutate();
   };
   const removeNode = () => {
@@ -325,12 +321,12 @@ export default function PersonalNotes({ config: { id }, config, toolName }) {
     const sorting = getMaxSorting(notes);
 
     const noteId = generateUniqueId(notes);
-    window.electronAPI.addNote(id, noteId, isFolder, sorting, "personal-notes");
+    window.electronAPI.addNote(id, noteId, isFolder, sorting, "team-notes");
     mutate();
   };
 
   const handleRemoveNode = ({ ids }) => {
-    window.electronAPI.removeNote(id, ids[0], "personal-notes");
+    window.electronAPI.removeNote(id, ids[0], "team-notes");
     mutate();
   };
 
@@ -349,7 +345,7 @@ export default function PersonalNotes({ config: { id }, config, toolName }) {
   }, [activeNote]);
 
   const removeAllNotes = () => {
-    window.electronAPI.removeAllNotes(id, "personal-notes");
+    window.electronAPI.removeAllNotes(id, "team-notes");
     mutate();
   };
 
@@ -473,7 +469,7 @@ export default function PersonalNotes({ config: { id }, config, toolName }) {
       window.electronAPI.updateNotes(
         id,
         sorted.concat(draggedNode),
-        "personal-notes"
+        "team-notes"
       );
     } else {
       draggedNode.parent_id = parentId;
@@ -507,7 +503,7 @@ export default function PersonalNotes({ config: { id }, config, toolName }) {
       window.electronAPI.updateNotes(
         id,
         filteredDraggable.concat(draggedNode),
-        "personal-notes"
+        "team-notes"
       );
     }
   };

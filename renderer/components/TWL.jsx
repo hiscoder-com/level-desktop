@@ -121,7 +121,6 @@ function TWL({
     getData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
-  // console.log({ wordObjects });
   return (
     <div id="container_tw" className="overflow-y-auto h-full">
       {!word && (
