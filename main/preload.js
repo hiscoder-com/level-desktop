@@ -37,27 +37,27 @@ process.once('loaded', () => {
       ipcRenderer.sendSync('get-words-with-data', projectid, wordids),
     importWord: (projectid, note) =>
       ipcRenderer.sendSync('import-word', projectid, note),
-    importNote: (projectid, note) =>
-      ipcRenderer.sendSync('import-note', projectid, note),
+    importNote: (projectid, note, type) =>
+      ipcRenderer.sendSync('import-note', projectid, note, type),
     removeWord: (projectid, wordid) =>
       ipcRenderer.sendSync('remove-word', projectid, wordid),
-    getNotes: () => ipcRenderer.sendSync('get-notes'),
-    getNotesWithData: (projectid) =>
-      ipcRenderer.sendSync('get-notes-with-data', projectid),
-    addNote: (projectid, noteid, isfolder, sorting) =>
-      ipcRenderer.sendSync('add-note', projectid, noteid, isfolder, sorting),
-    updateNote: (projectid, note) =>
-      ipcRenderer.sendSync('update-note', projectid, note),
-    renameNote: (projectid, title, noteid) =>
-      ipcRenderer.sendSync('rename-note', projectid, title, noteid),
-    getNote: (projectid, noteid) =>
-      ipcRenderer.sendSync('get-note', projectid, noteid),
-    removeNote: (projectid, noteid) =>
-      ipcRenderer.sendSync('remove-note', projectid, noteid),
-    removeAllNotes: (projectid) =>
-      ipcRenderer.sendSync('remove-all-notes', projectid),
-    updateNotes: (projectid, notes) =>
-      ipcRenderer.sendSync('update-notes', projectid, notes),
+    getNotes: (type) => ipcRenderer.sendSync('get-notes', type),
+    getNotesWithData: (projectid, type) =>
+      ipcRenderer.sendSync('get-notes-with-data', projectid, type),
+    addNote: (projectid, noteid, isfolder, sorting, type) =>
+      ipcRenderer.sendSync('add-note', projectid, noteid, isfolder, sorting, type),
+    updateNote: (projectid, note, type) =>
+      ipcRenderer.sendSync('update-note', projectid, note, type),
+    renameNote: (projectid, title, noteid, type) =>
+      ipcRenderer.sendSync('rename-note', projectid, title, noteid, type),
+    getNote: (projectid, noteid, type) =>
+      ipcRenderer.sendSync('get-note', projectid, noteid, type),
+    removeNote: (projectid, noteid, type) =>
+      ipcRenderer.sendSync('remove-note', projectid, noteid, type),
+    removeAllNotes: (projectid, type) =>
+      ipcRenderer.sendSync('remove-all-notes', projectid, type),
+    updateNotes: (projectid, notes, type) =>
+      ipcRenderer.sendSync('update-notes', projectid, notes, type),
     setItem: (key, val) => ipcRenderer.send('set-item', key, val),
     getUsfm: (id, resource, chapter = false) =>
       ipcRenderer.sendSync('get-usfm', id, resource, chapter),
