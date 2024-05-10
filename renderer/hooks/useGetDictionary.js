@@ -4,8 +4,8 @@ export function useGetDictionary({ id }) {
   const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState([]);
   const [alphabet, setAlphabet] = useState([]);
-  const mutate = (id) => {
-    const words = window.electronAPI.getWords(id);
+  const mutate = () => {
+    const words = window.electronAPI.getWords();
     setData(
       Object.values(words).sort((a, b) =>
         new Intl.Collator(undefined, {

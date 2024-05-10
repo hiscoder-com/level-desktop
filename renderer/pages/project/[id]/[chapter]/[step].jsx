@@ -68,7 +68,6 @@ function StepPage() {
       push(`/project/${id}`);
     }
   };
-
   return (
     <div className="w-full">
       <Breadcrumbs

@@ -94,8 +94,29 @@ ipcMain.on('get-projects', (event) => {
   event.sender.send('notify', 'Loaded');
 });
 
-let notesLS;
+let personalNotesLS;
+let teamNotesLS;
+
+const getNotesWithType = (type) => {
+  let notes
+  switch (type) {
+    case 'personal-notes':
+      notes = personalNotesLS
+      break;
+    case 'team-notes':
+      notes = teamNotesLS
+      break;
+    default:
+      notes = []
+      break;
+  }
+  return notes
+
+}
 let dictionaryLS;
+
+
+
 ipcMain.on('update-agreements', (event, agreements) => {
   storeAgreements.set('agreements', agreements);
   event.sender.send('notify', 'Updated');
@@ -103,8 +124,9 @@ ipcMain.on('update-agreements', (event, agreements) => {
 });
 
 ipcMain.on('set-project-folder', (event, id) => {
-  notesLS = new Store({ name: 'personal-notes', cwd: `projects/${id}` });
+  personalNotesLS = new Store({ name: 'personal-notes', cwd: `projects/${id}` });
   dictionaryLS = new Store({ name: 'dictionary', cwd: `projects/${id}` });
+  teamNotesLS = new Store({ name: 'team-notes', cwd: `projects/${id}` });
 });
 
 ipcMain.on('get-words', (event) => {
@@ -164,10 +186,11 @@ ipcMain.on('import-word', (event, projectid, newword) => {
   event.returnValue = id;
   event.sender.send('notify', 'Updated');
 });
-ipcMain.on('import-note', (event, projectid, note) => {
+ipcMain.on('import-note', (event, projectid, note, type) => {
   const { id, title, parent_id, is_folder, data: content, sorting } = note;
   const date = new Date();
-  notesLS.set(id, {
+  const notes = getNotesWithType(type)
+  notes.set(id, {
     id,
     title,
     parent_id,
@@ -182,7 +205,7 @@ ipcMain.on('import-note', (event, projectid, note) => {
     data: content, sorting, is_folder, parent_id
   };
   fs.writeFileSync(
-    path.join(projectUrl, projectid, 'personal-notes', id + '.json'),
+    path.join(projectUrl, projectid, type, id + '.json'),
     JSON.stringify(data, null, 2),
     { encoding: 'utf-8' }
   );
@@ -232,30 +255,33 @@ ipcMain.on('remove-word', (event, projectid, wordid) => {
   event.sender.send('notify', 'Removed');
 });
 
-ipcMain.on('get-notes', (event) => {
-  event.returnValue = notesLS.store;
-  event.sender.send('notify', 'Removed');
+ipcMain.on('get-notes', (event, type) => {
+  const notes = getNotesWithType(type)
+  event.returnValue = notes.store;
+  event.sender.send('notify', 'Loaded');
 });
 
-ipcMain.on('get-notes-with-data', (event, projectid) => {
+ipcMain.on('get-notes-with-data', (event, projectid, type) => {
   let notes = [];
+  const notesLS = getNotesWithType(type)
+
   for (const noteId in notesLS.store) {
     if (Object.hasOwnProperty.call(notesLS.store, noteId)) {
       const note = notesLS.store[noteId]
       const newNote = fs.readFileSync(
-        path.join(projectUrl, projectid, 'personal-notes', note.id + '.json'),
+        path.join(projectUrl, projectid, type, note.id + '.json'),
         { encoding: 'utf-8' }
       );
       const { data } = JSON.parse(newNote)
       notes.push({ ...note, data });
     }
   }
-
   event.returnValue = notes;
   event.sender.send('notify', 'Loaded');
 });
 
-ipcMain.on('add-note', (event, projectid, noteid, isfolder, sorting) => {
+ipcMain.on('add-note', (event, projectid, noteid, isfolder, sorting, type) => {
+  const notesLS = getNotesWithType(type)
   const date = new Date();
   const title = date.toLocaleString();
   notesLS.set(noteid, {
@@ -276,7 +302,7 @@ ipcMain.on('add-note', (event, projectid, noteid, isfolder, sorting) => {
     },
   };
   fs.writeFileSync(
-    path.join(projectUrl, projectid, 'personal-notes', noteid + '.json'),
+    path.join(projectUrl, projectid, type, noteid + '.json'),
     JSON.stringify(data, null, 2),
     { encoding: 'utf-8' }
   );
@@ -284,12 +310,11 @@ ipcMain.on('add-note', (event, projectid, noteid, isfolder, sorting) => {
   event.sender.send('notify', 'Updated');
 });
 
-ipcMain.on('update-note', (event, projectid, note) => {
+ipcMain.on('update-note', (event, projectid, note, type) => {
+  const notesLS = getNotesWithType(type)
   notesLS.set(`${note.id}.title`, note.title);
-
-
   fs.writeFileSync(
-    path.join(projectUrl, projectid, 'personal-notes', note.id + '.json'),
+    path.join(projectUrl, projectid, type, note.id + '.json'),
     JSON.stringify(note, null, 2),
     { encoding: 'utf-8' }
   );
@@ -297,16 +322,18 @@ ipcMain.on('update-note', (event, projectid, note) => {
   event.sender.send('notify', 'Updated');
 });
 
-ipcMain.on('rename-note', (event, projectid, title, noteid) => {
+ipcMain.on('rename-note', (event, projectid, title, noteid, type) => {
+  const notesLS = getNotesWithType(type)
+
   notesLS.set(`${noteid}.title`, title);
   const data = fs.readFileSync(
-    path.join(projectUrl, projectid, 'personal-notes', noteid + '.json'),
+    path.join(projectUrl, projectid, type, noteid + '.json'),
     { encoding: 'utf-8' }
   );
   const newNote = JSON.parse(data)
 
   fs.writeFileSync(
-    path.join(projectUrl, projectid, 'personal-notes', noteid + '.json'),
+    path.join(projectUrl, projectid, type, noteid + '.json'),
     JSON.stringify({ ...newNote, title }, null, 2),
     { encoding: 'utf-8' }
   );
@@ -314,35 +341,41 @@ ipcMain.on('rename-note', (event, projectid, title, noteid) => {
   event.sender.send('notify', 'Updated');
 });
 
-ipcMain.on('get-note', (event, projectid, noteid) => {
+ipcMain.on('get-note', (event, projectid, noteid, type) => {
   const data = fs.readFileSync(
-    path.join(projectUrl, projectid, 'personal-notes', noteid + '.json'),
+    path.join(projectUrl, projectid, type, noteid + '.json'),
     { encoding: 'utf-8' }
   );
   event.returnValue = data;
   event.sender.send('notify', 'Loaded');
 });
 
-ipcMain.on('remove-note', (event, projectid, noteid) => {
+ipcMain.on('remove-note', (event, projectid, noteid, type) => {
+  const notesLS = getNotesWithType(type)
+
   notesLS.delete(noteid);
   fs.rmSync(
-    path.join(projectUrl, projectid, 'personal-notes', noteid + '.json'),
+    path.join(projectUrl, projectid, type, noteid + '.json'),
     { force: true }
   );
   event.returnValue = noteid;
   event.sender.send('notify', 'Removed');
 });
 
-ipcMain.on('remove-all-notes', (event, projectid) => {
+ipcMain.on('remove-all-notes', (event, projectid, type) => {
+  const notesLS = getNotesWithType(type)
+
   notesLS.clear();
-  fs.readdirSync(path.join(projectUrl, projectid, 'personal-notes')).forEach(
-    (f) => fs.rmSync(path.join(projectUrl, projectid, 'personal-notes', f))
+  fs.readdirSync(path.join(projectUrl, projectid, type)).forEach(
+    (f) => fs.rmSync(path.join(projectUrl, projectid, type, f))
   );
   event.returnValue = projectid;
   event.sender.send('notify', 'Removed');
 });
 
-ipcMain.on('update-notes', (event, projectid, notes) => {
+ipcMain.on('update-notes', (event, projectid, notes, type) => {
+  const notesLS = getNotesWithType(type)
+
   notes.forEach((note) => {
     notesLS.set(`${note.id}.parent_id`, note.parent_id);
     notesLS.set(`${note.id}.sorting`, note.sorting);
