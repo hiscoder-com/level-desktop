@@ -1,5 +1,9 @@
 import Link from "next/link";
 import { JsonToPdf } from "@texttree/obs-format-convert-rcl";
+import ListBox from "./ListBox";
+import Modal from "./Modal";
+import { useState } from "react";
+import jszip from "jszip";
 
 const styles = {
   currentPage: {
@@ -14,13 +18,20 @@ const styles = {
   text: { alignment: "justify" },
 };
 
+const options = [
+  { label: "Export to PDF", value: "pdf" },
+  { label: "Export to ZIP", value: "zip" },
+];
+
 function ProjectsList({ projects }) {
-  const download = (id) => {
-    const _project = window.electronAPI.getBook(id);
+  const [selectedOption, setSelectedOption] = useState(options[0].value);
+  const [currentProjectId, setCurrentProjectId] = useState(null);
+  const [isOpenModal, setIsOpenModal] = useState(false);
+  const exportToPdf = (chapters) => {
     const book = [];
-    for (const chapterNum in _project) {
-      if (Object.hasOwnProperty.call(_project, chapterNum)) {
-        const chapter = Object.entries(_project[chapterNum]).map(([k, v]) => ({
+    for (const chapterNum in chapters) {
+      if (Object.hasOwnProperty.call(chapters, chapterNum)) {
+        const chapter = Object.entries(chapters[chapterNum]).map(([k, v]) => ({
           verse: k,
           text: v.text,
           enabled: v.enabled,
@@ -44,59 +55,132 @@ function ProjectsList({ projects }) {
       .then(() => console.log("PDF creation completed"))
       .catch((error) => console.error("PDF creation failed:", error));
   };
+  const exportToZip = (chapters) => {
+    try {
+      if (!chapters) {
+        throw new Error("error:NoData");
+      }
+      const jsonContent = JSON.stringify(chapters, null, 2);
+      const zip = new jszip();
+      const currentDate = new Date();
+      const formattedDate = currentDate.toISOString().split("T")[0];
+      const fileName = `chapters_${formattedDate}.json`;
+      zip.file(fileName, jsonContent);
+      zip.generateAsync({ type: "blob" }).then(function (content) {
+        const blob = content;
+        const url = window.URL.createObjectURL(blob);
+        const downloadLink = document.createElement("a");
+        downloadLink.href = url;
+        downloadLink.download = `chapters_${formattedDate}.zip`;
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+        window.URL.revokeObjectURL(url);
+      });
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+  const download = (id) => {
+    const chapters = window.electronAPI.getBook(id);
+    console.log(chapters);
+    if (selectedOption === "pdf") {
+      exportToPdf(chapters);
+    } else {
+      exportToZip(chapters);
+    }
+  };
   return (
-    <table className="border-collapse table-auto w-full text-sm">
-      <thead>
-        <tr>
-          <th className="border-b font-medium p-4 pl-8 pt-0 pb-3 text-slate-400 text-left">
-            Book
-          </th>
-          <th className="border-b font-medium p-4 pl-8 pt-0 pb-3 text-slate-400 text-left">
-            Project
-          </th>
-          <th className="border-b font-medium p-4 pl-8 pt-0 pb-3 text-slate-400 text-left">
-            Method
-          </th>
-          <th className="border-b font-medium p-4 pl-8 pt-0 pb-3 text-slate-400 text-left">
-            ID
-          </th>
-          <th className="border-b font-medium p-4 pl-8 pt-0 pb-3 text-slate-400 text-left">
-            Created At
-          </th>
-          <th className="border-b font-medium p-4 pl-8 pt-0 pb-3 text-slate-400 text-left"></th>
-        </tr>
-      </thead>
-      <tbody className="bg-white">
-        {projects.map((project) => (
-          <tr key={project.id}>
-            <td className="border-b border-slate-100 p-4 pl-8 text-slate-500">
-              <Link href={"project/" + project.id} legacyBehavior>
-                <a className="font-bold underline">
-                  {project.book.name} ({project.book.code})
-                </a>
-              </Link>
-            </td>
-            <td className="border-b border-slate-100 p-4 pl-8 text-slate-500">
-              {project.name}
-            </td>
-            <td className="border-b border-slate-100 p-4 pl-8 text-slate-500">
-              {project.method}
-            </td>
-            <td className="border-b border-slate-100 p-4 pl-8 text-slate-500">
-              {project.id}
-            </td>
-            <td className="border-b border-slate-100 p-4 pl-8 text-slate-500">
-              {new Date(project.createdAt).toLocaleDateString()}
-            </td>
-            <td className="border-b border-slate-100 p-4 pl-8 text-slate-500">
-              <div className="btn-primary" onClick={() => download(project.id)}>
-                Download
-              </div>
-            </td>
+    <>
+      <table className="border-collapse table-auto w-full text-sm">
+        <thead>
+          <tr>
+            <th className="border-b font-medium p-4 pl-8 pt-0 pb-3 text-slate-400 text-left">
+              Book
+            </th>
+            <th className="border-b font-medium p-4 pl-8 pt-0 pb-3 text-slate-400 text-left">
+              Project
+            </th>
+            <th className="border-b font-medium p-4 pl-8 pt-0 pb-3 text-slate-400 text-left">
+              Method
+            </th>
+            <th className="border-b font-medium p-4 pl-8 pt-0 pb-3 text-slate-400 text-left">
+              ID
+            </th>
+            <th className="border-b font-medium p-4 pl-8 pt-0 pb-3 text-slate-400 text-left">
+              Created At
+            </th>
+            <th className="border-b font-medium p-4 pl-8 pt-0 pb-3 text-slate-400 text-left"></th>
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody className="bg-white">
+          {projects.map((project) => (
+            <tr key={project.id}>
+              <td className="border-b border-slate-100 p-4 pl-8 text-slate-500">
+                <Link href={"project/" + project.id} legacyBehavior>
+                  <a className="font-bold underline">
+                    {project.book.name} ({project.book.code})
+                  </a>
+                </Link>
+              </td>
+              <td className="border-b border-slate-100 p-4 pl-8 text-slate-500">
+                {project.name}
+              </td>
+              <td className="border-b border-slate-100 p-4 pl-8 text-slate-500">
+                {project.method}
+              </td>
+              <td className="border-b border-slate-100 p-4 pl-8 text-slate-500">
+                {project.id}
+              </td>
+              <td className="border-b border-slate-100 p-4 pl-8 text-slate-500">
+                {new Date(project.createdAt).toLocaleDateString()}
+              </td>
+              <td className="border-b border-slate-100 p-4 pl-8 text-slate-500">
+                <div
+                  className="btn-primary"
+                  onClick={() => {
+                    setCurrentProjectId(project.id);
+                    setIsOpenModal(true);
+                  }}
+                >
+                  Download
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <Modal
+        closeHandle={() => setIsOpenModal(false)}
+        className={{
+          dialogPanel:
+            "w-full max-w-md align-middle p-6 bg-th-primary-100 text-th-text-secondary-100 overflow-y-visible rounded-3xl",
+        }}
+        isOpen={isOpenModal}
+      >
+        <ListBox
+          selectedOption={selectedOption}
+          setSelectedOption={setSelectedOption}
+          options={options}
+        />
+        <div className="flex justify-center">
+          <div className="flex gap-4 text-xl w-1/2">
+            <button
+              className="btn-primary flex-1"
+              onClick={() => setIsOpenModal(false)}
+            >
+              Close
+            </button>
+            <button
+              className="btn-primary flex-1"
+              onClick={() => download(currentProjectId)}
+            >
+              Download
+            </button>
+          </div>
+        </div>
+      </Modal>
+    </>
   );
 }
 
