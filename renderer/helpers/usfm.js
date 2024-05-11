@@ -1,3 +1,5 @@
+import usfm from 'usfm-js'
+
 const getText = (verseObject) => {
   return verseObject.text || verseObject.nextChar || '';
 };
@@ -114,11 +116,9 @@ export const convertToUsfm = ({ jsonChapters, book, project }) => {
   const headers = [
     {
       tag: 'id',
-      content: `${book?.code.toUpperCase()} ${project?.code.toUpperCase()} ${
-        project?.language.code
-      }_${capitalize(project?.language?.orig_name)}_${
-        project?.title
-      } ${Date()} v-cana`,
+      content: `${book?.code.toUpperCase()} ${project?.code.toUpperCase()} ${project?.language.code
+        }_${capitalize(project?.language?.orig_name)}_${project?.title
+        } ${Date()} v-cana`,
     },
     {
       tag: 'usfm',

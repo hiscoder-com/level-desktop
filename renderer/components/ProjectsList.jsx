@@ -4,6 +4,7 @@ import ListBox from "./ListBox";
 import Modal from "./Modal";
 import { useState } from "react";
 import jszip from "jszip";
+import ChaptersMerger from "./ChaptersMerger";
 
 const styles = {
   currentPage: {
@@ -21,11 +22,12 @@ const styles = {
 const options = [
   { label: "Export to PDF", value: "pdf" },
   { label: "Export to ZIP", value: "zip" },
+  { label: "Export to USFM", value: "usfm" },
 ];
 
 function ProjectsList({ projects }) {
   const [selectedOption, setSelectedOption] = useState(options[0].value);
-  const [currentProjectId, setCurrentProjectId] = useState(null);
+  const [currentProject, setCurrentProject] = useState(null);
   const [isOpenModal, setIsOpenModal] = useState(false);
   const exportToPdf = (chapters) => {
     const book = [];
@@ -81,8 +83,8 @@ function ProjectsList({ projects }) {
       console.log(error.message);
     }
   };
-  const download = (id) => {
-    const chapters = window.electronAPI.getBook(id);
+  const download = (project) => {
+    const chapters = window.electronAPI.getBook(project.id);
     console.log(chapters);
     if (selectedOption === "pdf") {
       exportToPdf(chapters);
@@ -139,7 +141,7 @@ function ProjectsList({ projects }) {
                 <div
                   className="btn-primary"
                   onClick={() => {
-                    setCurrentProjectId(project.id);
+                    setCurrentProject(project);
                     setIsOpenModal(true);
                   }}
                 >
@@ -163,6 +165,9 @@ function ProjectsList({ projects }) {
           setSelectedOption={setSelectedOption}
           options={options}
         />
+        {selectedOption === "usfm" && (
+          <ChaptersMerger book={currentProject.book.code} />
+        )}
         <div className="flex justify-center">
           <div className="flex gap-4 text-xl w-1/2">
             <button
@@ -171,12 +176,14 @@ function ProjectsList({ projects }) {
             >
               Close
             </button>
-            <button
-              className="btn-primary flex-1"
-              onClick={() => download(currentProjectId)}
-            >
-              Download
-            </button>
+            {selectedOption !== "usfm" && (
+              <button
+                className="btn-primary flex-1"
+                onClick={() => download(currentProject)}
+              >
+                Download
+              </button>
+            )}
           </div>
         </div>
       </Modal>
