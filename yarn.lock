@@ -1553,13 +1553,14 @@
     jszip "^3.10.1"
     pdfmake "^0.2.7"
 
-"@texttree/tn-quote@^0.5.0":
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/@texttree/tn-quote/-/tn-quote-0.5.0.tgz#f7886cae4311188e06836d8c85c6ad7e416dacd5"
-  integrity sha512-615eo+SnaVRkkOxmrsbi71OECl4TJlcLeSNMfs9Lr4MmMSjMxohg9jHNI2YLTFiDnXtK3UWVaggQJAO1Ti27Tw==
+"@texttree/tn-quote-helpers@^0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@texttree/tn-quote-helpers/-/tn-quote-helpers-0.1.1.tgz#6de2420a713ff98f7e67a7da751a55b88f15a33f"
+  integrity sha512-UQvc97/kJe4a+29YPfBOvTzM0kmqtr7CfCE6apcHl20eeQkz3VoXDyYMEDLOY50AfvHnL/rNGqKyEDMzxdM9Xw==
   dependencies:
     axios "^1.4.0"
     js-yaml "^4.1.0"
+    react "^18.3.1"
     string-punctuation-tokenizer "^2.2.0"
     usfm-js "^3.4.2"
     xregexp "^5.1.1"
@@ -5503,6 +5504,13 @@ react@^18.2.0:
   version "18.3.0"
   resolved "https://registry.yarnpkg.com/react/-/react-18.3.0.tgz#84386d0a36fdf5ef50fa5755b7812bdfb76194a5"
   integrity sha512-RPutkJftSAldDibyrjuku7q11d3oy6wKOyPe5K1HA/HwwrXcEqBdHsLypkC2FFYjP7bPUa6gbzSBhw4sY2JcDg==
+  dependencies:
+    loose-envify "^1.1.0"
+
+react@^18.3.1:
+  version "18.3.1"
+  resolved "https://registry.yarnpkg.com/react/-/react-18.3.1.tgz#49ab892009c53933625bd16b2533fc754cab2891"
+  integrity sha512-wS+hAgJShR0KhEvPJArfuPVN1+Hz1t0Y6n5jLrGQbkb4urgPE/0Rve+1kMB1v/oWgHgm4WIcV+i7F2pTVj+2iQ==
   dependencies:
     loose-envify "^1.1.0"
 
