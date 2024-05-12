@@ -3,15 +3,20 @@ import { useTranslation } from "next-i18next";
 import VcanaLogo from "../public/icons/vcana-logo-color.svg";
 import { useRouter } from "next/router";
 
-function StartPage() {
+export default function StartPage() {
   const router = useRouter();
-  const { t } = useTranslation(["start-page", "projects", "users", "common"]);
+
+  const {
+    i18n: { language: locale },
+    t,
+  } = useTranslation();
+
   const checkAgreements = () => {
     const agreements = window.electronAPI.getAgreements();
     if (Object.values(agreements).every((agreement) => agreement)) {
-      router.push("/account");
+      router.push(`/${locale}/account`);
     } else {
-      router.push("/agreements");
+      router.push(`/${locale}/agreements`);
     }
   };
   return (
@@ -27,12 +32,10 @@ function StartPage() {
           }}
         >
           <p className="p-5 lg:p-7 green-two-layers z-10 h-full w-full rounded-2xl after:rounded-2xl text-th-secondary-10 cursor-pointer">
-            {t("users:SignIn")}
+            {t("common:SignIn")}
           </p>
         </div>
       </div>
     </div>
   );
 }
-
-export default StartPage;
