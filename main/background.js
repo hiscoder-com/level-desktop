@@ -13,7 +13,7 @@ import {
   tsvToJSON,
   selectionsFromQuoteAndVerseObjects,
   parseVerseObjects,
-} from '@texttree/tn-quote';
+} from '@texttree/tn-quote-helpers';
 
 const isProd = process.env.NODE_ENV === 'production';
 
