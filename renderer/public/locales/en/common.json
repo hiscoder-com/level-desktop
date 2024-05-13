@@ -1,18 +1,20 @@
 {
+  "Back": "Back",
   "Book": "Book",
+  "Close": "Close",
   "Confession": "Confession of Faith",
+  "CreatedAt": "Created at",
   "DescriptionConfession": "consistent with the historical symbols of faith:<br />The Apostolic Creed, the Nicene Creed, and the Athanasian Creed; as well as the Lausanne Covenant.",
+  "Download": "Download",
   "EN": "EN",
   "ES": "ES",
   "GoToHome": "Go to home",
   "ID": "ID",
   "Import": "Import",
-  "Next": "Next",
-  "Projects": "Projects",
-  "Download": "Download",
-  "Close": "Close",
-  "V-CANA": "V-CANA",
-  "RU": "RU",
   "Loading": "Loading...",
-  "CreatedAt": "Created at"
+  "Next": "Next",
+  "NotSelected": "Not selected",
+  "Projects": "Projects",
+  "RU": "RU",
+  "V-CANA": "V-CANA"
 }

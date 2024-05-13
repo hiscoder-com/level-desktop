@@ -1,18 +1,20 @@
 {
+  "Back": "Atrás",
   "Book": "Libro",
+  "Close": "Cerca",
   "Confession": "Confesión de fe",
+  "CreatedAt": "Creado en",
   "DescriptionConfession": "consistent with the historical symbols of faith:<br />The Apostolic Creed, the Nicene Creed, and the Athanasian Creed; as well as the Lausanne Covenant.",
+  "Download": "Descargar",
   "EN": "EN",
   "ES": "ES",
   "GoToHome": "Ir a casa",
   "ID": "ID",
   "Import": "Importación",
-  "Next": "Próxima",
-  "Projects": "Proyectos",
-  "Download": "Descargar",
-  "Close": "Cerca",
-  "V-CANA": "V-CANA",
   "Loading": "Cargando...",
-  "CreatedAt": "Creado en",
-  "RU": "RU"
+  "Next": "Próxima",
+  "NotSelected": "No seleccionado",
+  "Projects": "Proyectos",
+  "RU": "RU",
+  "V-CANA": "V-CANA"
 }
