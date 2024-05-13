@@ -2,6 +2,8 @@ import { useTranslation } from "next-i18next";
 
 import VcanaLogo from "../public/icons/vcana-logo-color.svg";
 import { useRouter } from "next/router";
+import Gear from "../public/icons/gear.svg";
+import Link from "next/link";
 
 function StartPage() {
   const router = useRouter();
@@ -15,7 +17,10 @@ function StartPage() {
     }
   };
   return (
-    <div className="flex flex-col justify-center items-center gap-4 h-screen w-full ">
+    <div className="flex flex-col justify-center items-center gap-4 h-screen w-full relative">
+      <Link href="/chapter-merger">
+        <Gear className="w-12 h-12 absolute top-5 right-5" />
+      </Link>
       <div>
         <div className="flex flex-grow items-center justify-center p-5  h-24 bg-white rounded-2xl cursor-pointer mb-4">
           <VcanaLogo className="w-44" />

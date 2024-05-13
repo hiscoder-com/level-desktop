@@ -419,7 +419,7 @@ ipcMain.on('update-chapter', (event, projectid, chapter, data) => {
   );
   for (const verse in data) {
     if (Object.hasOwnProperty.call(data, verse)) {
-      chapterData[verse].text = data[verse];
+      chapterData[verse].text = data[verse].text;
     }
   }
   fs.writeFileSync(
@@ -724,7 +724,8 @@ ipcMain.on('go-to-step', async (event, id, chapter, step) => {
     saveStepData(id, chapter, oldStep);
   }
   if (newStep < oldStep) {
-    restoreStepData(id, chapter, oldStep);
+
+    // restoreStepData(id, chapter, oldStep); Пока решил закрыть, чтобы данные не потерять во время тестирования
   }
   if (newStep === oldStep && oldStep === config.steps.length - 1) {
     saveStepData(id, chapter, oldStep);
