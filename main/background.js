@@ -775,6 +775,9 @@ ipcMain.on("add-project", (event, url) => {
 
 ipcMain.handle("dialog:openFile", handleFileOpen);
 ipcMain.handle("dialog:openConfig", handleConfigOpen);
+
+const localeStore = new Store({ name: "locale" });
+
 ipcMain.handle("setLocale", (_event, locale) => {
-  userStore.set("locale", locale);
+  localeStore.set("locale", locale);
 });

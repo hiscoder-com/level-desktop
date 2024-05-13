@@ -3,8 +3,10 @@ import Head from "next/head";
 
 import { useTranslation } from "next-i18next";
 
-import StartPage from "../../components/StartPage";
 import { getStaticPaths, makeStaticProperties } from "../../lib/get-static";
+
+import StartPage from "../../components/StartPage";
+import SwitchLocalization from "../../components/LanguageSwitcher";
 
 export default function Home() {
   const {
@@ -18,6 +20,7 @@ export default function Home() {
         <title>V-CANA</title>
       </Head>
       <div className="text-2xl w-full">
+        <SwitchLocalization />
         <StartPage />
       </div>
     </>
