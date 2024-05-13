@@ -85,7 +85,6 @@ function ProjectsList({ projects }) {
   };
   const download = (project) => {
     const chapters = window.electronAPI.getBook(project.id);
-    console.log(chapters);
     if (selectedOption === "pdf") {
       exportToPdf(chapters);
     } else {

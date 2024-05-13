@@ -1,69 +1,99 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import JSZip from "jszip";
 import Close from "../public/icons/close.svg";
 import { convertToUsfm } from "../helpers/usfm";
-// import toast from "react-hot-toast";
 export default function ChaptersMerger({ book }) {
   const [jsonDataArray, setJsonDataArray] = useState([]);
   const [conflicts, setConflicts] = useState(null);
   const [mergedContent, setMergedContent] = useState(null);
+  const fileInputRef = useRef();
 
   const checkEqualFiles = (file) => {
     const existingFile = jsonDataArray.find((f) => f.filename === file);
     return existingFile;
   };
+  const exportToZip = (exportedData, name = "exported") => {
+    try {
+      if (!exportedData) {
+        throw new Error("error:NoData");
+      }
+      const jsonContent = JSON.stringify(exportedData, null, 2);
+      const zip = new JSZip();
+      const currentDate = new Date();
+      const formattedDate = currentDate
+        .toISOString()
+        .replace(/:/g, "-")
+        .split(".")[0];
+      const fileName = `chapter_${formattedDate}.json`;
+      zip.file(fileName, jsonContent);
+      zip.generateAsync({ type: "blob" }).then(function (content) {
+        const blob = content;
+        const url = window.URL.createObjectURL(blob);
+        const downloadLink = document.createElement("a");
+        downloadLink.href = url;
+        downloadLink.download = `${name}_${formattedDate}.zip`;
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+        window.URL.revokeObjectURL(url);
+      });
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
   const handleFiles = async (files) => {
     const jsonPromises = [];
-
-    for (let i = 0; i < files.length; i++) {
+    for (let file of files) {
       const zip = new JSZip();
-
-      const zipContents = await zip.loadAsync(files[i]);
-
-      Object.keys(zipContents.files).forEach((filename) => {
+      const zipContents = await zip.loadAsync(file);
+      for (let filename in zipContents.files) {
         const existingFile = checkEqualFiles(filename);
-
         if (filename.endsWith(".json") && !existingFile) {
           const filePromise = zipContents.files[filename]
             .async("text")
             .then((fileData) => {
-              return { filename, content: JSON.parse(fileData) };
+              const data = JSON.parse(fileData);
+              return { filename, content: data };
             });
-
           jsonPromises.push(filePromise);
-        } else {
-          // toast.error("Файлы с таким именем уже существуют");
+        } else if (filename.endsWith(".json") && existingFile) {
         }
-      });
+      }
     }
-    const jsonObjects = await Promise.all(jsonPromises);
 
-    setJsonDataArray((prevData) => [...prevData, ...jsonObjects]);
+    try {
+      const jsonObjects = await Promise.all(jsonPromises);
+      setJsonDataArray((prevData) => [...prevData, ...jsonObjects]);
+    } catch (error) {
+      console.error("Ошибка валидации", error);
+    }
   };
 
   function mergeJsonContents(jsonDataArray) {
     const mergedContent = {};
-
     const conflicts = [];
+    if (jsonDataArray.length < 2) {
+      return;
+    }
 
     jsonDataArray.forEach(({ content }) => {
-      Object.keys(content).forEach((chapter) => {
+      const chapters = content;
+      Object.keys(chapters).forEach((chapter) => {
         if (!mergedContent[chapter]) {
           mergedContent[chapter] = {};
         }
-
-        Object.keys(content[chapter]).forEach((verse) => {
-          if (content[chapter][verse].text && !mergedContent[chapter][verse]) {
-            mergedContent[chapter][verse] = content[chapter][verse];
+        Object.keys(chapters[chapter]).forEach((verse) => {
+          if (chapters[chapter][verse].text && !mergedContent[chapter][verse]) {
+            mergedContent[chapter][verse] = chapters[chapter][verse];
           } else if (
-            content[chapter][verse].text &&
+            chapters[chapter][verse].text &&
             mergedContent[chapter][verse].text
           ) {
             conflicts.push({
               chapter,
               verse,
               existingText: mergedContent[chapter][verse].text,
-              newText: content[chapter][verse].text,
+              newText: chapters[chapter][verse].text,
             });
           }
         });
@@ -81,7 +111,6 @@ export default function ChaptersMerger({ book }) {
         );
       });
     }
-
     return {
       mergedContent,
       conflicts,
@@ -109,7 +138,7 @@ export default function ChaptersMerger({ book }) {
     }
     return convertedChapters;
   };
-  const downloadFile = (chapters) => {
+  const downloadUsfm = (chapters) => {
     const convertedChapters = convertJson(chapters);
     const merge = convertToUsfm({
       jsonChapters: convertedChapters,
@@ -141,6 +170,7 @@ export default function ChaptersMerger({ book }) {
   return (
     <div className="layout-appbar">
       <input
+        ref={fileInputRef}
         type="file"
         multiple
         onChange={(e) => handleFiles(e.target.files)}
@@ -155,6 +185,10 @@ export default function ChaptersMerger({ book }) {
               onClick={() => {
                 setJsonDataArray(jsonDataArray.filter((_, i) => i !== index));
                 setConflicts(null);
+                if (fileInputRef.current) {
+                  fileInputRef.current.value = "";
+                }
+                setMergedContent(null);
               }}
             />
           </div>
@@ -162,7 +196,11 @@ export default function ChaptersMerger({ book }) {
         ))}
       </div>
       {jsonDataArray.length > 0 && (
-        <button className="btn-primary" onClick={() => mergeChapters()}>
+        <button
+          className="btn-primary"
+          disabled={jsonDataArray.length < 2}
+          onClick={() => mergeChapters()}
+        >
           Merge
         </button>
       )}
@@ -181,14 +219,23 @@ export default function ChaptersMerger({ book }) {
         </div>
       ) : (
         mergedContent && (
-          <div className="flex flex-col gap-2 items-center">
+          <div>
             <p>Конфликтов нет, можно скачать в формате USFM</p>
-            <button
-              className="btn-primary"
-              onClick={() => downloadFile(mergedContent)}
-            >
-              Скачать
-            </button>
+            <div className="flex gap-2 items-center justify-center">
+              <button
+                className="btn-primary"
+                onClick={() => downloadUsfm(mergedContent)}
+              >
+                USFM
+              </button>
+
+              <button
+                className="btn-primary"
+                onClick={() => exportToZip(mergedContent, "merged")}
+              >
+                Архив для переводчиков
+              </button>
+            </div>
           </div>
         )
       )}

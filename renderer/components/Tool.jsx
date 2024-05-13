@@ -10,17 +10,20 @@ import TQ from "./TQ";
 import TWL from "./TWL";
 import Divider from "./Divider";
 import TeamNotes from "./TeamNotes";
+import Merger from "./Merger";
 
 function Tool({ config, toolName }) {
   let CurrentTool;
   const title = toolName;
-
   switch (toolName) {
     case "bible":
       CurrentTool = Bible;
       break;
     case "divider":
       CurrentTool = Divider;
+      break;
+    case "merger":
+      CurrentTool = Merger;
       break;
 
     // case 'OBS Translation Questions':
