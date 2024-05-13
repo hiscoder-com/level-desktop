@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 
 import Breadcrumbs from "../../../../components/Breadcrumbs";
 import ChapterList from "../../../../components/ChaptersList";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { makeStaticProperties } from "../../../../lib/get-static";
 
 function Project() {
   const { t } = useTranslation(["common", "projects"]);
@@ -57,15 +57,7 @@ function Project() {
 
 export default Project;
 
-export async function getStaticProps({ params }) {
-  const { locale } = params;
-
-  return {
-    props: {
-      ...(await serverSideTranslations(locale, ["common", "projects"])),
-    },
-  };
-}
+export const getStaticProps = makeStaticProperties(["common", "projects"]);
 
 export async function getStaticPaths() {
   const paths = [
