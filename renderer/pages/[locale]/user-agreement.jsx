@@ -1,21 +1,25 @@
+import { useState } from "react";
+
 import { useRouter } from "next/router";
 
 import { useTranslation } from "next-i18next";
-import CheckBox from "../components/CheckBox";
-import { useState } from "react";
-// import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import CheckBox from "../../components/CheckBox";
+import { getStaticPaths, makeStaticProperties } from "../../lib/get-static";
 
 export default function UserAgreement() {
   const [isChecked, setIsChecked] = useState(false);
   const router = useRouter();
-  const { t } = useTranslation(["user-agreement", "common", "users"]);
+  const {
+    i18n: { language: locale },
+    t,
+  } = useTranslation(["user-agreement", "common", "users"]);
   const handleClick = async () => {
     const agreements = window.electronAPI.getAgreements();
     window.electronAPI.updateAgreements({
       ...agreements,
       userAgreement: isChecked,
     });
-    router.push("/agreements");
+    router.push(`/${locale}/agreements`);
   };
 
   return (
@@ -72,14 +76,10 @@ export default function UserAgreement() {
   );
 }
 
-// export async function getStaticProps({ locale }) {
-//   return {
-//     props: {
-//       ...(await serverSideTranslations(locale, [
-//         "user-agreement",
-//         "common",
-//         "users",
-//       ])),
-//     },
-//   };
-// }
+export const getStaticProps = makeStaticProperties([
+  "user-agreement",
+  "common",
+  "users",
+]);
+
+export { getStaticPaths };

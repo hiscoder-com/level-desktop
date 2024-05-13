@@ -17,7 +17,16 @@ export function getStaticPaths() {
   };
 }
 
-export async function getI18nProperties(context, namespaces = ["common"]) {
+export async function getI18nProperties(
+  context,
+  namespaces = [
+    "common",
+    "confession-steps",
+    "projects",
+    "user-agreement",
+    "users",
+  ]
+) {
   const locale = context?.params?.locale ?? i18next.i18n.defaultLocale;
   return {
     ...(await serverSideTranslations(locale, namespaces)),

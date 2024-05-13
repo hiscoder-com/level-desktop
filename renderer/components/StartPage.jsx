@@ -32,7 +32,7 @@ export default function StartPage() {
           }}
         >
           <p className="p-5 lg:p-7 green-two-layers z-10 h-full w-full rounded-2xl after:rounded-2xl text-th-secondary-10 cursor-pointer">
-            {t("common:SignIn")}
+            {t("users:SignIn")}
           </p>
         </div>
       </div>

@@ -3,14 +3,17 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 
 import { useTranslation } from "next-i18next";
-// import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { getStaticPaths, makeStaticProperties } from "../../lib/get-static";
 
 import CheckBox from "/components/CheckBox";
 
 import LeftArrow from "/public/icons/arrow-left.svg";
 
 export default function ConfessionSteps() {
-  const { t } = useTranslation(["confession-steps", "common", "users"]);
+  const {
+    i18n: { language: locale },
+    t,
+  } = useTranslation(["confession-steps", "common", "users"]);
   const router = useRouter();
   const [isChecked, setIsChecked] = useState(false);
   const [page, setPage] = useState(0);
@@ -80,7 +83,7 @@ export default function ConfessionSteps() {
       ...agreements,
       confession: isChecked,
     });
-    router.push("/agreements");
+    router.push(`/${locale}/agreements`);
   };
 
   return (
@@ -131,14 +134,10 @@ export default function ConfessionSteps() {
   );
 }
 
-// export async function getStaticProps({ locale }) {
-//   return {
-//     props: {
-//       ...(await serverSideTranslations(locale, [
-//         "confession-steps",
-//         "common",
-//         "users",
-//       ])),
-//     },
-//   };
-// }
+export const getStaticProps = makeStaticProperties([
+  "confession-steps",
+  "common",
+  "users",
+]);
+
+export { getStaticPaths };

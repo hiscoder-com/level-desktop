@@ -36,15 +36,14 @@ function LanguageSwitcher() {
                 as="div"
                 className="cursor-pointer px-4 py-2 hover:bg-th-primary-100-hover-backgroung last:rounded-b-2xl first:rounded-t-2xl hover:opacity-70"
               >
-                <Link
-                  legacyBehavior
-                  passHref
-                  href={pathname.replace("[locale]", loc)}
-                >
-                  <a className={`${locale === loc ? "text-gray-450" : ""}`}>
+                <div>
+                  <a
+                    href={pathname.replace("[locale]", loc)}
+                    className={`${locale === loc ? "text-gray-450" : ""}`}
+                  >
                     {t(loc.toUpperCase())}
                   </a>
-                </Link>
+                </div>
               </Menu.Item>
             ))}
           </div>

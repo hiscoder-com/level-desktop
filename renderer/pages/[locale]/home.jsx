@@ -20,6 +20,6 @@ export default function Home() {
   );
 }
 
-export const getStaticProps = makeStaticProperties(["common"]);
+export const getStaticProps = makeStaticProperties(["common", "users"]);
 
 export { getStaticPaths };

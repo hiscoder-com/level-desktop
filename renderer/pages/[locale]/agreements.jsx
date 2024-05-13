@@ -1,25 +1,31 @@
+import { useEffect, useState } from "react";
+
 import { useRouter } from "next/router";
 
 import { useTranslation } from "next-i18next";
-// import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import Check from "../public/icons/check.svg";
-import { useEffect, useState } from "react";
+
+import { getStaticPaths, makeStaticProperties } from "../../lib/get-static";
+
+import Check from "../../public/icons/check.svg";
 
 export default function Agreements() {
-  const { t } = useTranslation("users", "common", "user-agreement");
+  const {
+    i18n: { language: locale },
+    t,
+  } = useTranslation(["users", "common", "user-agreement"]);
   const { push } = useRouter();
   const [agreements, setAgreements] = useState({});
 
   const links = [
     {
       name: t("Agreement"),
-      link: "/user-agreement",
+      link: "user-agreement",
       done: agreements.userAgreement,
       text: t("user-agreement:TextLicense"),
     },
     {
       name: t("Confession"),
-      link: "/confession-steps",
+      link: "confession-steps",
       done: agreements.confession,
       text: t("common:DescriptionConfession"),
     },
@@ -44,7 +50,7 @@ export default function Agreements() {
                   ? "bg-th-primary-100 text-th-text-secondary-100"
                   : "bg-th-secondary-200 text-th-text-primary"
               } cursor-pointer rounded-md`}
-              onClick={() => push(agreement.link)}
+              onClick={() => push(`/${locale}/${agreement.link}`)}
             >
               <div
                 className={`absolute top-0 right-0 w-0 h-0 border-[24px] border-solid border-transparent 
@@ -72,7 +78,7 @@ export default function Agreements() {
         </div>
 
         <button
-          onClick={() => push("/account")}
+          onClick={() => push(`/${locale}/account`)}
           // disabled={!user?.agreement || !user?.confession}
           className="btn-primary"
         >
@@ -85,14 +91,10 @@ export default function Agreements() {
 
 Agreements.backgroundColor = "bg-th-secondary-100";
 
-// export async function getStaticProps({ locale }) {
-//   return {
-//     props: {
-//       ...(await serverSideTranslations(locale, [
-//         "users",
-//         "common",
-//         "user-agreement",
-//       ])),
-//     },
-//   };
-// }
+export const getStaticProps = makeStaticProperties([
+  "users",
+  "common",
+  "user-agreement",
+]);
+
+export { getStaticPaths };

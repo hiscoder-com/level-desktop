@@ -57,8 +57,8 @@ async function handleConfigOpen() {
   await app.whenReady();
 
   const mainWindow = createWindow("main", {
-    width: 1000,
-    height: 600,
+    width: 1400,
+    height: 800,
     backgroundColor: "#fff",
     autoHideMenuBar: isProd,
     webPreferences: {
