@@ -8,6 +8,7 @@ import { toJSON } from "usfm-js";
 import { markRepeatedWords } from "@texttree/translation-words-helpers";
 const fs = require("fs");
 import i18next from "../next-i18next.config.js";
+import { localeStore } from "./helpers/user-store";
 
 import {
   formatToString,
@@ -65,9 +66,7 @@ async function handleConfigOpen() {
     },
   });
 
-  const storeLocale = new Store({ name: "locale" });
-
-  const locale = storeLocale.get("locale", i18next.i18n.defaultLocale);
+  const locale = localeStore.get("locale", i18next.i18n.defaultLocale);
   console.log("Using locale:", locale);
 
   if (isProd) {
@@ -775,9 +774,3 @@ ipcMain.on("add-project", (event, url) => {
 
 ipcMain.handle("dialog:openFile", handleFileOpen);
 ipcMain.handle("dialog:openConfig", handleConfigOpen);
-
-const localeStore = new Store({ name: "locale" });
-
-ipcMain.handle("setLocale", (_event, locale) => {
-  localeStore.set("locale", locale);
-});
