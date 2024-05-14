@@ -16,6 +16,7 @@ import Pencil from "../../../../public/icons/editor-pencil.svg";
 import Info from "../../../../public/icons/info.svg";
 import Breadcrumbs from "../../../../components/Breadcrumbs";
 import ProgressBar from "../../../../components/ProgressBar";
+import TeamNote from "../../../../public/icons/team-note.svg";
 
 const sizes = {
   1: "lg:w-1/6",
@@ -30,6 +31,7 @@ const translateIcon = <Pencil className="w-5 inline" />;
 
 const icons = {
   personalNotes: <Notepad className="w-5 inline" />,
+  teamNotes: <TeamNote className="w-5 inline" />,
   dictionary: <Dict className="w-5 inline" />,
   retelling: <Audio className="w-5 inline" />,
   info: <Info className="w-5 inline" />,

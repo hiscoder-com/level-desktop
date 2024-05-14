@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 
 import { useTranslation } from "next-i18next";
-// import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
 import CheckBox from "/components/CheckBox";
 
@@ -75,11 +74,11 @@ export default function ConfessionSteps() {
   }, [page]);
 
   const handleClick = async () => {
-    const agreements = window.electronAPI.getAgreements();
-    window.electronAPI.updateAgreements({
-      ...agreements,
-      confession: isChecked,
-    });
+    const agreements = JSON.parse(window.electronAPI.getItem("agreements"));
+    window.electronAPI.setItem(
+      "agreements",
+      JSON.stringify({ ...agreements, confession: isChecked })
+    );
     router.push("/agreements");
   };
 
@@ -130,15 +129,3 @@ export default function ConfessionSteps() {
     </div>
   );
 }
-
-// export async function getStaticProps({ locale }) {
-//   return {
-//     props: {
-//       ...(await serverSideTranslations(locale, [
-//         "confession-steps",
-//         "common",
-//         "users",
-//       ])),
-//     },
-//   };
-// }

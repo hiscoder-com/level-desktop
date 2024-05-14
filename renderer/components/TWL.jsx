@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
 
-import ReactMarkdown from "react-markdown";
-
 import localforage from "localforage";
 import jszip from "jszip";
 import { useGetTwlResource } from "../hooks/useGetTwlResource";
@@ -84,7 +82,7 @@ function TWL({
     chapter,
     wholeChapter,
   });
-  const [wordObjects, setWordObjects] = useState([]);
+  const [wordObjects, setWordObjects] = useState({});
   const [isLoadingTW, setIsLoadingTW] = useState(false);
   useEffect(() => {
     const getData = async () => {
@@ -150,7 +148,7 @@ function TWL({
           main: "relative h-full",
           content: {
             container:
-              "absolute top-0 bottom-0 pr-2 ,bg-th-secondary-10 overflow-auto left-0 right-0",
+              "absolute top-0 bottom-0 pr-2 bg-th-secondary-10 overflow-auto left-0 right-0",
             header: "sticky flex top-0 pb-4 bg-th-secondary-10",
             backButton:
               "w-fit h-fit p-1 mr-2.5 cursor-pointer hover:opacity-70 rounded-full bg-th-secondary-100",
@@ -162,7 +160,7 @@ function TWL({
             container:
               "divide-y divide-th-text-primary divide-dashed h-full overflow-auto",
             verseBlock: "pl-7 flex-1",
-            currentNote: "bg-th-secondary-100",
+            currentWord: "bg-th-secondary-100",
             word: "p-2 cursor-pointer rounded-lg hover:bg-th-secondary-100",
             verseWrapper: "p-4 flex mx-4",
             filtered: "text-th-secondary-300",
@@ -172,7 +170,7 @@ function TWL({
         isLoading={isLoadingTW || isLoading}
         scrollTopOffset={20}
         startHighlightIds={checkLSVal("highlightIds", {}, "object")}
-        currentScrollVerse={currentScrollVerse}
+        currentScrollVerse={String(currentScrollVerse)}
         toolId={toolName}
         idContainerScroll={"container_tw"}
         setCurrentScrollVerse={setCurrentScrollVerse}
@@ -240,7 +238,7 @@ const getFileFromZip = async ({ id, resource }) => {
 };
 
 const getFile = async ({ id, resource, chapter }) => {
-  const file = await getFileFromZip({ id, resource, chapter });
+  const file = await getFileFromZip({ id, resource });
   if (!file) {
     return await fetchFileFromServer({ id, resource, chapter });
   } else {

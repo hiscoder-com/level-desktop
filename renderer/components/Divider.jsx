@@ -78,7 +78,7 @@ function Verses({
   };
   return (
     <>
-      {verseObjects?.map((verseObject, idx) => (
+      {verseObjects?.map((verseObject) => (
         <div
           key={verseObject.verse}
           id={"id" + verseObject.verse}
@@ -87,9 +87,9 @@ function Verses({
               ? "bg-gray-200"
               : ""
           }`}
-          onClick={() => {
-            handleSaveScroll(String(verseObject.verse));
-          }}
+          // onClick={() => {
+          //   handleSaveScroll(String(verseObject.verse));
+          // }} // убрал - автоскролл на время теста, он раздражает, если понадобится- верну
         >
           <input
             type="checkbox"
