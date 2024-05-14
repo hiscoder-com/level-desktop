@@ -1,8 +1,8 @@
-import { screen, BrowserWindow } from 'electron';
-import Store from 'electron-store';
+import { screen, BrowserWindow } from "electron";
+import Store from "electron-store";
 
 export const createWindow = (windowName, options) => {
-  const key = 'window-state';
+  const key = "window-state";
   const name = `window-state-${windowName}`;
   const store = new Store({ name });
   const defaultSize = {
@@ -66,13 +66,13 @@ export const createWindow = (windowName, options) => {
     ...state,
     ...options,
     webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: true,
       ...options.webPreferences,
-      // nodeIntegration: true,
-      // contextIsolation: false,
     },
   });
 
-  win.on('close', saveState);
+  win.on("close", saveState);
 
   return win;
 };

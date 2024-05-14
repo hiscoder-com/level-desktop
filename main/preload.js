@@ -1,4 +1,4 @@
-const { contextBridge, ipcRenderer } = require('electron');
+const { contextBridge, ipcRenderer } = require('electron')
 
 process.once('loaded', () => {
   contextBridge.exposeInMainWorld('electronAPI', {
@@ -6,7 +6,7 @@ process.once('loaded', () => {
     openConfig: () => ipcRenderer.invoke('dialog:openConfig'),
     notify: (handler) =>
       ipcRenderer.on('notify', (event, data) => {
-        handler(data);
+        handler(data)
       }),
     removeNotify: () => ipcRenderer.removeAllListeners('notify'),
     getProjects: () => ipcRenderer.sendSync('get-projects'),
@@ -15,8 +15,7 @@ process.once('loaded', () => {
       ipcRenderer.sendSync('go-to-step', id, chapter, step),
     getChapter: (projectid, chapter) =>
       ipcRenderer.sendSync('get-chapter', projectid, chapter),
-    getBook: (projectid) =>
-      ipcRenderer.sendSync('get-book', projectid),
+    getBook: (projectid) => ipcRenderer.sendSync('get-book', projectid),
     updateChapter: (projectid, chapter, data) =>
       ipcRenderer.sendSync('update-chapter', projectid, chapter, data),
     divideVerse: (projectid, chapter, verse, enabled) =>
@@ -27,16 +26,12 @@ process.once('loaded', () => {
     removeItem: (key) => ipcRenderer.sendSync('remove-item', key),
     setProjectFolder: (id) => ipcRenderer.send('set-project-folder', id),
     getWords: () => ipcRenderer.sendSync('get-words'),
-    addWord: (projectid, wordid) =>
-      ipcRenderer.sendSync('add-word', projectid, wordid),
-    updateWord: (projectid, word) =>
-      ipcRenderer.sendSync('update-word', projectid, word),
-    getWord: (projectid, wordid) =>
-      ipcRenderer.sendSync('get-word', projectid, wordid),
+    addWord: (projectid, wordid) => ipcRenderer.sendSync('add-word', projectid, wordid),
+    updateWord: (projectid, word) => ipcRenderer.sendSync('update-word', projectid, word),
+    getWord: (projectid, wordid) => ipcRenderer.sendSync('get-word', projectid, wordid),
     getWordsWithData: (projectid, wordids) =>
       ipcRenderer.sendSync('get-words-with-data', projectid, wordids),
-    importWord: (projectid, note) =>
-      ipcRenderer.sendSync('import-word', projectid, note),
+    importWord: (projectid, note) => ipcRenderer.sendSync('import-word', projectid, note),
     importNote: (projectid, note, type) =>
       ipcRenderer.sendSync('import-note', projectid, note, type),
     removeWord: (projectid, wordid) =>
@@ -72,5 +67,24 @@ process.once('loaded', () => {
     getTWL: (id, resource, mainResource, chapter = false) =>
       ipcRenderer.sendSync('get-twl', id, resource, mainResource, chapter),
     addProject: (fileUrl) => ipcRenderer.send('add-project', fileUrl),
-  });
-});
+  })
+
+  const handler = {
+    send(channel, value) {
+      ipcRenderer.send(channel, value)
+    },
+    on(channel, callback) {
+      const subscription = (_event, ...args) => callback(...args)
+      ipcRenderer.on(channel, subscription)
+
+      return () => {
+        ipcRenderer.removeListener(channel, subscription)
+      }
+    },
+    setLocale(locale) {
+      ipcRenderer.invoke(`setLocale`, locale)
+    },
+  }
+
+  contextBridge.exposeInMainWorld('ipc', handler)
+})

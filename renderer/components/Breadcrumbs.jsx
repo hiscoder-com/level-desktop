@@ -1,20 +1,22 @@
-import Link from "next/link";
-import React, { Fragment } from "react";
+import React, { Fragment } from 'react'
+import Link from 'next/link'
+import { useTranslation } from 'react-i18next'
+
+import VcanaLogo from '../public/icons/vcana-logo.svg'
 
 export default function Breadcrumbs({ links = [], currentTitle }) {
+  const {
+    i18n: { language: locale },
+  } = useTranslation()
+
+  const homeUrl = `/${locale}/account`
+
   return (
-    <div className="bg-gray-200 dark:bg-gray-800 mb-4">
+    <div className="bg-gray-200 dark:bg-slate-550 mb-4">
       <div className="flex items-center px-6 py-4 mx-auto overflow-x-auto whitespace-nowrap">
-        <Link href="/home" legacyBehavior>
+        <Link href={homeUrl} legacyBehavior>
           <a className="text-gray-600 dark:text-gray-200">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-5 h-5"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
-            </svg>
+            <VcanaLogo className="w-32" />
           </a>
         </Link>
         {links.map((link, idx) => (
@@ -56,12 +58,10 @@ export default function Breadcrumbs({ links = [], currentTitle }) {
                 />
               </svg>
             </span>
-            <div className="text-blue-600 dark:text-blue-400">
-              {currentTitle}
-            </div>
+            <div className="text-gray-600 dark:text-gray-200">{currentTitle}</div>
           </Fragment>
         )}
       </div>
     </div>
-  );
+  )
 }

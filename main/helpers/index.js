@@ -1,1 +1,3 @@
-export * from './create-window'
+import "./ipc";
+
+export * from "./create-window";
