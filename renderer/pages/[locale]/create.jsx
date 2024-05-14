@@ -42,7 +42,7 @@ export default function Create() {
           <input
             className="btn-primary text-base mt-3"
             type="submit"
-            value={"Create"}
+            value={t("Create")}
           />
         </form>
       </div>

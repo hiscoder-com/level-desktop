@@ -177,12 +177,12 @@ function TWL({
 export default TWL;
 
 function FilterRepeated({ setFilter, filter }) {
-  const { t } = useTranslation();
+  const { t } = useTranslation(["common", "projects"]);
 
   const options = [
-    { value: "verse", name: "По стиху" },
-    { value: "book", name: "По книге" },
-    { value: "disabled", name: "Disabled" },
+    { value: "verse", name: t("projects:ByVerse") },
+    { value: "book", name: t("projects:ByBook") },
+    { value: "disabled", name: t("Disabled") },
   ];
 
   return (

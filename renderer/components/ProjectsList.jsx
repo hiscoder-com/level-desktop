@@ -25,17 +25,16 @@ const styles = {
   text: { alignment: "justify" },
 };
 
-const options = [
-  { label: "Export to PDF", value: "pdf" },
-  { label: "Export to ZIP", value: "zip" },
-  { label: "Export to USFM", value: "usfm" },
-];
-
 function ProjectsList({ projects }) {
   const {
     i18n: { language: locale },
     t,
   } = useTranslation(["common", "projects"]);
+  const options = [
+    { label: t("projects:ExportToPDF"), value: "pdf" },
+    { label: t("projects:ExportToZIP"), value: "zip" },
+    { label: t("projects:ExportToUSFM"), value: "usfm" },
+  ];
   const { pathname } = useRouter();
   const [selectedOption, setSelectedOption] = useState(options[0].value);
   const [currentProject, setCurrentProject] = useState(null);

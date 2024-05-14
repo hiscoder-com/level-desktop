@@ -93,6 +93,7 @@ function Dictionary({ config: { id } }) {
   useEffect(() => {
     getWords(searchQuery, currentPage);
   }, [searchQuery]);
+
   useEffect(() => {
     if (!wordId) {
       return;
@@ -320,7 +321,7 @@ function Dictionary({ config: { id } }) {
           </button>
         </div>
       </div>
-      <Card>
+      <Card t={t}>
         <div className="mt-4">
           <Alphabet
             alphabet={alphabet}
@@ -485,7 +486,7 @@ function Alphabet({ alphabet, setCurrentPage, setSearchQuery, t, disabled }) {
     </div>
   );
 }
-function Card({ children, isOpen = true, isHidden = false }) {
+function Card({ children, t, isOpen = true, isHidden = false }) {
   return (
     <div className="flex flex-col w-full gap-3 bg-th-secondary-10 mt-2">
       <Disclosure defaultOpen={isOpen}>
