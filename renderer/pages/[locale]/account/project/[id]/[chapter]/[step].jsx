@@ -69,9 +69,9 @@ function StepPage() {
       parseInt(step) + 1
     );
     if (nextStep !== parseInt(step)) {
-      push(`/project/${id}/${chapter}/${nextStep}`);
+      push(`/${locale}/account/project/${id}/${chapter}/${nextStep}`);
     } else {
-      push(`/project/${id}`);
+      push(`/${locale}/account/project/${id}`);
     }
   };
   return (
@@ -79,7 +79,7 @@ function StepPage() {
       <Breadcrumbs
         links={[
           {
-            href: "/project/" + id,
+            href: `/${locale}/account/project/${id}`,
             title: `${project?.book?.name} ${chapter}`,
           },
         ]}
@@ -117,8 +117,8 @@ function StepPage() {
             <div onClick={nextStepHandle}>
               <a className="btn-cyan !px-6">
                 {project?.steps?.length === parseInt(step) + 1
-                  ? "Finish"
-                  : "Next"}
+                  ? t("Finish")
+                  : t("Next")}
               </a>
             </div>
           </div>

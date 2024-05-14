@@ -1,17 +1,13 @@
 import React, { Fragment } from "react";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
-import { useRouter } from "next/router";
 
 export default function Breadcrumbs({ links = [], currentTitle }) {
   const {
     i18n: { language: locale },
   } = useTranslation();
-  const { pathname } = useRouter();
 
-  const pathRegex = /\/\[locale\]\/account\/project\/\[id\]/;
-  const cleanPath = pathname.replace(pathRegex, `/${locale}`);
-  const homeUrl = `${cleanPath}/home`;
+  const homeUrl = `/${locale}/home`;
 
   return (
     <div className="bg-gray-200 dark:bg-gray-800 mb-4">
