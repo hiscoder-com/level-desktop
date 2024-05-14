@@ -25,18 +25,30 @@ const getWords = async ({ zip, repo, wordObjects }) => {
   if (!zip || !repo || !wordObjects) {
     return [];
   }
-  const promises = wordObjects.map(async (wordObject) => {
-    const uriMd =
-      repo + "/" + wordObject.TWLink.split("/").slice(-2).join("/") + ".md";
-    const markdown = await zip.files[uriMd].async("string");
-    const splitter = markdown?.search("\n");
-    return {
-      ...wordObject,
-      title: markdown?.slice(0, splitter),
-      text: markdown?.slice(splitter),
-    };
-  });
-  return await Promise.all(promises);
+  try {
+    const promises = wordObjects.map(async (wordObject) => {
+      const uriMd =
+        repo + "/" + wordObject.TWLink.split("/").slice(-2).join("/") + ".md";
+      const md = zip.files[uriMd];
+      if (md) {
+        const markdown = await zip.files[uriMd].async("string");
+        const splitter = markdown?.search("\n");
+        return {
+          ...wordObject,
+          title: markdown?.slice(0, splitter),
+          text: markdown?.slice(splitter),
+        };
+      } else {
+        console.log("this word got lost: ", uriMd);
+
+        return { ...wordObject, title: uriMd, text: uriMd };
+      }
+    });
+    return await Promise.all(promises);
+  } catch (error) {
+    console.log(error);
+    return [];
+  }
 };
 
 function filterNotes(newNote, verse, notes) {
@@ -77,7 +89,6 @@ function TWL({
   useEffect(() => {
     const getData = async () => {
       setIsLoadingTW(true);
-
       const zip = await getFile({
         id,
         resource,
@@ -217,9 +228,9 @@ const fetchFileFromServer = async ({ id, resource, chapter }) => {
   }
 };
 
-const getFileFromZip = async ({ id, resource, chapter }) => {
+const getFileFromZip = async ({ id, resource }) => {
   let file;
-  const uriZip = id + "/" + resource + "/" + chapter;
+  const uriZip = id + "/" + resource;
   const zipBlob = await zipStore.getItem(uriZip);
   if (zipBlob) {
     const zip = await jszip.loadAsync(zipBlob);
