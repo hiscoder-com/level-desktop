@@ -1,26 +1,26 @@
-import React, { useEffect } from "react";
+import React, { useEffect } from 'react'
 
-import { useRouter } from "next/router";
-import Link from "next/link";
+import { useRouter } from 'next/router'
+import Link from 'next/link'
 
-import { Menu } from "@headlessui/react";
-import { useTranslation } from "next-i18next";
-import i18next from "../../next-i18next.config";
+import { Menu } from '@headlessui/react'
+import { useTranslation } from 'next-i18next'
+import i18next from '../../next-i18next.config'
 
 function LanguageSwitcher() {
-  const { t, i18n } = useTranslation();
-  const locale = i18n.language;
-  const supportedLngs = i18next.i18n.locales;
-  const { pathname } = useRouter();
+  const { t, i18n } = useTranslation()
+  const locale = i18n.language
+  const supportedLngs = i18next.i18n.locales
+  const { pathname } = useRouter()
 
-  const sortedLngs = [locale, ...supportedLngs.filter((lng) => lng !== locale)];
+  const sortedLngs = [locale, ...supportedLngs.filter((lng) => lng !== locale)]
 
   useEffect(() => {
-    window.ipc.setLocale(locale);
-  }, [locale]);
+    window.ipc.setLocale(locale)
+  }, [locale])
 
   return (
-    <div className="relative max-w-min text-xs lg:text-sm font-bold mt-5">
+    <div className="relative max-w-min text-xs lg:text-sm font-bold">
       <Menu>
         <Menu.Button
           className="px-4 py-2 text-sm bg-th-secondary-100 rounded-[9rem] hover:opacity-70"
@@ -38,8 +38,8 @@ function LanguageSwitcher() {
               >
                 <div>
                   <a
-                    href={pathname.replace("[locale]", loc)}
-                    className={`${locale === loc ? "text-gray-450" : ""}`}
+                    href={pathname.replace('[locale]', loc)}
+                    className={`${locale === loc ? 'text-gray-450' : ''}`}
                   >
                     {t(loc.toUpperCase())}
                   </a>
@@ -50,7 +50,7 @@ function LanguageSwitcher() {
         </Menu.Items>
       </Menu>
     </div>
-  );
+  )
 }
 
-export default LanguageSwitcher;
+export default LanguageSwitcher

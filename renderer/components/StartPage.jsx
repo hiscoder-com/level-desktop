@@ -3,6 +3,8 @@ import Link from 'next/link'
 
 import { useTranslation } from 'next-i18next'
 
+import LanguageSwitcher from './LanguageSwitcher'
+
 import VcanaLogo from '../public/icons/vcana-logo-color.svg'
 import Gear from '../public/icons/gear.svg'
 
@@ -25,12 +27,16 @@ export default function StartPage() {
     router.push(allAgreed ? `/${locale}/account` : `/${locale}/agreements`)
   }
   return (
-    <div className="flex flex-col justify-center items-center gap-4 h-screen w-full relative">
-      <Link href="/chapter-merger">
-        <Gear className="w-12 h-12 absolute top-5 right-5" />
-      </Link>
+    <div className="relative flex flex-col justify-center items-center gap-4 h-screen w-full mx-auto max-w-7xl ">
+      <div className="w-full absolute flex justify-between items-center top-10">
+        <LanguageSwitcher />
+        <Link href={`/${locale}/chapter-merger`}>
+          <Gear className="w-10 h-10" />
+        </Link>
+      </div>
+
       <div>
-        <div className="flex flex-grow items-center justify-center p-5  h-24 bg-white rounded-2xl cursor-pointer mb-4">
+        <div className="flex flex-grow items-center justify-center p-5 h-24 bg-white rounded-2xl cursor-pointer mb-4">
           <VcanaLogo className="w-44" />
         </div>
         <div
