@@ -78,15 +78,8 @@ app.on('window-all-closed', () => {
 });
 
 const storeProjects = new Store({ name: 'projects' });
-const storeAgreements = new Store({ name: 'agreements' });
 
 const storeLS = new Store({ name: 'localStorage' });
-
-ipcMain.on('get-agreements', (event) => {
-  const agreements = storeAgreements.get('agreements') || [];
-  event.returnValue = agreements;
-  event.sender.send('notify', 'Loaded');
-});
 
 ipcMain.on('get-projects', (event) => {
   const projects = storeProjects.get('projects') || [];
@@ -114,14 +107,6 @@ const getNotesWithType = (type) => {
 
 }
 let dictionaryLS;
-
-
-
-ipcMain.on('update-agreements', (event, agreements) => {
-  storeAgreements.set('agreements', agreements);
-  event.sender.send('notify', 'Updated');
-  event.returnValue = agreements;
-});
 
 ipcMain.on('set-project-folder', (event, id) => {
   personalNotesLS = new Store({ name: 'personal-notes', cwd: `projects/${id}` });

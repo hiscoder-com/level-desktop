@@ -19,7 +19,7 @@
     "@texttree/obs-format-convert-rcl": "^0.4.2",
     "@texttree/tn-quote-helpers": "^0.1.1",
     "@texttree/translation-words-helpers": "^0.2.4",
-    "@texttree/v-cana-rcl": "0.1.0-alpha.0",
+    "@texttree/v-cana-rcl": "^0.1.0-alpha.1",
     "axios": "1.6.8",
     "decompress": "^4.2.1",
     "electron-serve": "^1.3.0",
