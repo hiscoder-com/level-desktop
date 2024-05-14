@@ -95,6 +95,7 @@ function StepPage() {
               } ${sizes[el.size]}`}
             >
               <Panel
+                t={t}
                 tools={el.tools}
                 mainResource={project.mainResource}
                 id={id}
@@ -132,7 +133,7 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-function Panel({ tools, mainResource, id, chapter, toolNames, stepConfig }) {
+function Panel({ tools, mainResource, id, chapter, toolNames, stepConfig, t }) {
   return (
     <Tab.Group>
       <Tab.List className="space-x-3 text-xs px-3 -mb-2 lg:-mb-7 flex overflow-auto">
@@ -156,9 +157,9 @@ function Panel({ tools, mainResource, id, chapter, toolNames, stepConfig }) {
               "dictionary",
               "info",
             ].includes(tool.name) ? (
-              <span title={tool.name}>
+              <span title={t(tool.name)}>
                 {icons[tool.name]}
-                <span className="hidden ml-2 sm:inline">{tool.name}</span>
+                <span className="hidden ml-2 sm:inline">{t(tool.name)}</span>
               </span>
             ) : (
               toolNames[tool.config.resource]
