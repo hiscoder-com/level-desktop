@@ -439,32 +439,7 @@
   .btn {
     @apply text-center border-2 rounded-md inline-block px-3 py-1 cursor-pointer disabled:bg-white disabled:hover:border-gray-300 disabled:hover:bg-white disabled:active:bg-white disabled:cursor-not-allowed disabled:border-gray-300 disabled:text-gray-400;
   }
-  .btn-white {
-    @apply btn bg-white text-cyan-600 border-cyan-600
-	hover:bg-cyan-50
-	active:bg-cyan-200
-	fill-cyan-600;
-  }
-  .btn-blue {
-    @apply btn text-white bg-blue-600 border-blue-600
-	hover:bg-blue-700 hover:border-blue-700
-	active:bg-blue-800 active:border-blue-800
-	disabled:bg-gray-300 disabled:hover:bg-gray-300 disabled:active:bg-gray-300	fill-white;
-  }
 
-  .btn-gray-red {
-    @apply btn text-white bg-gray-500 border-gray-600
-	hover:bg-red-700 hover:border-red-700
-	active:bg-red-800 active:border-red-800
-	disabled:bg-gray-300 disabled:hover:bg-gray-300 disabled:active:bg-gray-300;
-  }
-
-  .btn-cyan {
-    @apply btn text-white bg-cyan-600 border-cyan-600
-	hover:bg-cyan-700 hover:border-cyan-700
-	active:bg-cyan-800 active:border-cyan-800
-	disabled:bg-gray-300 disabled:hover:bg-gray-300 disabled:active:bg-gray-300	fill-white;
-  }
   .btn-secondary {
     @apply px-5 py-2 border rounded-3xl cursor-pointer text-center text-sm md:text-base text-slate-900 bg-gray-200 hover:bg-white;
   }
