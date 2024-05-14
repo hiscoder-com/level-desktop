@@ -1570,10 +1570,10 @@
   resolved "https://registry.yarnpkg.com/@texttree/translation-words-helpers/-/translation-words-helpers-0.2.4.tgz#db67e56464bc45a163fcc937248032374eccee1c"
   integrity sha512-1Icnf4pIej0/M63QzDsqFvcNjqtR7oZDprxoOhNVwFuEuCs/Ct+gPCCoPcraFOjy1nU9c+Qe6f+BKKQ34kFr/g==
 
-"@texttree/v-cana-rcl@0.1.0-alpha.0":
-  version "0.1.0-alpha.0"
-  resolved "https://registry.yarnpkg.com/@texttree/v-cana-rcl/-/v-cana-rcl-0.1.0-alpha.0.tgz#fab5c62cb263d7bfb884068dab3c8aa9fa935d6f"
-  integrity sha512-+69kaYjfuDppgOfEN3ppkmo1nK2hi1bgrmQzh4OCRCwFJJCipALSYR04vdyQZyF0NR57XLJn3WDEOgORtDsCQQ==
+"@texttree/v-cana-rcl@^0.1.0-alpha.1":
+  version "0.1.0-alpha.1"
+  resolved "https://registry.yarnpkg.com/@texttree/v-cana-rcl/-/v-cana-rcl-0.1.0-alpha.1.tgz#301b7ca4bd4d0bc8d5e198d91b71ba9572fc6e4d"
+  integrity sha512-jB1NDgnXQ/om7aUXfeVXTNfYv48rok4ooBwg1mgxnVJI+1PlFkJgLfST+mLnaRiDc7I0par7R+0FfBPaMw98Hw==
   dependencies:
     "@headlessui/react" "^1.7.18"
     "@texttree/notepad-rcl" "^2.4.1"

@@ -72,7 +72,5 @@ process.once('loaded', () => {
     getTWL: (id, resource, mainResource, chapter = false) =>
       ipcRenderer.sendSync('get-twl', id, resource, mainResource, chapter),
     addProject: (fileUrl) => ipcRenderer.send('add-project', fileUrl),
-    getAgreements: () => ipcRenderer.sendSync('get-agreements'),
-    updateAgreements: (agreements) => ipcRenderer.sendSync('update-agreements', agreements),
   });
 });

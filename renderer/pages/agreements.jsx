@@ -1,14 +1,16 @@
 import { useRouter } from "next/router";
 
 import { useTranslation } from "next-i18next";
-// import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Check from "../public/icons/check.svg";
 import { useEffect, useState } from "react";
 
 export default function Agreements() {
   const { t } = useTranslation("users", "common", "user-agreement");
   const { push } = useRouter();
-  const [agreements, setAgreements] = useState({});
+  const [agreements, setAgreements] = useState({
+    userAgreement: false,
+    confession: false,
+  });
 
   const links = [
     {
@@ -26,9 +28,13 @@ export default function Agreements() {
   ];
 
   useEffect(() => {
-    const _agreements = window.electronAPI.getAgreements();
-    if (_agreements) {
-      setAgreements(_agreements);
+    const agreements = window.electronAPI.getItem("agreements");
+    if (!agreements) {
+      const startAgreements = { userAgreement: false, confession: false };
+      window.electronAPI.setItem("agreements", JSON.stringify(startAgreements));
+      setAgreements(startAgreements);
+    } else {
+      setAgreements(JSON.parse(agreements));
     }
   }, []);
 
@@ -73,7 +79,7 @@ export default function Agreements() {
 
         <button
           onClick={() => push("/account")}
-          // disabled={!user?.agreement || !user?.confession}
+          disabled={!agreements?.userAgreement || !agreements?.confession}
           className="btn-primary"
         >
           {t("common:Next")}

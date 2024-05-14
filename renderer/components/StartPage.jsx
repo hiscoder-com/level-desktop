@@ -9,12 +9,14 @@ function StartPage() {
   const router = useRouter();
   const { t } = useTranslation(["start-page", "projects", "users", "common"]);
   const checkAgreements = () => {
-    const agreements = window.electronAPI.getAgreements();
-    if (Object.values(agreements).every((agreement) => agreement)) {
-      router.push("/account");
-    } else {
-      router.push("/agreements");
+    const agreements = window.electronAPI.getItem("agreements");
+    if (!agreements) {
+      return router.push("/agreements");
     }
+    const agreementsObj = JSON.parse(agreements);
+    const allAgreed = agreementsObj.userAgreement && agreementsObj.confession;
+
+    router.push(allAgreed ? "/account" : "/agreements");
   };
   return (
     <div className="flex flex-col justify-center items-center gap-4 h-screen w-full relative">
