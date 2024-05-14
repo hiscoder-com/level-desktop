@@ -1,15 +1,15 @@
-import React, { Fragment } from "react";
-import Link from "next/link";
-import { useTranslation } from "react-i18next";
+import React, { Fragment } from 'react'
+import Link from 'next/link'
+import { useTranslation } from 'react-i18next'
 
-import VcanaLogo from "../public/icons/vcana-logo.svg";
+import VcanaLogo from '../public/icons/vcana-logo.svg'
 
 export default function Breadcrumbs({ links = [], currentTitle }) {
   const {
     i18n: { language: locale },
-  } = useTranslation();
+  } = useTranslation()
 
-  const homeUrl = `/${locale}/account`;
+  const homeUrl = `/${locale}/account`
 
   return (
     <div className="bg-gray-200 dark:bg-slate-550 mb-4">
@@ -58,12 +58,10 @@ export default function Breadcrumbs({ links = [], currentTitle }) {
                 />
               </svg>
             </span>
-            <div className="text-gray-600 dark:text-gray-200">
-              {currentTitle}
-            </div>
+            <div className="text-gray-600 dark:text-gray-200">{currentTitle}</div>
           </Fragment>
         )}
       </div>
     </div>
-  );
+  )
 }

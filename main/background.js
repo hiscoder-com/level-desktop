@@ -67,7 +67,6 @@ async function handleConfigOpen() {
   })
 
   const locale = localeStore.get('locale', i18next.i18n.defaultLocale)
-  console.log('Using locale:', locale)
 
   if (isProd) {
     await mainWindow.loadURL(`app://./${locale}/home`)
