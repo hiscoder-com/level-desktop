@@ -1,9 +1,15 @@
+import { useState } from "react";
+
 import Link from "next/link";
+import { useRouter } from "next/router";
+
+import { useTranslation } from "react-i18next";
+import jszip from "jszip";
+
 import { JsonToPdf } from "@texttree/obs-format-convert-rcl";
+
 import ListBox from "./ListBox";
 import Modal from "./Modal";
-import { useState } from "react";
-import jszip from "jszip";
 import ChaptersMerger from "./ChaptersMerger";
 
 const styles = {
@@ -19,13 +25,17 @@ const styles = {
   text: { alignment: "justify" },
 };
 
-const options = [
-  { label: "Export to PDF", value: "pdf" },
-  { label: "Export to ZIP", value: "zip" },
-  { label: "Export to USFM", value: "usfm" },
-];
-
 function ProjectsList({ projects }) {
+  const {
+    i18n: { language: locale },
+    t,
+  } = useTranslation(["common", "projects"]);
+  const options = [
+    { label: t("projects:ExportToPDF"), value: "pdf" },
+    { label: t("projects:ExportToZIP"), value: "zip" },
+    { label: t("projects:ExportToUSFM"), value: "usfm" },
+  ];
+  const { pathname } = useRouter();
   const [selectedOption, setSelectedOption] = useState(options[0].value);
   const [currentProject, setCurrentProject] = useState(null);
   const [isOpenModal, setIsOpenModal] = useState(false);
@@ -60,7 +70,7 @@ function ProjectsList({ projects }) {
   const exportToZip = (chapters) => {
     try {
       if (!chapters) {
-        throw new Error("error:NoData");
+        throw new Error(t("NoData"));
       }
       const jsonContent = JSON.stringify(chapters, null, 2);
       const zip = new jszip();
@@ -97,19 +107,19 @@ function ProjectsList({ projects }) {
         <thead>
           <tr>
             <th className="border-b font-medium p-4 pl-8 pt-0 pb-3 text-slate-400 text-left">
-              Book
+              {t("Book")}
             </th>
             <th className="border-b font-medium p-4 pl-8 pt-0 pb-3 text-slate-400 text-left">
-              Project
+              {t("projects:Project")}
             </th>
             <th className="border-b font-medium p-4 pl-8 pt-0 pb-3 text-slate-400 text-left">
-              Method
+              {t("projects:Method")}
             </th>
             <th className="border-b font-medium p-4 pl-8 pt-0 pb-3 text-slate-400 text-left">
-              ID
+              {t("ID")}
             </th>
             <th className="border-b font-medium p-4 pl-8 pt-0 pb-3 text-slate-400 text-left">
-              Created At
+              {t("CreatedAt")}
             </th>
             <th className="border-b font-medium p-4 pl-8 pt-0 pb-3 text-slate-400 text-left"></th>
           </tr>
@@ -118,7 +128,12 @@ function ProjectsList({ projects }) {
           {projects.map((project) => (
             <tr key={project.id}>
               <td className="border-b border-slate-100 p-4 pl-8 text-slate-500">
-                <Link href={"project/" + project.id} legacyBehavior>
+                <Link
+                  href={`${pathname.replace("[locale]", locale)}/project/${
+                    project.id
+                  }`}
+                  legacyBehavior
+                >
                   <a className="font-bold underline">
                     {project.book.name} ({project.book.code})
                   </a>
@@ -144,7 +159,7 @@ function ProjectsList({ projects }) {
                     setIsOpenModal(true);
                   }}
                 >
-                  Download
+                  {t("Download")}
                 </div>
               </td>
             </tr>
@@ -173,14 +188,14 @@ function ProjectsList({ projects }) {
               className="btn-primary flex-1"
               onClick={() => setIsOpenModal(false)}
             >
-              Close
+              {t("Close")}
             </button>
             {selectedOption !== "usfm" && (
               <button
                 className="btn-primary flex-1"
                 onClick={() => download(currentProject)}
               >
-                Download
+                {t("Download")}
               </button>
             )}
           </div>

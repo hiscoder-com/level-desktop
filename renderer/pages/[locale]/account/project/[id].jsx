@@ -1,11 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import Head from 'next/head';
+import React, { useEffect, useState } from "react";
 
-import { useRouter } from 'next/router';
-import Breadcrumbs from '../../components/Breadcrumbs';
-import ChapterList from '../../components/ChaptersList';
+import Head from "next/head";
+import { useRouter } from "next/router";
+import { useTranslation } from "react-i18next";
+
+import Breadcrumbs from "../../../../components/Breadcrumbs";
+import ChapterList from "../../../../components/ChaptersList";
+import { makeStaticProperties } from "../../../../lib/get-static";
 
 function Project() {
+  const { t } = useTranslation(["common", "projects"]);
   const {
     query: { id },
   } = useRouter();
@@ -26,14 +30,14 @@ function Project() {
   return (
     <>
       <Head>
-        <title>V-CANA</title>
+        <title>{t("V-CANA")}</title>
       </Head>
       <div className="w-full">
         <Breadcrumbs currentTitle={project?.book?.name} />
         {/* <Link href={`/project/${id}/settings`}>
           <a>Settings</a>
         </Link> */}
-        <h2 className="mt-6 mb-6 text-4xl">Chapters</h2>
+        <h2 className="mt-6 mb-6 text-4xl">{t("projects:Chapters")}</h2>
         {project ? (
           <ChapterList
             id={id}
@@ -42,7 +46,7 @@ function Project() {
             mutate={mutate}
           />
         ) : (
-          <>Loading...</>
+          <>{t("Loading")}</>
         )}
         <br />
         {/* <pre>{JSON.stringify(project, null, 2)}</pre> */}
@@ -52,3 +56,9 @@ function Project() {
 }
 
 export default Project;
+
+export const getStaticProps = makeStaticProperties(["common", "projects"]);
+
+export async function getStaticPaths() {
+  return { paths: [], fallback: "blocking" };
+}

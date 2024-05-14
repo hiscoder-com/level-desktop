@@ -1,6 +1,9 @@
 import Link from "next/link";
-import React from "react";
+import { useRouter } from "next/router";
+
 import { JsonToPdf } from "@texttree/obs-format-convert-rcl";
+import { useTranslation } from "react-i18next";
+
 const styles = {
   currentPage: {
     fontSize: 16,
@@ -15,6 +18,12 @@ const styles = {
 };
 
 function ChapterList({ id, chapters, steps, mutate }) {
+  const {
+    i18n: { language: locale },
+    t,
+  } = useTranslation(["projects", "common"]);
+  const { pathname } = useRouter();
+
   const handleBackStep = (chapter, step) => {
     const backStep = window.electronAPI.goToStep(id, chapter, step - 1);
     if (backStep !== step) {
@@ -47,16 +56,16 @@ function ChapterList({ id, chapters, steps, mutate }) {
       <thead>
         <tr>
           <th className="border-b font-medium p-4 pl-8 pt-0 pb-3 text-slate-400 text-left">
-            Chapter
+            {t("Chapter")}
           </th>
           <th className="border-b font-medium p-4 pl-8 pt-0 pb-3 text-slate-400 text-left">
-            Step
+            {t("Step")}
           </th>
           <th className="border-b font-medium p-4 pl-8 pt-0 pb-3 text-slate-400 text-left">
-            Step back
+            {t("StepBack")}
           </th>
           <th className="border-b font-medium p-4 pl-8 pt-0 pb-3 text-slate-400 text-left">
-            Download
+            {t("common:Download")}
           </th>
         </tr>
       </thead>
@@ -64,8 +73,15 @@ function ChapterList({ id, chapters, steps, mutate }) {
         {chapters.map(([chapter, step]) => (
           <tr key={chapter}>
             <td className="border-b border-slate-100 p-4 pl-8 text-slate-500">
-              <Link href={`/project/${id}/${chapter}/${step}`} legacyBehavior>
-                <a className="font-bold underline">Chapter {chapter}</a>
+              <Link
+                href={`${pathname
+                  .replace("[locale]", locale)
+                  .replace("[id]", id)}/${chapter}/${step}`}
+                legacyBehavior
+              >
+                <a className="font-bold underline">
+                  {t("Chapter")} {chapter}
+                </a>
               </Link>
             </td>
             <td className="border-b border-slate-100 p-4 pl-8 text-slate-500">
@@ -77,7 +93,7 @@ function ChapterList({ id, chapters, steps, mutate }) {
                   className="btn-primary text-base"
                   onClick={() => handleBackStep(chapter, step)}
                 >
-                  Go to step {step}
+                  {t("GoToStep")} {step}
                 </div>
               )}
             </td>
@@ -86,7 +102,7 @@ function ChapterList({ id, chapters, steps, mutate }) {
                 className="btn-primary text-base"
                 onClick={() => handleDownloadChapter(chapter)}
               >
-                Download
+                {t("common:Download")}
               </div>
             </td>
           </tr>

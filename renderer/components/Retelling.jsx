@@ -2,12 +2,14 @@ import { useEffect } from "react";
 
 import { useRouter } from "next/router";
 
+import { useTranslation } from "react-i18next";
 import { useSetRecoilState } from "recoil";
 
 import { inactiveState } from "../helpers/atoms";
 import Recorder from "./Recorder";
 
 export default function Retelling() {
+  const { t } = useTranslation();
   const setInactive = useSetRecoilState(inactiveState);
   const router = useRouter();
 
@@ -27,11 +29,11 @@ export default function Retelling() {
     <>
       <div className="flex justify-center flex-wrap mt-8">
         <div className="w-full pb-4 px-2 mb-4 border-b-4">
-          <p className="mb-4">{"OriginalRecording"}</p>
+          <p className="mb-4">{t("OriginalRecording")}</p>
           <Recorder />
         </div>
         <div className="w-full pb-4 px-2 mb-4 border-b-4">
-          <p className="mb-4">{"TargetRecording"}</p>
+          <p className="mb-4">{t("TargetRecording")}</p>
           <Recorder />
         </div>
       </div>

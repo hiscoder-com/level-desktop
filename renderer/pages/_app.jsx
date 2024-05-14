@@ -1,6 +1,9 @@
 import React, { useEffect } from 'react'
 
+import { appWithTranslation } from 'next-i18next'
+
 import '../styles/globals.css'
+
 // import NotifyBox from '../components/NotifyBox';
 import { RecoilRoot } from 'recoil'
 import Layout from '../components/Layout'
@@ -24,4 +27,4 @@ function MyApp({ Component, pageProps }) {
   )
 }
 
-export default MyApp
+export default appWithTranslation(MyApp)

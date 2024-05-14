@@ -1,23 +1,29 @@
-import { useTranslation } from "next-i18next";
+import { useRouter } from 'next/router'
+import Link from 'next/link'
 
-import VcanaLogo from "../public/icons/vcana-logo-color.svg";
-import { useRouter } from "next/router";
-import Gear from "../public/icons/gear.svg";
-import Link from "next/link";
+import { useTranslation } from 'next-i18next'
 
-function StartPage() {
-  const router = useRouter();
-  const { t } = useTranslation(["start-page", "projects", "users", "common"]);
+import VcanaLogo from '../public/icons/vcana-logo-color.svg'
+import Gear from '../public/icons/gear.svg'
+
+export default function StartPage() {
+  const router = useRouter()
+
+  const {
+    i18n: { language: locale },
+    t,
+  } = useTranslation()
+
   const checkAgreements = () => {
-    const agreements = window.electronAPI.getItem("agreements");
+    const agreements = window.electronAPI.getItem('agreements')
     if (!agreements) {
-      return router.push("/agreements");
+      return router.push(`/${locale}/agreements`)
     }
-    const agreementsObj = JSON.parse(agreements);
-    const allAgreed = agreementsObj.userAgreement && agreementsObj.confession;
+    const agreementsObj = JSON.parse(agreements)
+    const allAgreed = agreementsObj.userAgreement && agreementsObj.confession
 
-    router.push(allAgreed ? "/account" : "/agreements");
-  };
+    router.push(allAgreed ? `/${locale}/account` : `/${locale}/agreements`)
+  }
   return (
     <div className="flex flex-col justify-center items-center gap-4 h-screen w-full relative">
       <Link href="/chapter-merger">
@@ -30,16 +36,14 @@ function StartPage() {
         <div
           className="h-32 rounded-2xl bg-slate-550"
           onClick={() => {
-            checkAgreements();
+            checkAgreements()
           }}
         >
           <p className="p-5 lg:p-7 green-two-layers z-10 h-full w-full rounded-2xl after:rounded-2xl text-th-secondary-10 cursor-pointer">
-            {t("users:SignIn")}
+            {t('users:SignIn')}
           </p>
         </div>
       </div>
     </div>
-  );
+  )
 }
-
-export default StartPage;

@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+
 import Retelling from './Retelling'
 import Bible from './Bible'
 import BlindEditor from './BlindEditor'
@@ -13,15 +15,20 @@ import TeamNotes from './TeamNotes'
 import Merger from './Merger'
 
 function Tool({ config, toolName }) {
+  const { t } = useTranslation()
   let CurrentTool
-  const title = toolName
+  let title = toolName
+
   switch (toolName) {
     case 'bible':
       CurrentTool = Bible
+      title = t('bible')
       break
     case 'divider':
       CurrentTool = Divider
+      title = t('divider')
       break
+
     case 'merger':
       CurrentTool = Merger
       break
@@ -66,46 +73,53 @@ function Tool({ config, toolName }) {
 
     case 'editor':
       CurrentTool = Editor
+      title = t('translate')
       break
 
     case 'blindEditor':
       CurrentTool = BlindEditor
+      title = t('translate')
       break
 
     case 'personalNotes':
       CurrentTool = PersonalNotes
+      title = t('personalNotes')
       break
 
     case 'teamNotes':
       CurrentTool = TeamNotes
+      title = t('teamNotes')
       break
 
     case 'retelling':
       CurrentTool = Retelling
+      title = t('retelling')
       break
 
     case 'dictionary':
       CurrentTool = Dictionary
+      title = t('dictionary')
       break
 
     case 'info':
       CurrentTool = Info
+      title = t('info')
       break
 
     default:
-      return <div>{'WrongResource'}</div>
+      return <div>{t('WrongResource')}</div>
   }
   return (
     <>
       <div className="pt-2.5 px-4 h-10 font-bold bg-th-primary-200 text-th-text-secondary-100 rounded-t-lg truncate">
         {/* {![
-          'translate',
-          'commandTranslate',
-          'draftTranslate',
-          'teamNotes',
-          'personalNotes',
-          'retelling',
-          'dictionary',
+          "translate",
+          "commandTranslate",
+          "draftTranslate",
+          "teamNotes",
+          "personalNotes",
+          "retelling",
+          "dictionary",
         ].includes(toolName) &&
           `${t(`books:${config?.reference?.book}`)} ${
             config?.reference?.chapter

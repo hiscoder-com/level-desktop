@@ -2,22 +2,24 @@ import React, { useEffect, useState } from 'react'
 
 import { useRouter } from 'next/router'
 
+import { useTranslation } from 'react-i18next'
 import { Tab } from '@headlessui/react'
-import Tool from '../../../../components/Tool'
-import CheckBox from '../../../../components/CheckBox'
+import Tool from '../../../../../../components/Tool'
+import CheckBox from '../../../../../../components/CheckBox'
+import Breadcrumbs from '../../../../../../components/Breadcrumbs'
+import ProgressBar from '../../../../../../components/ProgressBar'
 
 import { useRecoilValue } from 'recoil'
 
-import { inactiveState } from '../../../../helpers/atoms'
+import { makeStaticProperties } from '../../../../../../lib/get-static'
+import { inactiveState } from '../../../../../../helpers/atoms'
 
-import Dict from '../../../../public/icons/dictionary.svg'
-import Notepad from '../../../../public/icons/notepad.svg'
-import Audio from '../../../../public/icons/audio.svg'
-import Pencil from '../../../../public/icons/editor-pencil.svg'
-import Info from '../../../../public/icons/info.svg'
-import Breadcrumbs from '../../../../components/Breadcrumbs'
-import ProgressBar from '../../../../components/ProgressBar'
-import TeamNote from '../../../../public/icons/team-note.svg'
+import Dict from '../../../../../../public/icons/dictionary.svg'
+import Notepad from '../../../../../../public/icons/notepad.svg'
+import Audio from '../../../../../../public/icons/audio.svg'
+import Pencil from '../../../../../../public/icons/editor-pencil.svg'
+import Info from '../../../../../../public/icons/info.svg'
+import TeamNote from '../../../../../../public/icons/team-note.svg'
 
 const sizes = {
   1: 'lg:w-1/6',
@@ -42,11 +44,14 @@ const icons = {
 
 function StepPage() {
   const {
+    i18n: { language: locale },
+    t,
+  } = useTranslation()
+  const {
     query: { id, chapter, step },
     push,
   } = useRouter()
   const inactive = useRecoilValue(inactiveState)
-  const t = () => {}
 
   const [project, setProject] = useState(false)
   const [checked, setChecked] = useState(false)
@@ -65,9 +70,9 @@ function StepPage() {
     const nextStep = window.electronAPI.goToStep(id, chapter, parseInt(step) + 1)
 
     if (nextStep !== parseInt(step)) {
-      push(`/project/${id}/${chapter}/${nextStep}`)
+      push(`/${locale}/account/project/${id}/${chapter}/${nextStep}`)
     } else {
-      push(`/project/${id}`)
+      push(`/${locale}/account/project/${id}`)
     }
     setChecked(false)
   }
@@ -76,7 +81,7 @@ function StepPage() {
       <Breadcrumbs
         links={[
           {
-            href: '/project/' + id,
+            href: `/${locale}/account/project/${id}`,
             title: `${project?.book?.name} ${chapter}`,
           },
         ]}
@@ -92,6 +97,7 @@ function StepPage() {
               }`}
             >
               <Panel
+                t={t}
                 tools={el.tools}
                 mainResource={project.mainResource}
                 id={id}
@@ -127,7 +133,7 @@ function StepPage() {
               onClick={nextStepHandle}
               disabled={!checked}
             >
-              {project?.steps?.length === parseInt(step) + 1 ? 'Finish' : 'Next'}
+              {project?.steps?.length === parseInt(step) + 1 ? t('Finish') : t('Next')}
             </button>
           </div>
         </div>
@@ -140,7 +146,7 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-function Panel({ tools, mainResource, id, chapter, toolNames, stepConfig }) {
+function Panel({ tools, mainResource, id, chapter, toolNames, stepConfig, t }) {
   return (
     <Tab.Group>
       <Tab.List className="space-x-3 text-xs px-3 -mb-2 lg:-mb-7 flex overflow-auto">
@@ -164,9 +170,9 @@ function Panel({ tools, mainResource, id, chapter, toolNames, stepConfig }) {
               'dictionary',
               'info',
             ].includes(tool.name) ? (
-              <span title={tool.name}>
+              <span title={t(tool.name)}>
                 {icons[tool.name]}
-                <span className="hidden ml-2 sm:inline">{tool.name}</span>
+                <span className="hidden ml-2 sm:inline">{t(tool.name)}</span>
               </span>
             ) : (
               toolNames[tool.config.resource]
@@ -199,3 +205,9 @@ function Panel({ tools, mainResource, id, chapter, toolNames, stepConfig }) {
 }
 
 export default StepPage
+
+export const getStaticProps = makeStaticProperties(['common', 'projects'])
+
+export async function getStaticPaths() {
+  return { paths: [], fallback: 'blocking' }
+}

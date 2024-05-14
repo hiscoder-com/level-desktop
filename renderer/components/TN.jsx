@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 
-import { Placeholder } from "./Placeholder";
-import { useGetTnResource } from "../hooks/useGetTnResource";
 import dynamic from "next/dynamic";
-import Back from "../public/icons/left.svg";
-import { checkLSVal } from "../helpers/checkls";
+
 import { useRecoilState } from "recoil";
+
+import { useGetTnResource } from "../hooks/useGetTnResource";
+import { checkLSVal } from "../helpers/checkls";
 import { currentVerse } from "../helpers/atoms";
+import { Placeholder } from "./Placeholder";
+
+import Back from "../public/icons/left.svg";
 
 const TNotes = dynamic(
   () => import("@texttree/v-cana-rcl").then((mod) => mod.TNotes),
