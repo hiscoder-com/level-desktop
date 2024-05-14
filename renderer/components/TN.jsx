@@ -42,7 +42,7 @@ function TN({
 }) {
   const [currentScrollVerse, setCurrentScrollVerse] =
     useRecoilState(currentVerse);
-  const [tnotes, setTnotes] = useState([]);
+  const [tnotes, setTnotes] = useState({});
   const { isLoading, data } = useGetTnResource({
     id,
     resource,
@@ -57,7 +57,11 @@ function TN({
       for (const el of data) {
         filterNotes(el, el.verse, _data);
       }
-      setTnotes(_data);
+      const result = {};
+      _data.forEach((array) => {
+        result[array[0].verse[0]] = array;
+      });
+      setTnotes(result); //TODO переписать -очень много переборов
     }
   }, [data]);
 
@@ -86,7 +90,7 @@ function TN({
             container:
               "divide-y divide-th-text-primary divide-dashed h-full overflow-auto",
             verseBlock: "pl-7 flex-1",
-            currentNote: "bg-th-secondary-300",
+            currentNote: "bg-th-secondary-100",
             note: "p-2 cursor-pointer rounded-lg hover:bg-th-secondary-100",
             verseWrapper: "p-4 flex mx-4",
           },
@@ -95,7 +99,7 @@ function TN({
         isLoading={isLoading}
         scrollTopOffset={20}
         startHighlightIds={checkLSVal("highlightIds", {}, "object")}
-        currentScrollVerse={currentScrollVerse}
+        currentScrollVerse={String(currentScrollVerse)}
         toolId={toolName}
         idContainerScroll={"container_tn"}
         setCurrentScrollVerse={setCurrentScrollVerse}

@@ -1,32 +1,37 @@
-import { useTranslation } from "react-i18next";
+import { useTranslation } from 'react-i18next'
 
-import Retelling from "./Retelling";
-import Bible from "./Bible";
-import BlindEditor from "./BlindEditor";
-import Dictionary from "./Dictionary";
-import Editor from "./Editor";
-import Info from "./Info";
-import PersonalNotes from "./PersonalNotes";
-import TN from "./TN";
-import TQ from "./TQ";
-import TWL from "./TWL";
-import Divider from "./Divider";
-import TeamNotes from "./TeamNotes";
+import Retelling from './Retelling'
+import Bible from './Bible'
+import BlindEditor from './BlindEditor'
+import Dictionary from './Dictionary'
+import Editor from './Editor'
+import Info from './Info'
+import PersonalNotes from './PersonalNotes'
+import TN from './TN'
+import TQ from './TQ'
+import TWL from './TWL'
+import Divider from './Divider'
+import TeamNotes from './TeamNotes'
+import Merger from './Merger'
 
 function Tool({ config, toolName }) {
-  const { t } = useTranslation();
-  let CurrentTool;
-  let title = toolName;
+  const { t } = useTranslation()
+  let CurrentTool
+  let title = toolName
 
   switch (toolName) {
-    case "bible":
-      CurrentTool = Bible;
-      title = t("bible");
-      break;
-    case "divider":
-      CurrentTool = Divider;
-      title = t("divider");
-      break;
+    case 'bible':
+      CurrentTool = Bible
+      title = t('bible')
+      break
+    case 'divider':
+      CurrentTool = Divider
+      title = t('divider')
+      break
+
+    case 'merger':
+      CurrentTool = Merger
+      break
 
     // case 'OBS Translation Questions':
     // case 'TSV OBS Translation Questions':
@@ -46,17 +51,17 @@ function Tool({ config, toolName }) {
     //   url = '/api/git/obs-tn';
     //   break;
 
-    case "twl":
-      CurrentTool = TWL;
-      break;
+    case 'twl':
+      CurrentTool = TWL
+      break
 
-    case "tn":
-      CurrentTool = TN;
-      break;
+    case 'tn':
+      CurrentTool = TN
+      break
 
-    case "tq":
-      CurrentTool = TQ;
-      break;
+    case 'tq':
+      CurrentTool = TQ
+      break
 
     // case 'Open Bible Stories':
     //   CurrentTool = Bible;
@@ -66,43 +71,43 @@ function Tool({ config, toolName }) {
     //   url = '/api/git/obs';
     //   break;
 
-    case "editor":
-      CurrentTool = Editor;
-      title = t("translate");
-      break;
+    case 'editor':
+      CurrentTool = Editor
+      title = t('translate')
+      break
 
-    case "blindEditor":
-      CurrentTool = BlindEditor;
-      title = t("translate");
-      break;
+    case 'blindEditor':
+      CurrentTool = BlindEditor
+      title = t('translate')
+      break
 
-    case "personalNotes":
-      CurrentTool = PersonalNotes;
-      title = t("personalNotes");
-      break;
+    case 'personalNotes':
+      CurrentTool = PersonalNotes
+      title = t('personalNotes')
+      break
 
-    case "teamNotes":
-      CurrentTool = TeamNotes;
-      title = t("teamNotes");
-      break;
+    case 'teamNotes':
+      CurrentTool = TeamNotes
+      title = t('teamNotes')
+      break
 
-    case "retelling":
-      CurrentTool = Retelling;
-      title = t("retelling");
-      break;
+    case 'retelling':
+      CurrentTool = Retelling
+      title = t('retelling')
+      break
 
-    case "dictionary":
-      CurrentTool = Dictionary;
-      title = t("dictionary");
-      break;
+    case 'dictionary':
+      CurrentTool = Dictionary
+      title = t('dictionary')
+      break
 
-    case "info":
-      CurrentTool = Info;
-      title = t("info");
-      break;
+    case 'info':
+      CurrentTool = Info
+      title = t('info')
+      break
 
     default:
-      return <div>{t("WrongResource")}</div>;
+      return <div>{t('WrongResource')}</div>
   }
   return (
     <>
@@ -121,13 +126,13 @@ function Tool({ config, toolName }) {
           }, `} */}
         {title}
       </div>
-      <div className="adaptive-card">
+      <div className="adaptive-card border border-b-th-secondary-300 border-l-th-secondary-300 border-r-th-secondary-300 rounded-b-lg box-border">
         <div className="h-full p-4 overflow-x-hidden overflow-y-auto">
           <CurrentTool config={config} toolName={toolName} />
         </div>
       </div>
     </>
-  );
+  )
 }
 
-export default Tool;
+export default Tool

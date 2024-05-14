@@ -1,42 +1,49 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react'
 
-import { useRouter } from "next/router";
+import { useRouter } from 'next/router'
 
-import { useTranslation } from "next-i18next";
+import { useTranslation } from 'next-i18next'
 
-import { getStaticPaths, makeStaticProperties } from "../../lib/get-static";
+import { getStaticPaths, makeStaticProperties } from '../../lib/get-static'
 
-import Check from "../../public/icons/check.svg";
+import Check from '../../public/icons/check.svg'
 
 export default function Agreements() {
   const {
     i18n: { language: locale },
     t,
-  } = useTranslation(["users", "common", "user-agreement"]);
-  const { push } = useRouter();
-  const [agreements, setAgreements] = useState({});
+  } = useTranslation(['users', 'common', 'user-agreement'])
+  const { push } = useRouter()
+  const [agreements, setAgreements] = useState({
+    userAgreement: false,
+    confession: false,
+  })
 
   const links = [
     {
-      name: t("Agreement"),
-      link: "user-agreement",
+      name: t('Agreement'),
+      link: 'user-agreement',
       done: agreements.userAgreement,
-      text: t("user-agreement:TextLicense"),
+      text: t('user-agreement:TextLicense'),
     },
     {
-      name: t("Confession"),
-      link: "confession-steps",
+      name: t('Confession'),
+      link: 'confession-steps',
       done: agreements.confession,
-      text: t("common:DescriptionConfession"),
+      text: t('common:DescriptionConfession'),
     },
-  ];
+  ]
 
   useEffect(() => {
-    const _agreements = window.electronAPI.getAgreements();
-    if (_agreements) {
-      setAgreements(_agreements);
+    const agreements = window.electronAPI.getItem('agreements')
+    if (!agreements) {
+      const startAgreements = { userAgreement: false, confession: false }
+      window.electronAPI.setItem('agreements', JSON.stringify(startAgreements))
+      setAgreements(startAgreements)
+    } else {
+      setAgreements(JSON.parse(agreements))
     }
-  }, []);
+  }, [])
 
   return (
     <div className="layout-appbar">
@@ -47,8 +54,8 @@ export default function Agreements() {
               key={agreement.name}
               className={`relative flex flex-col justify-start gap-5 py-5 pl-3 pr-4 max-w-xs text-start ${
                 agreement.done
-                  ? "bg-th-primary-100 text-th-text-secondary-100"
-                  : "bg-th-secondary-200 text-th-text-primary"
+                  ? 'bg-th-primary-100 text-th-text-secondary-100'
+                  : 'bg-th-secondary-200 text-th-text-primary'
               } cursor-pointer rounded-md`}
               onClick={() => push(`/${locale}/${agreement.link}`)}
             >
@@ -56,8 +63,8 @@ export default function Agreements() {
                 className={`absolute top-0 right-0 w-0 h-0 border-[24px] border-solid border-transparent 
               ${
                 agreement.done
-                  ? "border-b-th-primary-400 border-l-th-primary-400"
-                  : "border-b-th-secondary-300 border-l-th-secondary-300"
+                  ? 'border-b-th-primary-400 border-l-th-primary-400'
+                  : 'border-b-th-secondary-300 border-l-th-secondary-300'
               } rounded-bl-lg`}
               />
               <div className="absolute top-0 right-0 w-0 h-0 border-[24px] border-solid border-transparent border-t-th-secondary-10 border-r-th-secondary-10" />
@@ -67,7 +74,7 @@ export default function Agreements() {
               </div>
               <p
                 dangerouslySetInnerHTML={{
-                  __html: t(agreement.text.split("<br /><br />")[0] ?? "", {
+                  __html: t(agreement.text.split('<br /><br />')[0] ?? '', {
                     interpolation: { escapeValue: false },
                   }),
                 }}
@@ -79,22 +86,18 @@ export default function Agreements() {
 
         <button
           onClick={() => push(`/${locale}/account`)}
-          // disabled={!user?.agreement || !user?.confession}
+          disabled={!agreements?.userAgreement || !agreements?.confession}
           className="btn-primary"
         >
-          {t("common:Next")}
+          {t('common:Next')}
         </button>
       </div>
     </div>
-  );
+  )
 }
 
-Agreements.backgroundColor = "bg-th-secondary-100";
+Agreements.backgroundColor = 'bg-th-secondary-100'
 
-export const getStaticProps = makeStaticProperties([
-  "users",
-  "common",
-  "user-agreement",
-]);
+export const getStaticProps = makeStaticProperties(['users', 'common', 'user-agreement'])
 
-export { getStaticPaths };
+export { getStaticPaths }

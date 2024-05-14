@@ -1,166 +1,196 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
-import { useTranslation } from "react-i18next";
-import JSZip from "jszip";
+import JSZip from 'jszip'
 
-import { convertToUsfm } from "../helpers/usfm";
+import { convertToUsfm } from '../helpers/usfm'
 
-import Close from "../public/icons/close.svg";
-// import toast from "react-hot-toast";
+import Close from '../public/icons/close.svg'
+
 export default function ChaptersMerger({ book }) {
-  const { t } = useTranslation(["common", "projects"]);
+  const { t } = useTranslation(['common', 'projects'])
 
-  const [jsonDataArray, setJsonDataArray] = useState([]);
-  const [conflicts, setConflicts] = useState(null);
-  const [mergedContent, setMergedContent] = useState(null);
+  const [jsonDataArray, setJsonDataArray] = useState([])
+  const [conflicts, setConflicts] = useState(null)
+  const [mergedContent, setMergedContent] = useState(null)
+  const fileInputRef = useRef()
 
   const checkEqualFiles = (file) => {
-    const existingFile = jsonDataArray.find((f) => f.filename === file);
-    return existingFile;
-  };
-  const handleFiles = async (files) => {
-    const jsonPromises = [];
-
-    for (let i = 0; i < files.length; i++) {
-      const zip = new JSZip();
-
-      const zipContents = await zip.loadAsync(files[i]);
-
-      Object.keys(zipContents.files).forEach((filename) => {
-        const existingFile = checkEqualFiles(filename);
-
-        if (filename.endsWith(".json") && !existingFile) {
-          const filePromise = zipContents.files[filename]
-            .async("text")
-            .then((fileData) => {
-              return { filename, content: JSON.parse(fileData) };
-            });
-
-          jsonPromises.push(filePromise);
-        } else {
-          // toast.error("Файлы с таким именем уже существуют");
-        }
-      });
+    const existingFile = jsonDataArray.find((f) => f.filename === file)
+    return existingFile
+  }
+  const exportToZip = (exportedData, name = 'exported') => {
+    try {
+      if (!exportedData) {
+        throw new Error('error:NoData')
+      }
+      const jsonContent = JSON.stringify(exportedData, null, 2)
+      const zip = new JSZip()
+      const currentDate = new Date()
+      const formattedDate = currentDate.toISOString().replace(/:/g, '-').split('.')[0]
+      const fileName = `chapter_${formattedDate}.json`
+      zip.file(fileName, jsonContent)
+      zip.generateAsync({ type: 'blob' }).then(function (content) {
+        const blob = content
+        const url = window.URL.createObjectURL(blob)
+        const downloadLink = document.createElement('a')
+        downloadLink.href = url
+        downloadLink.download = `${name}_${formattedDate}.zip`
+        document.body.appendChild(downloadLink)
+        downloadLink.click()
+        document.body.removeChild(downloadLink)
+        window.URL.revokeObjectURL(url)
+      })
+    } catch (error) {
+      console.log(error.message)
     }
-    const jsonObjects = await Promise.all(jsonPromises);
+  }
+  const handleFiles = async (files) => {
+    const jsonPromises = []
+    for (let file of files) {
+      const zip = new JSZip()
+      const zipContents = await zip.loadAsync(file)
+      for (let filename in zipContents.files) {
+        const existingFile = checkEqualFiles(filename)
+        if (filename.endsWith('.json') && !existingFile) {
+          const filePromise = zipContents.files[filename]
+            .async('text')
+            .then((fileData) => {
+              const data = JSON.parse(fileData)
+              return { filename, content: data }
+            })
+          jsonPromises.push(filePromise)
+        } else if (filename.endsWith('.json') && existingFile) {
+        }
+      }
+    }
 
-    setJsonDataArray((prevData) => [...prevData, ...jsonObjects]);
-  };
+    try {
+      const jsonObjects = await Promise.all(jsonPromises)
+      setJsonDataArray((prevData) => [...prevData, ...jsonObjects])
+    } catch (error) {
+      console.error('Ошибка валидации', error)
+    }
+  }
 
   function mergeJsonContents(jsonDataArray) {
-    const mergedContent = {};
-
-    const conflicts = [];
+    const mergedContent = {}
+    const conflicts = []
+    if (jsonDataArray.length < 2) {
+      return
+    }
 
     jsonDataArray.forEach(({ content }) => {
-      Object.keys(content).forEach((chapter) => {
+      const chapters = content
+      Object.keys(chapters).forEach((chapter) => {
         if (!mergedContent[chapter]) {
-          mergedContent[chapter] = {};
+          mergedContent[chapter] = {}
         }
-
-        Object.keys(content[chapter]).forEach((verse) => {
-          if (content[chapter][verse].text && !mergedContent[chapter][verse]) {
-            mergedContent[chapter][verse] = content[chapter][verse];
+        Object.keys(chapters[chapter]).forEach((verse) => {
+          if (chapters[chapter][verse].text && !mergedContent[chapter][verse]) {
+            mergedContent[chapter][verse] = chapters[chapter][verse]
           } else if (
-            content[chapter][verse].text &&
+            chapters[chapter][verse].text &&
             mergedContent[chapter][verse].text
           ) {
             conflicts.push({
               chapter,
               verse,
               existingText: mergedContent[chapter][verse].text,
-              newText: content[chapter][verse].text,
-            });
+              newText: chapters[chapter][verse].text,
+            })
           }
-        });
-      });
-    });
+        })
+      })
+    })
 
     if (conflicts.length > 0) {
       conflicts.forEach((conflict, index) => {
         console.log(
           `${index + 1}. Chapter: ${conflict.chapter}, Verse: ${
             conflict.verse
-          }, Existing Text: "${conflict.existingText}", New Text: "${
-            conflict.newText
-          }"`
-        );
-      });
+          }, Existing Text: "${conflict.existingText}", New Text: "${conflict.newText}"`
+        )
+      })
     }
-
     return {
       mergedContent,
       conflicts,
-    };
+    }
   }
 
   const mergeChapters = () => {
-    const { mergedContent, conflicts } = mergeJsonContents(jsonDataArray);
+    const { mergedContent, conflicts } = mergeJsonContents(jsonDataArray)
     if (conflicts.length > 0) {
-      setConflicts(conflicts);
+      setConflicts(conflicts)
     } else {
-      setMergedContent(mergedContent);
+      setMergedContent(mergedContent)
     }
-  };
+  }
   const convertJson = (chapters) => {
-    const convertedChapters = [];
+    const convertedChapters = []
     for (const num in chapters) {
       if (Object.hasOwnProperty.call(chapters, num)) {
-        const chapter = chapters[num];
+        const chapter = chapters[num]
         const convertedChapter = Object.keys(chapter).reduce((acc, verse) => {
-          return { ...acc, [verse]: chapter[verse].text };
-        }, {});
-        convertedChapters.push({ num: num, text: convertedChapter });
+          return { ...acc, [verse]: chapter[verse].text }
+        }, {})
+        convertedChapters.push({ num: num, text: convertedChapter })
       }
     }
-    return convertedChapters;
-  };
-  const downloadFile = (chapters) => {
-    const convertedChapters = convertJson(chapters);
+    return convertedChapters
+  }
+  const downloadUsfm = (chapters) => {
+    const convertedChapters = convertJson(chapters)
     const merge = convertToUsfm({
       jsonChapters: convertedChapters,
       book: {
-        code: "",
+        code: '',
         properties: {
           scripture: {
-            h: "",
-            toc1: "",
-            toc2: "",
-            toc3: "",
-            mt: "",
-            chapter_label: "",
+            h: '',
+            toc1: '',
+            toc2: '',
+            toc3: '',
+            mt: '',
+            chapter_label: '',
           },
         },
       },
-      project: { code: "", language: { code: "", orig_name: "" }, title: "" },
-    });
+      project: { code: '', language: { code: '', orig_name: '' }, title: '' },
+    })
 
-    const blob = new Blob([merge], { type: "text/plain;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", `${book ?? "book"}.usfm`);
-    document.body.appendChild(link);
-    link.click();
-  };
+    const blob = new Blob([merge], { type: 'text/plain;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', `${book ?? 'book'}.usfm`)
+    document.body.appendChild(link)
+    link.click()
+  }
 
   return (
     <div className="layout-appbar">
       <input
+        ref={fileInputRef}
         type="file"
         multiple
         onChange={(e) => handleFiles(e.target.files)}
       />
       <div>
-        <p>{t("UploadedFiles")}</p>
+        <p>{t('UploadedFiles')}</p>
         {jsonDataArray.map((json, index) => (
           <div className="flex gap-2 items-center" key={index}>
             <h1 key={index}>{json.filename}</h1>
             <Close
               className="w-5 h-5 cursor-pointer"
               onClick={() => {
-                setJsonDataArray(jsonDataArray.filter((_, i) => i !== index));
-                setConflicts(null);
+                setJsonDataArray(jsonDataArray.filter((_, i) => i !== index))
+                setConflicts(null)
+                if (fileInputRef.current) {
+                  fileInputRef.current.value = ''
+                }
+                setMergedContent(null)
               }}
             />
           </div>
@@ -168,44 +198,53 @@ export default function ChaptersMerger({ book }) {
         ))}
       </div>
       {jsonDataArray.length > 0 && (
-        <button className="btn-primary" onClick={() => mergeChapters()}>
-          {t("Merge")}
+        <button
+          className="btn-primary"
+          disabled={jsonDataArray.length < 2}
+          onClick={() => mergeChapters()}
+        >
+          {t('Merge')}
         </button>
       )}
       {conflicts ? (
         <div>
-          <p className="font-bold mb-2">{t("ConflictTitle")}</p>
+          <p className="font-bold mb-2">{t('ConflictTitle')}</p>
           {conflicts.map((conflict, index) => (
             <div key={index}>
               <p>
-                {t("projects:Chapter")} {conflict.chapter},{" "}
-                {t("projects:Verse")}
+                {t('projects:Chapter')} {conflict.chapter}, {t('projects:Verse')}
                 {conflict.verse}
               </p>
               <p>
-                {t("projects:ExistingText")} {conflict.existingText}
+                {t('projects:ExistingText')} {conflict.existingText}
               </p>
               <p>
-                {t("projects:NewText")} {conflict.newText}
+                {t('projects:NewText')} {conflict.newText}
               </p>
             </div>
           ))}
         </div>
       ) : (
         mergedContent && (
-          <div className="flex flex-col gap-2 items-center">
-            <p>{t("projects:NoConflicts")}</p>
-            <button
-              className="btn-primary"
-              onClick={() => downloadFile(mergedContent)}
-            >
-              {t("Download")}
-            </button>
+          <div>
+            <p>{t('projects:NoConflicts')}</p>
+            <div className="flex gap-2 items-center justify-center">
+              <button className="btn-primary" onClick={() => downloadUsfm(mergedContent)}>
+                USFM
+              </button>
+
+              <button
+                className="btn-primary"
+                onClick={() => exportToZip(mergedContent, 'merged')}
+              >
+                Архив для переводчиков
+              </button>
+            </div>
           </div>
         )
       )}
     </div>
-  );
+  )
 }
 
-ChaptersMerger.backgroundColor = "bg-th-secondary-100";
+ChaptersMerger.backgroundColor = 'bg-th-secondary-100'
