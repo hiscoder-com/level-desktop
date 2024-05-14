@@ -60,11 +60,5 @@ export default Project;
 export const getStaticProps = makeStaticProperties(["common", "projects"]);
 
 export async function getStaticPaths() {
-  const paths = [
-    { params: { locale: "en", id: "1" } },
-    { params: { locale: "es", id: "2" } },
-    { params: { locale: "ru", id: "3" } },
-  ];
-
-  return { paths, fallback: "blocking" };
+  return { paths: [], fallback: "blocking" };
 }

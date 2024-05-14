@@ -2,11 +2,13 @@ import React, { useEffect, useState } from "react";
 
 import { useRouter } from "next/router";
 
+import { useTranslation } from "react-i18next";
 import { Tab } from "@headlessui/react";
 import Tool from "../../../../../../components/Tool";
 
 import { useRecoilValue } from "recoil";
 
+import { makeStaticProperties } from "../../../../../../lib/get-static";
 import { inactiveState } from "../../../../../../helpers/atoms";
 
 import Dict from "../../../../../../public/icons/dictionary.svg";
@@ -38,6 +40,10 @@ const icons = {
 };
 
 function StepPage() {
+  const {
+    i18n: { language: locale },
+    t,
+  } = useTranslation();
   const {
     query: { id, chapter, step },
     push,
@@ -185,3 +191,9 @@ function Panel({ tools, mainResource, id, chapter, toolNames, stepConfig }) {
 }
 
 export default StepPage;
+
+export const getStaticProps = makeStaticProperties(["common", "projects"]);
+
+export async function getStaticPaths() {
+  return { paths: [], fallback: "blocking" };
+}

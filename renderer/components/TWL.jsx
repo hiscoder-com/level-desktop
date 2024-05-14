@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import ReactMarkdown from "react-markdown";
 
+import { useTranslation } from "react-i18next";
 import localforage from "localforage";
 import jszip from "jszip";
 import { useGetTwlResource } from "../hooks/useGetTwlResource";
@@ -176,6 +177,8 @@ function TWL({
 export default TWL;
 
 function FilterRepeated({ setFilter, filter }) {
+  const { t } = useTranslation();
+
   const options = [
     { value: "verse", name: "По стиху" },
     { value: "book", name: "По книге" },
@@ -184,7 +187,7 @@ function FilterRepeated({ setFilter, filter }) {
 
   return (
     <div className="flex items-center justify-center">
-      <div className="">Фильтр повторяющихся слов</div>
+      <div>{t("RepeatedWordsFilter")}</div>
       <select
         className="input m-2 !w-auto"
         value={filter}

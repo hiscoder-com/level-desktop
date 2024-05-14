@@ -71,7 +71,7 @@ function ProjectsList({ projects }) {
   const exportToZip = (chapters) => {
     try {
       if (!chapters) {
-        throw new Error("error:NoData");
+        throw new Error(t("NoData"));
       }
       const jsonContent = JSON.stringify(chapters, null, 2);
       const zip = new jszip();

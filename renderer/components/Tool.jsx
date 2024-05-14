@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 import Retelling from "./Retelling";
 import Bible from "./Bible";
 import BlindEditor from "./BlindEditor";
@@ -12,6 +14,7 @@ import Divider from "./Divider";
 import TeamNotes from "./TeamNotes";
 
 function Tool({ config, toolName }) {
+  const { t } = useTranslation();
   let CurrentTool;
   const title = toolName;
 
@@ -90,7 +93,7 @@ function Tool({ config, toolName }) {
       break;
 
     default:
-      return <div>{"WrongResource"}</div>;
+      return <div>{t("WrongResource")}</div>;
   }
   return (
     <>

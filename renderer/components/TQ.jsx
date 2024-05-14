@@ -1,7 +1,9 @@
-import { useGetTqResource } from "../hooks/useGetTqResource";
-import { useRecoilState } from "recoil";
-import { currentVerse } from "../helpers/atoms";
 import dynamic from "next/dynamic";
+import { useRecoilState } from "recoil";
+
+import { useGetTqResource } from "../hooks/useGetTqResource";
+import { currentVerse } from "../helpers/atoms";
+
 import Down from "../public/icons/arrow-down.svg";
 
 const TQuestions = dynamic(

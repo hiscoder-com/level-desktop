@@ -22,7 +22,7 @@ export default function Account() {
   return (
     <>
       <Head>
-        <title>V-CANA</title>
+        <title>{t("V-CANA")}</title>
       </Head>
       <div className="text-2xl w-full">
         <h2 className="mt-6 mb-6 text-4xl">{t("Projects")}</h2>

@@ -3,9 +3,11 @@ import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 
 import { Disclosure } from "@headlessui/react";
+import { useTranslation } from "react-i18next";
 
 import Modal from "./Modal";
 import { useGetDictionary } from "../hooks/useGetDictionary";
+import { generateUniqueId } from "../helpers/noteEditor";
 
 import RightArrow from "../public/icons/right-arrow.svg";
 import LeftArrow from "../public/icons/left-arrow.svg";
@@ -16,7 +18,6 @@ import Down from "../public/icons/arrow-down.svg";
 import Back from "../public/icons/left.svg";
 import Export from "../public/icons/export.svg";
 import Import from "../public/icons/import.svg";
-import { generateUniqueId } from "../helpers/noteEditor";
 
 const t = (str) => str;
 
@@ -37,6 +38,7 @@ const MenuButtons = dynamic(
 const countWordsOnPage = 10;
 
 function Dictionary({ config: { id } }) {
+  const { t } = useTranslation();
   const isRtl = false;
   const [currentPage, setCurrentPage] = useState(0);
   const [isOpenModal, setIsOpenModal] = useState(false);
@@ -140,18 +142,18 @@ function Dictionary({ config: { id } }) {
       try {
         const file = event.target.files[0];
         if (!file) {
-          throw new Error(t("error:NoFileSelected"));
+          throw new Error(t("NoFileSelected"));
         }
         const fileContents = await file.text();
 
         if (!fileContents.trim()) {
-          throw new Error(t("error:EmptyFileContent"));
+          throw new Error(t("EmptyFileContent"));
         }
 
         const importedData = JSON.parse(fileContents);
 
         if (importedData.type !== "dictionary") {
-          throw new Error(t("error:ContentError"));
+          throw new Error(t("ContentError"));
         }
 
         for (const word of importedData.data) {
@@ -174,7 +176,7 @@ function Dictionary({ config: { id } }) {
   function exportWords() {
     try {
       if (!dictionary || !dictionary.length) {
-        throw new Error(t("error:NoData"));
+        throw new Error(t("NoData"));
       }
       const wordIds = dictionary.map(({ id }) => id);
       const words = window.electronAPI.getWordsWithData(id, wordIds);
@@ -246,7 +248,7 @@ function Dictionary({ config: { id } }) {
         id: "export",
         buttonContent: (
           <span className="flex items-center gap-2.5 py-1 pr-7 pl-2.5">
-            <Export className="w-5 h-5" /> {"Export"}
+            <Export className="w-5 h-5" /> {t("Export")}
           </span>
         ),
         action: () => exportWords(),
@@ -255,7 +257,7 @@ function Dictionary({ config: { id } }) {
         id: "import",
         buttonContent: (
           <span className="flex items-center gap-2.5 py-1 pr-7 pl-2.5">
-            <Import className="w-5 h-5" /> {"Import"}
+            <Import className="w-5 h-5" /> {t("Import")}
           </span>
         ),
         action: () => importWords(true),
@@ -284,7 +286,7 @@ function Dictionary({ config: { id } }) {
               setCurrentPage(0);
               setSearchQuery(e.target.value);
             }}
-            placeholder={t("common:Search")}
+            placeholder={t("Search")}
             readOnly={activeWord}
           />
           {searchQuery && (
@@ -311,7 +313,7 @@ function Dictionary({ config: { id } }) {
           <button
             className="btn-tertiary p-3"
             onClick={addWord}
-            title={t("common:AddWord")}
+            title={t("AddWord")}
             disabled={activeWord}
           >
             <Plus className="w-6 h-6 stroke-th-text-secondary-100 stroke-2" />
@@ -473,7 +475,7 @@ function Alphabet({ alphabet, setCurrentPage, setSearchQuery, t, disabled }) {
               setCurrentPage(0);
               setSearchQuery(letter.toLowerCase());
             }}
-            className="px-1.5 cursor-pointer hover:opacity-50 "
+            className="px-1.5 cursor-pointer hover:opacity-50"
             key={letter}
             disabled={disabled}
           >

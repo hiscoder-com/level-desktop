@@ -1,7 +1,8 @@
+import { useRouter } from "next/router";
+
 import { useTranslation } from "next-i18next";
 
 import VcanaLogo from "../public/icons/vcana-logo-color.svg";
-import { useRouter } from "next/router";
 
 export default function StartPage() {
   const router = useRouter();

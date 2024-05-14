@@ -1,11 +1,22 @@
-import Link from "next/link";
 import React, { Fragment } from "react";
+import Link from "next/link";
+import { useTranslation } from "react-i18next";
+import { useRouter } from "next/router";
 
 export default function Breadcrumbs({ links = [], currentTitle }) {
+  const {
+    i18n: { language: locale },
+  } = useTranslation();
+  const { pathname } = useRouter();
+
+  const pathRegex = /\/\[locale\]\/account\/project\/\[id\]/;
+  const cleanPath = pathname.replace(pathRegex, `/${locale}`);
+  const homeUrl = `${cleanPath}/home`;
+
   return (
     <div className="bg-gray-200 dark:bg-gray-800 mb-4">
       <div className="flex items-center px-6 py-4 mx-auto overflow-x-auto whitespace-nowrap">
-        <Link href="/home" legacyBehavior>
+        <Link href={homeUrl} legacyBehavior>
           <a className="text-gray-600 dark:text-gray-200">
             <svg
               xmlns="http://www.w3.org/2000/svg"

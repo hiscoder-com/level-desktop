@@ -2,6 +2,12 @@ import { useEffect, useState } from "react";
 
 import dynamic from "next/dynamic";
 
+import { useTranslation } from "react-i18next";
+
+import { useGetTeamNotes } from "../hooks/useGetTeamNotes";
+import { convertNotesToTree, generateUniqueId } from "../helpers/noteEditor";
+import Modal from "./Modal";
+
 import Back from "../public/icons/left.svg";
 import Trash from "../public/icons/trash.svg";
 import FileIcon from "../public/icons/file-icon.svg";
@@ -15,10 +21,6 @@ import Rename from "../public/icons/rename.svg";
 import Close from "../public/icons/close.svg";
 import Plus from "../public/icons/plus.svg";
 import Progress from "../public/icons/progress.svg";
-
-import { useGetTeamNotes } from "../hooks/useGetTeamNotes";
-import Modal from "./Modal";
-import { convertNotesToTree, generateUniqueId } from "../helpers/noteEditor";
 
 const t = (str) => str;
 
@@ -35,12 +37,14 @@ const ContextMenu = dynamic(
     ssr: false,
   }
 );
+
 const Redactor = dynamic(
   () => import("@texttree/notepad-rcl").then((mod) => mod.Redactor),
   {
     ssr: false,
   }
 );
+
 const TreeView = dynamic(
   () => import("@texttree/notepad-rcl").then((mod) => mod.TreeView),
   {
@@ -65,6 +69,8 @@ const icons = {
 };
 
 export default function TeamNotes({ config: { id }, config, toolName }) {
+  const { t } = useTranslation(["common", "projects"]);
+
   const [noteId, setNoteId] = useState("");
   const [contextMenuEvent, setContextMenuEvent] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -170,17 +176,17 @@ export default function TeamNotes({ config: { id }, config, toolName }) {
       try {
         const file = event.target.files[0];
         if (!file) {
-          throw new Error(t("error:NoFileSelected"));
+          throw new Error(t("NoFileSelected"));
         }
 
         const fileContents = await file.text();
         if (!fileContents.trim()) {
-          throw new Error(t("error:EmptyFileContent"));
+          throw new Error(t("EmptyFileContent"));
         }
 
         const importedData = JSON.parse(fileContents);
         if (importedData.type !== "personal_notes") {
-          throw new Error(t("error:ContentError"));
+          throw new Error(t("ContentError"));
         }
         const maxSorting = getMaxSortingNullParent(notes);
         const parsedNotes = parseNotesWithTopFolder(
@@ -358,7 +364,8 @@ export default function TeamNotes({ config: { id }, config, toolName }) {
         id: "adding_note",
         buttonContent: (
           <span className="flex items-center gap-2.5 py-1 pr-7 pl-2.5">
-            <FileIcon /> {"New note"}
+            <FileIcon />
+            {t("NewNote")}
           </span>
         ),
         action: () => addNote(),
@@ -367,7 +374,8 @@ export default function TeamNotes({ config: { id }, config, toolName }) {
         id: "adding_folder",
         buttonContent: (
           <span className="flex items-center gap-2.5 py-1 pr-7 pl-2.5">
-            <CloseFolder /> {"New folder"}
+            <CloseFolder />
+            {t("NewFolder")}
           </span>
         ),
         action: () => addNote(true),
@@ -376,7 +384,7 @@ export default function TeamNotes({ config: { id }, config, toolName }) {
         id: "rename",
         buttonContent: (
           <span className="flex items-center gap-2.5 py-1 pr-7 pl-2.5">
-            <Rename /> {"Rename"}
+            <Rename /> {t("Rename")}
           </span>
         ),
         action: handleRename,
@@ -385,7 +393,7 @@ export default function TeamNotes({ config: { id }, config, toolName }) {
         id: "delete",
         buttonContent: (
           <span className="flex items-center gap-2.5 py-1 pr-7 pl-2.5">
-            <Trash className="w-5 h-5" /> {"Delete"}
+            <Trash className="w-5 h-5" /> {t("projects:Delete")}
           </span>
         ),
         action: () => setIsOpenModal(true),
@@ -396,7 +404,7 @@ export default function TeamNotes({ config: { id }, config, toolName }) {
         id: "export",
         buttonContent: (
           <span className="flex items-center gap-2.5 py-1 pr-7 pl-2.5">
-            <Export className="w-4 h-4" /> {"Export"}
+            <Export className="w-4 h-4" /> {t("Export")}
           </span>
         ),
         action: () => exportNotes(),
@@ -405,7 +413,7 @@ export default function TeamNotes({ config: { id }, config, toolName }) {
         id: "import",
         buttonContent: (
           <span className="flex items-center gap-2.5 py-1 pr-7 pl-2.5">
-            <Import className="w-4 h-4" /> {"Import"}
+            <Import className="w-4 h-4" /> {t("Import")}
           </span>
         ),
         action: () => importNotes(true),
@@ -414,7 +422,7 @@ export default function TeamNotes({ config: { id }, config, toolName }) {
         id: "remove",
         buttonContent: (
           <span className="flex items-center gap-2.5 py-1 pr-7 pl-2.5">
-            <Trash className="w-5 h-5" /> {"Remove all"}
+            <Trash className="w-5 h-5" /> {t("RemoveAll")}
           </span>
         ),
         action: () => {

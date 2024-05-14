@@ -1,9 +1,15 @@
 import React, { useState } from "react";
 import Head from "next/head";
 import Link from "next/link";
+import { useTranslation } from "react-i18next";
 import { books } from "../helpers/books";
+import { makeStaticProperties, getStaticPaths } from "../../lib/get-static";
 
 function Create() {
+  const {
+    i18n: { language: locale },
+    t,
+  } = useTranslation();
   const [fileUrl, setFileUrl] = useState("");
   const [resources, setResources] = useState([]);
 
@@ -23,27 +29,17 @@ function Create() {
   return (
     <>
       <Head>
-        <title>V-CANA</title>
+        <title>{t("V-CANA")}</title>
       </Head>
       <div className="text-lg w-full p-4">
-        <Link href={"/home"} legacyBehavior>
-          <a className="border py-2 px-3 rounded-md bg-slate-300">Back</a>
+        <Link href={`${locale}/home`} legacyBehavior>
+          <a className="border py-2 px-3 rounded-md bg-slate-300">
+            {t("Back")}
+          </a>
         </Link>
         <br />
-        <h2 className="text-2xl mt-3 mb-4">Создать book package</h2>
-        <p>
-          Работать будет так.
-          <br />
-          1ым шагом мы загружаем файл с конфигом, где прописаны будут все шаги и
-          т.д.
-          <br />
-          2ой шаг - это указать ссылки на ресурсы
-          <br />
-          3ий шаг - указать код книги, для которой мы создаем пакет
-          <br />
-          После этого надо нажать кнопку "Сгенерировать", и у нас получится
-          архив со всеми настройками и файлами
-        </p>
+        <h2 className="text-2xl mt-3 mb-4">{t("CreateBP")}</h2>
+        <p>{t("CreationRules")}</p>
         <form onSubmit={onSubmit}>
           <button
             className="border border-green-700 bg-green-600 hover:bg-green-700 active:bg-green-800 shadow-md hover:border-green-800 rounded-md text-white px-3 py-2 text-base mt-3"
@@ -54,7 +50,7 @@ function Create() {
               setResources(resources);
             }}
           >
-            Выбрать конфиг проекта
+            {t("SelectProjectConfig")}
           </button>
           <input type="text" readOnly name="fileUrl" value={fileUrl} />
           {resources.length
@@ -89,3 +85,7 @@ function Create() {
 }
 
 export default Create;
+
+export const getStaticProps = makeStaticProperties(["common"]);
+
+export { getStaticPaths };

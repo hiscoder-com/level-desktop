@@ -1,9 +1,15 @@
 import React, { useState } from "react";
+
+import { useTranslation } from "react-i18next";
 import JSZip from "jszip";
-import Close from "../public/icons/close.svg";
+
 import { convertToUsfm } from "../helpers/usfm";
+
+import Close from "../public/icons/close.svg";
 // import toast from "react-hot-toast";
 export default function ChaptersMerger({ book }) {
+  const { t } = useTranslation(["common", "projects"]);
+
   const [jsonDataArray, setJsonDataArray] = useState([]);
   const [conflicts, setConflicts] = useState(null);
   const [mergedContent, setMergedContent] = useState(null);
@@ -146,7 +152,7 @@ export default function ChaptersMerger({ book }) {
         onChange={(e) => handleFiles(e.target.files)}
       />
       <div>
-        <p>Загруженные файлы:</p>
+        <p>{t("UploadedFiles")}</p>
         {jsonDataArray.map((json, index) => (
           <div className="flex gap-2 items-center" key={index}>
             <h1 key={index}>{json.filename}</h1>
@@ -163,31 +169,37 @@ export default function ChaptersMerger({ book }) {
       </div>
       {jsonDataArray.length > 0 && (
         <button className="btn-primary" onClick={() => mergeChapters()}>
-          Merge
+          {t("Merge")}
         </button>
       )}
       {conflicts ? (
         <div>
-          <p className="font-bold mb-2">Есть конфликты, надо их исправить</p>
+          <p className="font-bold mb-2">{t("ConflictTitle")}</p>
           {conflicts.map((conflict, index) => (
             <div key={index}>
               <p>
-                Chapter {conflict.chapter}, Verse {conflict.verse}
+                {t("projects:Chapter")} {conflict.chapter},{" "}
+                {t("projects:Verse")}
+                {conflict.verse}
               </p>
-              <p>Existing Text: {conflict.existingText}</p>
-              <p>New Text: {conflict.newText}</p>
+              <p>
+                {t("projects:ExistingText")} {conflict.existingText}
+              </p>
+              <p>
+                {t("projects:NewText")} {conflict.newText}
+              </p>
             </div>
           ))}
         </div>
       ) : (
         mergedContent && (
           <div className="flex flex-col gap-2 items-center">
-            <p>Конфликтов нет, можно скачать в формате USFM</p>
+            <p>{t("projects:NoConflicts")}</p>
             <button
               className="btn-primary"
               onClick={() => downloadFile(mergedContent)}
             >
-              Скачать
+              {t("Download")}
             </button>
           </div>
         )

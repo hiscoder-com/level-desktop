@@ -12,11 +12,14 @@
   "Coordinators": "Coordinadores",
   "CreateProject": "Crear un proyecto",
   "Delete": "Delete",
+  "ExistingText": "Texto existente:",
   "GoToStep": "Ir al paso",
   "Information": "Información",
   "Language": "Language",
   "Method": "Method",
   "MyProjects": "My projects",
+  "NewText": "Nuevo texto:",
+  "NoConflicts": "No conflicts, can be downloaded in USFM format",
   "OrigTitle": "Nombre en el idioma de destino",
   "Project": "Proyecto",
   "ProjectBooks": "Project books",
@@ -31,5 +34,6 @@
   "Title": "Project name",
   "Translator": "translator",
   "Translators": "Traductores",
-  "V-CANAProjects": "V-CANA projects"
+  "V-CANAProjects": "V-CANA projects",
+  "Verse": "Verso"
 }

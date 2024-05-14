@@ -12,11 +12,14 @@
   "Coordinators": "Координаторы",
   "CreateProject": "Создать проект",
   "Delete": "Удалить",
+  "ExistingText": "Существующий текст:",
   "GoToStep": "Перейти к Шагу",
   "Information": "Информация",
   "Language": "Язык",
   "Method": "Метод",
   "MyProjects": "Мои Проекты",
+  "NewText": "Новый текст:",
+  "NoConflicts": "Конфликтов нет, можно скачать в формате USFM",
   "OrigTitle": "Название на целевом языке",
   "Project": "Проект",
   "ProjectBooks": "Книги проекта",
@@ -31,5 +34,6 @@
   "Title": "Название проекта",
   "Translator": "переводчика",
   "Translators": "Переводчики",
-  "V-CANAProjects": "Проекты V-CANA"
+  "V-CANAProjects": "Проекты V-CANA",
+  "Verse": "Стих"
 }
