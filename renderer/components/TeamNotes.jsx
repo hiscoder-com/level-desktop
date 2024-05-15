@@ -58,7 +58,7 @@ const icons = {
   arrowRight: <ArrowRight className="stroke-2" />,
   openFolder: <OpenFolder className="w-6 h-6 stroke-[1.7]" />,
   closeFolder: <CloseFolder className="w-6 h-6" />,
-  plus: <Plus className="w-6 h-6" />,
+  plus: <Plus className="w-6 h-6 stroke-2" />,
   dots: (
     <div className="flex items-center justify-center w-6 h-6 space-x-1">
       {[...Array(3).keys()].map((key) => (
@@ -519,8 +519,8 @@ export default function TeamNotes({ config: { id }, config, toolName }) {
 
   return (
     <>
-      <div className="flex gap-2.5 w-full mb-2">
-        <div className="relative flex items-center mb-4 w-full">
+      <div className="flex gap-2.5 w-full items-center">
+        <div className="relative flex items-center w-full">
           <input
             className="input-primary w-full !pr-8"
             value={term}
@@ -547,7 +547,7 @@ export default function TeamNotes({ config: { id }, config, toolName }) {
           disabled={activeNote}
         />
       </div>
-      <div className="relative">
+      <div className="relative mt-6">
         {!activeNote || !Object.keys(activeNote)?.length ? (
           <>
             {!isLoading || notes?.length ? (
