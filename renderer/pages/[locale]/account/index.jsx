@@ -31,7 +31,7 @@ export default function Account() {
       <div className="text-2xl w-full">
         <Link href={`/${locale}/home`} legacyBehavior>
           <a>
-            <VcanaLogo className="w-32 mt-6" />
+            <VcanaLogo className="w-32 pt-6" />
           </a>
         </Link>
         <h2 className="my-6 text-4xl">{t('Projects')}</h2>

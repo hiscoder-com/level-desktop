@@ -13,16 +13,16 @@ export default function Breadcrumbs({ links = [], currentTitle }) {
   const homeUrl = `/${locale}/account`
 
   return (
-    <div className="bg-gray-200 dark:bg-slate-550 mb-4">
+    <div className="absolute top-0 left-0 w-full bg-slate-550 mb-4">
       <div className="flex items-center px-6 py-4 mx-auto overflow-x-auto whitespace-nowrap">
         <Link href={homeUrl} legacyBehavior>
-          <a className="text-gray-600 dark:text-gray-200">
+          <a className="text-th-secondary-10">
             <VcanaLogo className="w-32" />
           </a>
         </Link>
         {links.map((link, idx) => (
           <Fragment key={idx}>
-            <span className="mx-5 text-gray-500 dark:text-gray-300 rtl:-scale-x-100">
+            <span className="mx-5 text-th-secondary-10 rtl:-scale-x-100">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="w-5 h-5"
@@ -37,15 +37,13 @@ export default function Breadcrumbs({ links = [], currentTitle }) {
               </svg>
             </span>
             <Link href={link.href} legacyBehavior>
-              <a className="text-gray-600 dark:text-gray-200 hover:underline">
-                {link.title}
-              </a>
+              <a className="text-th-secondary-10 hover:underline">{link.title}</a>
             </Link>
           </Fragment>
         ))}
         {currentTitle && (
           <Fragment>
-            <span className="mx-5 text-gray-500 dark:text-gray-300 rtl:-scale-x-100">
+            <span className="mx-5 text-th-secondary-10 rtl:-scale-x-100">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="w-5 h-5"
@@ -59,7 +57,7 @@ export default function Breadcrumbs({ links = [], currentTitle }) {
                 />
               </svg>
             </span>
-            <div className="text-gray-600 dark:text-gray-200">{currentTitle}</div>
+            <div className="text-th-secondary-10">{currentTitle}</div>
           </Fragment>
         )}
       </div>
