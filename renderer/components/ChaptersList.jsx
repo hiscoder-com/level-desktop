@@ -100,7 +100,7 @@ function ChapterList({ id, chapters, steps, mutate }) {
             </td>
             <td className="border-b border-slate-100 p-4 pl-8 text-slate-500">
               <div
-                className="btn-primary text-base"
+                className="btn-primary text-base w-fit"
                 onClick={() => handleDownloadChapter(chapter)}
               >
                 {t('common:Download') || 'Download'}

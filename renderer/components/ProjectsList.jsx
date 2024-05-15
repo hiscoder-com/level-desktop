@@ -128,7 +128,9 @@ function ProjectsList({ projects, mutate }) {
             <th className="border-b font-medium p-4 pl-8 pt-0 pb-3 text-slate-400 text-left">
               {t('CreatedAt') || 'Created at'}
             </th>
-            <th className="border-b font-medium p-4 pl-8 pt-0 pb-3 text-slate-400 text-left"></th>
+            <th className="border-b font-medium p-4 pl-8 pt-0 pb-3 text-slate-400 text-left">
+              {t('Download') || 'Download'}
+            </th>
           </tr>
         </thead>
         <tbody className="bg-white">
@@ -158,7 +160,7 @@ function ProjectsList({ projects, mutate }) {
               </td>
               <td className="border-b border-slate-100 p-4 pl-8 text-slate-500">
                 <div
-                  className="btn-primary"
+                  className="btn-primary w-fit"
                   onClick={() => {
                     setCurrentProject(project)
                     setIsOpenModal(true)

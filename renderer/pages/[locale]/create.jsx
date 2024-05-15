@@ -54,17 +54,17 @@ export default function Create() {
               {t('projects:SelectArchiveProject') || 'Выберите архив с проектом'}
             </button>
             <div className="flex items-center gap-2">
-              <p className="text-center font-bold">
-                {fileUrl || t('NotSelected') || 'Не выбрано'}
-              </p>
               {fileUrl && (
-                <Close
-                  className="w-5 h-5 cursor-pointer"
-                  onClick={() => {
-                    setFileUrl(false)
-                    setSuccess(false)
-                  }}
-                />
+                <>
+                  <p className="text-center font-bold">{fileUrl}</p>
+                  <Close
+                    className="w-5 h-5 cursor-pointer"
+                    onClick={() => {
+                      setFileUrl(false)
+                      setSuccess(false)
+                    }}
+                  />
+                </>
               )}
             </div>
 
