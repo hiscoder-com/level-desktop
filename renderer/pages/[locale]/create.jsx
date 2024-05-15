@@ -5,6 +5,7 @@ import { makeStaticProperties, getStaticPaths } from '../../lib/get-static'
 import Breadcrumbs from '../../components/Breadcrumbs'
 import Close from '../../public/icons/close.svg'
 import Progress from '../../public/icons/progress.svg'
+import Link from 'next/link'
 
 export default function Create() {
   // const {
@@ -15,6 +16,7 @@ export default function Create() {
   const t = () => {}
   const [fileUrl, setFileUrl] = React.useState(false)
   const [isCreating, setIsCreating] = useState(false)
+  const [success, setSuccess] = useState(false)
   const onSubmit = async (e) => {
     e.preventDefault()
     setIsCreating(true)
@@ -24,6 +26,8 @@ export default function Create() {
     } finally {
       setTimeout(() => {
         setIsCreating(false)
+        setSuccess(true)
+        setFileUrl(false)
       }, 10000)
     }
   }
@@ -35,9 +39,9 @@ export default function Create() {
       </Head>
       <Breadcrumbs />
 
-      <div className="flex justify-center text-2xl w-full mt-10">
+      <div className="flex justify-center w-full mt-10">
         <div className="flex flex-col items-center gap-4">
-          <h2>{t('projects:CreateProject') || 'Создать проект'}</h2>
+          <h2 className="font-bold">{t('projects:CreateProject') || 'Создать проект'}</h2>
           <form onSubmit={onSubmit} className="flex flex-col items-center gap-4">
             <button
               className="btn-primary text-base mt-3 w-fit"
@@ -50,12 +54,15 @@ export default function Create() {
               {t('projects:SelectArchiveProject') || 'Выберите архив с проектом'}
             </button>
             <div className="flex items-center gap-2">
-              <p className="text-center">{fileUrl || t('NotSelected') || 'Не выбрано'}</p>
+              <p className="text-center font-bold">
+                {fileUrl || t('NotSelected') || 'Не выбрано'}
+              </p>
               {fileUrl && (
                 <Close
                   className="w-5 h-5 cursor-pointer"
                   onClick={() => {
                     setFileUrl(false)
+                    setSuccess(false)
                   }}
                 />
               )}
@@ -73,6 +80,16 @@ export default function Create() {
               )}
             </div>
           </form>
+          {success && (
+            <>
+              <p className="font-bold">
+                Проект успешно создан, перейдите в личный кабинет
+              </p>
+              <Link href={`/${locale}/account`} className="btn-primary">
+                Личный кабинет
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </>
