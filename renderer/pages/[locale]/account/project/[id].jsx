@@ -1,43 +1,44 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react'
 
-import Head from "next/head";
-import { useRouter } from "next/router";
-import { useTranslation } from "react-i18next";
+import Head from 'next/head'
+import { useRouter } from 'next/router'
+// import { useTranslation } from 'react-i18next'
 
-import Breadcrumbs from "../../../../components/Breadcrumbs";
-import ChapterList from "../../../../components/ChaptersList";
-import { makeStaticProperties } from "../../../../lib/get-static";
+import Breadcrumbs from '../../../../components/Breadcrumbs'
+import ChapterList from '../../../../components/ChaptersList'
+// import { makeStaticProperties } from '../../../../lib/get-static'
 
 function Project() {
-  const { t } = useTranslation(["common", "projects"]);
+  // const { t } = useTranslation(['common', 'projects'])
+  const t = () => {}
   const {
     query: { id },
-  } = useRouter();
+  } = useRouter()
 
-  const [project, setProject] = useState(false);
+  const [project, setProject] = useState(false)
 
   const mutate = () => {
-    setProject(window.electronAPI.getProject(id));
-  };
+    setProject(window.electronAPI.getProject(id))
+  }
 
   useEffect(() => {
     if (id) {
-      setProject(window.electronAPI.getProject(id));
-      window.electronAPI.setProjectFolder(id);
+      setProject(window.electronAPI.getProject(id))
+      window.electronAPI.setProjectFolder(id)
     }
-  }, [id]);
+  }, [id])
 
   return (
     <>
       <Head>
-        <title>{t("V-CANA")}</title>
+        <title>{t('V-CANA')}</title>
       </Head>
       <div className="w-full">
         <Breadcrumbs currentTitle={project?.book?.name} />
         {/* <Link href={`/project/${id}/settings`}>
           <a>Settings</a>
         </Link> */}
-        <h2 className="mt-6 mb-6 text-4xl">{t("projects:Chapters")}</h2>
+        <h2 className="mt-6 mb-6 text-4xl">{t('projects:Chapters')}</h2>
         {project ? (
           <ChapterList
             id={id}
@@ -46,19 +47,24 @@ function Project() {
             mutate={mutate}
           />
         ) : (
-          <>{t("Loading")}</>
+          <>{t('Loading')}</>
         )}
         <br />
         {/* <pre>{JSON.stringify(project, null, 2)}</pre> */}
       </div>
     </>
-  );
+  )
 }
 
-export default Project;
+export default Project
 
-export const getStaticProps = makeStaticProperties(["common", "projects"]);
+// export const getStaticProps = makeStaticProperties(['common', 'projects'])
 
-export async function getStaticPaths() {
-  return { paths: [], fallback: "blocking" };
-}
+// export const getStaticPaths = ({}) => {
+//   const paths = [
+//     { params: { id: '09b8f580-0367-4437-9a3e-694b77905e29', locale: 'en' } },
+//     { params: { id: '81c5508c-2e05-424b-b5d2-55674873f235', locale: 'en' } },
+//   ]
+
+//   return { paths, fallback: 'blocking' }
+// }

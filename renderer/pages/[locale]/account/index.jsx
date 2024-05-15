@@ -1,30 +1,32 @@
-import React from "react";
-import Head from "next/head";
-import Link from "next/link";
-import { useTranslation } from "react-i18next";
+import React from 'react'
+import Head from 'next/head'
+import Link from 'next/link'
+import { useTranslation } from 'react-i18next'
 
-import { getStaticPaths, makeStaticProperties } from "../../../lib/get-static";
+import { getStaticPaths, makeStaticProperties } from '../../../lib/get-static'
 
-import ProjectsList from "../../../components/ProjectsList";
+import ProjectsList from '../../../components/ProjectsList'
 
-import VcanaLogo from "../../../public/icons/vcana-logo-color.svg";
+import VcanaLogo from '../../../public/icons/vcana-logo-color.svg'
 
 export default function Account() {
   const {
     i18n: { language: locale },
     t,
-  } = useTranslation(["common", "projects"]);
+  } = useTranslation(['common', 'projects'])
 
-  const [projects, setProjects] = React.useState([]);
-
+  const [projects, setProjects] = React.useState([])
+  const mutate = () => {
+    setProjects(window.electronAPI.getProjects())
+  }
   React.useEffect(() => {
-    setProjects(window.electronAPI.getProjects());
-  }, []);
+    mutate()
+  }, [])
 
   return (
     <>
       <Head>
-        <title>{t("V-CANA")}</title>
+        <title>{t('V-CANA')}</title>
       </Head>
       <div className="text-2xl w-full">
         <Link href={`/${locale}/home`} legacyBehavior>
@@ -32,18 +34,18 @@ export default function Account() {
             <VcanaLogo className="w-32 mt-6" />
           </a>
         </Link>
-        <h2 className="my-6 text-4xl">{t("Projects")}</h2>
+        <h2 className="my-6 text-4xl">{t('Projects')}</h2>
         <div className="py-4">
-          <ProjectsList projects={projects} />
+          <ProjectsList projects={projects} mutate={mutate} />
         </div>
         <Link href={`/${locale}/create`} legacyBehavior>
-          <a className="btn-primary text-base">{t("Import")}</a>
+          <a className="btn-primary text-base">{t('Import')}</a>
         </Link>
       </div>
     </>
-  );
+  )
 }
 
-export const getStaticProps = makeStaticProperties(["common", "projects"]);
+export const getStaticProps = makeStaticProperties(['common', 'projects'])
 
-export { getStaticPaths };
+export { getStaticPaths }

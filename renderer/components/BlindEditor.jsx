@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 
-import { useTranslation } from 'react-i18next'
+// import { useTranslation } from 'react-i18next'
 import { useSetRecoilState } from 'recoil'
 
 import Modal from './Modal'
@@ -12,7 +12,8 @@ import Pencil from '../public/icons/pencil.svg'
 import Check from '../public/icons/check.svg'
 
 function BlindEditor({ config: { id, mainResource, chapter = false }, toolName }) {
-  const { t } = useTranslation()
+  // const { t } = useTranslation()
+  const t = () => {}
   const [isShowFinalButton, setIsShowFinalButton] = useState(false)
   const [translatedVerses, setTranslatedVerses] = useState([])
   const [enabledInputs, setEnabledInputs] = useState([])
@@ -202,13 +203,15 @@ function BlindEditor({ config: { id, mainResource, chapter = false }, toolName }
             }}
             className="btn-base bg-th-primary-100 text-th-text-secondary-100 hover:opacity-70"
           >
-            {t('Save')}
+            {t('Save') || 'Save'}
           </button>
         )}
       </div>
       <Modal isOpen={isOpenModal} closeHandle={() => setIsOpenModal(false)}>
         <div className="flex flex-col gap-7 items-center">
-          <div className="text-center text-2xl">{t('AreYouSureWantStartBlind')}</div>
+          <div className="text-center text-2xl">
+            {t('AreYouSureWantStartBlind') || 'Are you sure want to start blind draft?'}
+          </div>
           <div className="flex gap-7 w-1/2">
             <button
               className="btn-secondary flex-1"
@@ -222,7 +225,7 @@ function BlindEditor({ config: { id, mainResource, chapter = false }, toolName }
                 }, 1000)
               }}
             >
-              {t('Yes')}
+              {t('Yes') || 'Yes'}
             </button>
             <button
               className="btn-secondary flex-1"
@@ -230,7 +233,7 @@ function BlindEditor({ config: { id, mainResource, chapter = false }, toolName }
                 setIsOpenModal(false)
               }}
             >
-              {t('No')}
+              {t('No') || 'No'}
             </button>
           </div>
         </div>
