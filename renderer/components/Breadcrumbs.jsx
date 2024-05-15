@@ -12,7 +12,7 @@ export default function Breadcrumbs({ links = [], currentTitle }) {
   const homeUrl = `/${locale}/account`
 
   return (
-    <div className="bg-gray-200 dark:bg-slate-550 mb-4">
+    <div className="absolute top-0 left-0 w-full bg-gray-200 dark:bg-slate-550 mb-4">
       <div className="flex items-center px-6 py-4 mx-auto overflow-x-auto whitespace-nowrap">
         <Link href={homeUrl} legacyBehavior>
           <a className="text-gray-600 dark:text-gray-200">

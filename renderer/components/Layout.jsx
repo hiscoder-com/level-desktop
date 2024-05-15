@@ -9,6 +9,18 @@ import Progress from '../public/icons/progress.svg'
 function Layout({ children }) {
   const [loadingPage, setLoadingPage] = useState(false)
   const router = useRouter()
+
+  const homePath = '/[locale]/home'
+  const accountPath = '/[locale]/account'
+
+  const getMainClassName = () => {
+    if (router.pathname === homePath || router.pathname === accountPath) {
+      return 'mx-auto min-h-screen'
+    } else {
+      return 'mx-auto h-[calc(100vh-5rem)] mt-20'
+    }
+  }
+
   useEffect(() => {
     const handleStart = (url, { shallow }) => {
       if (!shallow) {
@@ -22,7 +34,7 @@ function Layout({ children }) {
   }, [router])
   return (
     <>
-      <div className="mx-auto min-h-screen">
+      <div className={getMainClassName()}>
         <Transition
           as={Fragment}
           appear={true}
