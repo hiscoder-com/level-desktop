@@ -1,3 +1,5 @@
+import { useCallback, useEffect, useRef, useState } from 'react'
+
 import { useTranslation } from 'react-i18next'
 
 import Retelling from './Retelling'
@@ -109,6 +111,46 @@ function Tool({ config, toolName }) {
     default:
       return <div>{t('WrongResource')}</div>
   }
+  const contentRef = useRef(null)
+  const [hasVerticalScroll, setHasVerticalScroll] = useState(false)
+
+  const checkVerticalScroll = useCallback(() => {
+    const contentElement = contentRef.current
+    if (contentElement) {
+      const hasScroll = contentElement.scrollHeight > contentElement.clientHeight
+      setHasVerticalScroll(hasScroll)
+    }
+  }, [])
+
+  useEffect(() => {
+    const handleResize = () => {
+      checkVerticalScroll()
+    }
+
+    window.addEventListener('resize', handleResize)
+    checkVerticalScroll()
+
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [checkVerticalScroll])
+
+  useEffect(() => {
+    checkVerticalScroll()
+  }, [toolName, checkVerticalScroll])
+
+  useEffect(() => {
+    const contentElement = contentRef.current
+    if (contentElement) {
+      const observer = new MutationObserver(checkVerticalScroll)
+      observer.observe(contentElement, { subtree: true, childList: true })
+
+      return () => {
+        observer.disconnect()
+      }
+    }
+  }, [checkVerticalScroll])
+
   return (
     <>
       <div className="pt-2.5 px-4 h-10 font-bold bg-th-primary-200 text-th-text-secondary-100 rounded-t-lg truncate">
@@ -127,7 +169,12 @@ function Tool({ config, toolName }) {
         {title}
       </div>
       <div className="adaptive-card border border-b-th-secondary-300 border-l-th-secondary-300 border-r-th-secondary-300 rounded-b-lg box-border">
-        <div className="h-full p-4 overflow-x-hidden overflow-y-auto">
+        <div
+          className={`h-full overflow-x-hidden overflow-y-auto py-4 pl-4 ${
+            hasVerticalScroll ? 'pr-1' : 'pr-5'
+          }`}
+          ref={contentRef}
+        >
           <CurrentTool config={config} toolName={toolName} />
         </div>
       </div>
