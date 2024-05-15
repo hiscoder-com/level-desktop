@@ -87,7 +87,7 @@ export default function ConfessionSteps() {
   }
 
   return (
-    <div className="layout-appbar">
+    <div className="layout-appbar mt-16">
       <h1 className="text-2xl md:text-4xl text-center">{t('users:Confession')}:</h1>
       <div className="flex flex-row h-full flex-wrap sm:flex-nowrap justify-evenly sm:justify-center w-full xl:w-4/5 max-w-7xl gap-4 text-sm sm:text-base lg:text-lg xl:text-xl">
         <div className="flex items-center">

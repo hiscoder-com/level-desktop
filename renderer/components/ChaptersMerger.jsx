@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react'
-import { useTranslation } from 'react-i18next'
+// import { useTranslation } from 'react-i18next'
 
 import JSZip from 'jszip'
 
@@ -8,7 +8,8 @@ import { convertToUsfm } from '../helpers/usfm'
 import Close from '../public/icons/close.svg'
 
 export default function ChaptersMerger({ book }) {
-  const { t } = useTranslation(['common', 'projects'])
+  // const { t } = useTranslation(['common', 'projects'])
+  const t = () => {}
 
   const [jsonDataArray, setJsonDataArray] = useState([])
   const [conflicts, setConflicts] = useState(null)
@@ -171,6 +172,7 @@ export default function ChaptersMerger({ book }) {
 
   return (
     <div className="layout-appbar">
+      <p className="font-bold">Выберите все архивы</p>
       <input
         ref={fileInputRef}
         type="file"
@@ -178,7 +180,7 @@ export default function ChaptersMerger({ book }) {
         onChange={(e) => handleFiles(e.target.files)}
       />
       <div>
-        <p>{t('UploadedFiles')}</p>
+        <p>{t('UploadedFiles') || 'Загруженные файлы:'}</p>
         {jsonDataArray.map((json, index) => (
           <div className="flex gap-2 items-center" key={index}>
             <h1 key={index}>{json.filename}</h1>
@@ -198,17 +200,23 @@ export default function ChaptersMerger({ book }) {
         ))}
       </div>
       {jsonDataArray.length > 0 && (
-        <button
-          className="btn-primary"
-          disabled={jsonDataArray.length < 2}
-          onClick={() => mergeChapters()}
-        >
-          {t('Merge')}
-        </button>
+        <>
+          <p className="font-bold">
+            Нажмите кнопку 'Соединить архивы',чтобы соединить все стихи в одну главу
+          </p>
+
+          <button
+            className="btn-primary"
+            disabled={jsonDataArray.length < 2}
+            onClick={() => mergeChapters()}
+          >
+            {t('Merge') || 'Соединить архивы'}
+          </button>
+        </>
       )}
       {conflicts ? (
         <div>
-          <p className="font-bold mb-2">{t('ConflictTitle')}</p>
+          <p className="font-bold mb-2">{t('ConflictTitle') || 'Есть конфликты'}</p>
           {conflicts.map((conflict, index) => (
             <div key={index}>
               <p>
@@ -226,12 +234,18 @@ export default function ChaptersMerger({ book }) {
         </div>
       ) : (
         mergedContent && (
-          <div>
-            <p>{t('projects:NoConflicts')}</p>
+          <div className="tex-center">
+            <p className="text-center mb-2">
+              {t('projects:NoConflicts') || 'Конфликтов нет'}
+            </p>
+            <p className="font-bold mb-2">
+              Нажмите кнопку 'Архив для переводчиков', дожитесь скачивания архива, а затем
+              отправьте его всем переводчикам этой главы.
+            </p>
             <div className="flex gap-2 items-center justify-center">
-              <button className="btn-primary" onClick={() => downloadUsfm(mergedContent)}>
+              {/* <button className="btn-primary" onClick={() => downloadUsfm(mergedContent)}>
                 USFM
-              </button>
+              </button> */}
 
               <button
                 className="btn-primary"

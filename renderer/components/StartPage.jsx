@@ -28,11 +28,8 @@ export default function StartPage() {
   }
   return (
     <div className="relative flex flex-col justify-center items-center gap-4 h-screen w-full mx-auto max-w-7xl ">
-      <div className="w-full absolute flex justify-between items-center top-10">
+      <div className="w-full absolute flex justify-start items-center top-10">
         <LanguageSwitcher />
-        <Link href={`/${locale}/chapter-merger`}>
-          <Gear className="w-10 h-10" />
-        </Link>
       </div>
 
       <div>

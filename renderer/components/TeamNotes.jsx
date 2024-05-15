@@ -181,9 +181,10 @@ export default function TeamNotes({ config: { id }, config, toolName }) {
         if (!fileContents.trim()) {
           throw new Error(t('EmptyFileContent'))
         }
-
         const importedData = JSON.parse(fileContents)
-        if (importedData.type !== 'personal_notes') {
+        console.log(importedData.type !== 'team_notes')
+
+        if (importedData.type !== 'team_notes') {
           throw new Error(t('ContentError'))
         }
         const maxSorting = getMaxSortingNullParent(notes)
@@ -269,7 +270,7 @@ export default function TeamNotes({ config: { id }, config, toolName }) {
       const transformedData = formationJSONToTree(notesWithData)
 
       const jsonContent = JSON.stringify(
-        { type: 'personal_notes', data: transformedData },
+        { type: 'team_notes', data: transformedData },
         null,
         2
       )
@@ -280,7 +281,7 @@ export default function TeamNotes({ config: { id }, config, toolName }) {
       const currentDate = new Date()
       const formattedDate = currentDate.toISOString().split('T')[0]
 
-      const fileName = `personal_notes_${formattedDate}.json`
+      const fileName = `team-notes_${formattedDate}.json`
 
       const url = URL.createObjectURL(blob)
 

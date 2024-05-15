@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-import { useTranslation } from 'react-i18next'
+// import { useTranslation } from 'react-i18next'
 
 import localforage from 'localforage'
 import jszip from 'jszip'
@@ -182,17 +182,18 @@ function TWL({
 export default TWL
 
 function FilterRepeated({ setFilter, filter }) {
-  const { t } = useTranslation(['common', 'projects'])
+  // const { t } = useTranslation(['common', 'projects'])
+  const t = () => {}
 
   const options = [
-    { value: 'verse', name: t('projects:ByVerse') },
-    { value: 'book', name: t('projects:ByBook') },
-    { value: 'disabled', name: t('Disabled') },
+    { value: 'verse', name: t('projects:ByVerse') || 'By verse' },
+    { value: 'book', name: t('projects:ByBook') || 'By book' },
+    { value: 'disabled', name: t('Disabled') || 'Disabled' },
   ]
 
   return (
     <div className="flex items-center justify-center">
-      <div>{t('RepeatedWordsFilter')}</div>
+      <div>{t('RepeatedWordsFilter') || 'Repeated words filter'}</div>
       <select
         className="input m-2 !w-auto"
         value={filter}

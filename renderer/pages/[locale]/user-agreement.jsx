@@ -23,7 +23,7 @@ export default function UserAgreement() {
   }
 
   return (
-    <div className="layout-appbar">
+    <div className="layout-appbar mt-16">
       <div
         className="max-w-7xl pb-6 px-6 lg:px-8 bg-th-secondary-10 rounded-lg text-justify overflow-auto text-th-text-primary"
         style={{ height: 'calc(100vh - 15rem)' }}

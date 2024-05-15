@@ -2,17 +2,17 @@ import React, { useEffect, useState } from 'react'
 
 import { useRouter } from 'next/router'
 
-import { useTranslation } from 'react-i18next'
+// import { useTranslation } from 'react-i18next'
 import { Tab } from '@headlessui/react'
 import Tool from '../../../../../../components/Tool'
 import CheckBox from '../../../../../../components/CheckBox'
 import Breadcrumbs from '../../../../../../components/Breadcrumbs'
 import ProgressBar from '../../../../../../components/ProgressBar'
 
-import { useRecoilValue } from 'recoil'
+import { useRecoilValue, useSetRecoilState } from 'recoil'
 
-import { makeStaticProperties } from '../../../../../../lib/get-static'
-import { inactiveState } from '../../../../../../helpers/atoms'
+// import { makeStaticProperties } from '../../../../../../lib/get-static'
+import { inactiveState, currentVerse } from '../../../../../../helpers/atoms'
 
 import Dict from '../../../../../../public/icons/dictionary.svg'
 import Notepad from '../../../../../../public/icons/notepad.svg'
@@ -43,15 +43,18 @@ const icons = {
 }
 
 function StepPage() {
-  const {
-    i18n: { language: locale },
-    t,
-  } = useTranslation()
+  // const {
+  //   i18n: { language: locale },
+  //   t,
+  // } = useTranslation()
+  const locale = 'ru'
+  const t = () => {}
   const {
     query: { id, chapter, step },
     push,
   } = useRouter()
   const inactive = useRecoilValue(inactiveState)
+  const setCurrentVerse = useSetRecoilState(currentVerse)
 
   const [project, setProject] = useState(false)
   const [checked, setChecked] = useState(false)
@@ -75,6 +78,7 @@ function StepPage() {
       push(`/${locale}/account/project/${id}`)
     }
     setChecked(false)
+    setCurrentVerse('0')
   }
   return (
     <div className="w-full">
@@ -126,14 +130,16 @@ function StepPage() {
                 cursor:
                   'fill-th-secondary-10 text-th-secondary-10 stroke-th-secondary-10',
               }}
-              label={t('Done')}
+              label={t('Done') || 'Done'}
             />
             <button
               className="relative btn-quaternary w-28 text-center"
               onClick={nextStepHandle}
               disabled={!checked}
             >
-              {project?.steps?.length === parseInt(step) + 1 ? t('Finish') : t('Next')}
+              {project?.steps?.length === parseInt(step) + 1
+                ? t('Finish') || 'Finish'
+                : t('Next') || 'Next'}
             </button>
           </div>
         </div>
@@ -169,10 +175,11 @@ function Panel({ tools, mainResource, id, chapter, toolNames, stepConfig, t }) {
               'retelling',
               'dictionary',
               'info',
+              'merger',
             ].includes(tool.name) ? (
-              <span title={t(tool.name)}>
+              <span title={t(tool.name) || tool.name}>
                 {icons[tool.name]}
-                <span className="hidden ml-2 sm:inline">{t(tool.name)}</span>
+                <span className="hidden ml-2 sm:inline">{t(tool.name) || tool.name}</span>
               </span>
             ) : (
               toolNames[tool.config.resource]
@@ -206,8 +213,8 @@ function Panel({ tools, mainResource, id, chapter, toolNames, stepConfig, t }) {
 
 export default StepPage
 
-export const getStaticProps = makeStaticProperties(['common', 'projects'])
+// export const getStaticProps = makeStaticProperties(['common', 'projects'])
 
-export async function getStaticPaths() {
-  return { paths: [], fallback: 'blocking' }
-}
+// export async function getStaticPaths() {
+//   return { paths: [], fallback: 'blocking' }
+// }

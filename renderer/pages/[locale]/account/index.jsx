@@ -6,8 +6,9 @@ import { useTranslation } from 'react-i18next'
 import { getStaticPaths, makeStaticProperties } from '../../../lib/get-static'
 
 import ProjectsList from '../../../components/ProjectsList'
+import Breadcrumbs from '../../../components/Breadcrumbs'
 
-import VcanaLogo from '../../../public/icons/vcana-logo-color.svg'
+import Gear from '../../../public/icons/gear.svg'
 
 export default function Account() {
   const {
@@ -16,9 +17,11 @@ export default function Account() {
   } = useTranslation(['common', 'projects'])
 
   const [projects, setProjects] = React.useState([])
-
-  React.useEffect(() => {
+  const mutate = () => {
     setProjects(window.electronAPI.getProjects())
+  }
+  React.useEffect(() => {
+    mutate()
   }, [])
 
   return (
@@ -26,15 +29,17 @@ export default function Account() {
       <Head>
         <title>{t('V-CANA')}</title>
       </Head>
-      <div className="text-2xl w-full">
-        <Link href={`/${locale}/home`} legacyBehavior>
-          <a>
-            <VcanaLogo className="w-32 pt-6" />
-          </a>
-        </Link>
-        <h2 className="my-6 text-4xl">{t('Projects')}</h2>
+      <div className="text-2xl">
+        <Breadcrumbs />
+
+        <div className="absolute top-2 right-16 text-th-secondary-10">
+          <Link href={`/${locale}/chapter-merger`}>
+            <Gear className="w-10 h-10" />
+          </Link>
+        </div>
+        <h2 className="my-6 mt-16 text-2xl">{t('Projects')}</h2>
         <div className="py-4">
-          <ProjectsList projects={projects} />
+          <ProjectsList projects={projects} mutate={mutate} />
         </div>
         <Link href={`/${locale}/create`} legacyBehavior>
           <a className="btn-primary text-base">{t('Import')}</a>
