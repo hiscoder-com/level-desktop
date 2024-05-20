@@ -1,25 +1,25 @@
-import { forwardRef } from "react";
+import { forwardRef } from 'react'
 
-import CheckboxShevron from "../public/icons/checkbox-shevron.svg";
+import CheckboxShevron from '../public/icons/checkbox-shevron.svg'
 
 const CheckBox = forwardRef(
   (
     {
       className = {
-        cursor: "text-th-secondary-10 stroke-th-secondary-10 fill-th-secondary-10",
+        cursor: 'text-th-secondary-10 stroke-th-secondary-10 fill-th-secondary-10',
         accent:
-          "bg-th-secondary-10 checked:bg-th-secondary-400 checked:border-th-secondary-400 checked:before:bg-th-secondary-400 border-th-secondary",
-        wrapper: "flex-row-reverse justify-between",
+          'bg-th-secondary-10 checked:bg-th-secondary-400 checked:border-th-secondary-400 checked:before:bg-th-secondary-400 border-th-secondary',
+        wrapper: 'flex-row-reverse justify-between',
       },
       label,
       disabled,
-      id = "checkBox",
+      id = 'checkBox',
       ...props
     },
     ref
   ) => (
     <div
-      className={`flex gap-3 items-center ${disabled ? "opacity-40" : ""} ${
+      className={`flex gap-3 items-center ${disabled ? 'opacity-40' : ''} ${
         className.wrapper
       }`}
     >
@@ -44,6 +44,6 @@ const CheckBox = forwardRef(
       <label htmlFor={id}>{label}</label>
     </div>
   )
-);
-CheckBox.displayName = "CheckBox";
-export default CheckBox;
+)
+CheckBox.displayName = 'CheckBox'
+export default CheckBox
