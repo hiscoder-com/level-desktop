@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { useRouter } from 'next/router'
 
@@ -7,12 +7,16 @@ import CheckBox from '../../components/CheckBox'
 import { getStaticPaths, makeStaticProperties } from '../../lib/get-static'
 
 export default function UserAgreement() {
+  const endOfTextRef = useRef(null)
   const [isChecked, setIsChecked] = useState(false)
+  const [isDisabled, setIsDisabled] = useState(true)
+  const [hasReadText, setHasReadText] = useState(false)
   const router = useRouter()
   const {
     i18n: { language: locale },
     t,
   } = useTranslation(['user-agreement', 'common', 'users'])
+
   const handleClick = async () => {
     const agreements = JSON.parse(window.electronAPI.getItem('agreements'))
     window.electronAPI.setItem(
@@ -21,6 +25,28 @@ export default function UserAgreement() {
     )
     router.push(`/${locale}/agreements`)
   }
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasReadText) {
+          setIsDisabled(false)
+          setHasReadText(true)
+        }
+      },
+      { root: null, rootMargin: '0px', threshold: 1 }
+    )
+
+    if (endOfTextRef.current) {
+      observer.observe(endOfTextRef.current)
+    }
+
+    return () => {
+      if (endOfTextRef.current) {
+        observer.unobserve(endOfTextRef.current)
+      }
+    }
+  }, [hasReadText])
 
   return (
     <div className="layout-appbar">
@@ -57,17 +83,20 @@ export default function UserAgreement() {
             }}
             className="pt-4"
           />
+          <div ref={endOfTextRef} className="h-0.5"></div>
         </div>
       </div>
-      <CheckBox
-        onChange={() => setIsChecked((prev) => !prev)}
-        checked={isChecked}
-        label={t('users:Agree')}
-      />
-
-      <button className="btn-primary" onClick={handleClick} disabled={!isChecked}>
-        {t('common:Next')}
-      </button>
+      <div className="flex flex-row items-center space-x-6">
+        <CheckBox
+          onChange={() => setIsChecked((prev) => !prev)}
+          checked={isChecked}
+          disabled={isDisabled}
+          label={t('users:Agree')}
+        />
+        <button className="btn-primary" onClick={handleClick} disabled={!isChecked}>
+          {t('common:Next')}
+        </button>
+      </div>
     </div>
   )
 }
