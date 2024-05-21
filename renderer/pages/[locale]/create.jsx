@@ -25,7 +25,7 @@ export default function Create() {
           <a className="btn-primary text-base">{t("Back")}</a>
         </Link>
         <br />
-        <h2>{t("projects:CreateProject")}</h2>
+        <h2>{t("projects:ImportProject")}</h2>
         <form onSubmit={onSubmit}>
           <button
             className="btn-primary text-base mt-3"
