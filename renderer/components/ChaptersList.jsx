@@ -4,6 +4,8 @@ import { useRouter } from 'next/router'
 import { JsonToPdf } from '@texttree/obs-format-convert-rcl'
 import { useTranslation } from 'react-i18next'
 
+import DownloadPDF from '../public/icons/download-pdf.svg'
+
 const styles = {
   currentPage: {
     fontSize: 16,
@@ -57,25 +59,22 @@ function ChapterList({ id, chapters, steps, mutate }) {
   return (
     <table className="border-collapse table-auto w-full text-sm">
       <thead>
-        <tr>
-          <th className="border-b font-medium p-4 pl-8 pt-0 pb-3 text-slate-400 text-left">
-            {t('Chapter')}
-          </th>
-          <th className="border-b font-medium p-4 pl-8 pt-0 pb-3 text-slate-400 text-left">
-            {t('Step')}
-          </th>
-          <th className="border-b font-medium p-4 pl-8 pt-0 pb-3 text-slate-400 text-left">
-            {t('StepBack')}
-          </th>
-          <th className="border-b font-medium p-4 pl-8 pt-0 pb-3 text-slate-400 text-left">
+        <tr className="text-th-secondary-300 border-b border-th-secondary-200 cursor-default">
+          <th className="font-medium pt-0 pr-4 pb-3 pl-8 text-left">{t('Chapter')}</th>
+          <th className="font-medium pt-0 pr-4 pb-3 pl-8 text-left">{t('Step')}</th>
+          <th className="font-medium pt-0 pr-4 pb-3 pl-8 text-center">{t('StepBack')}</th>
+          <th className="font-medium pt-0 pr-4 pb-3 pl-8 text-center">
             {t('common:Download')}
           </th>
         </tr>
       </thead>
-      <tbody className="bg-white">
+      <tbody className="bg-th-secondary-10">
         {chapters.map(([chapter, step]) => (
-          <tr key={chapter}>
-            <td className="border-b border-slate-100 p-4 pl-8 text-slate-500">
+          <tr
+            key={chapter}
+            className="border-b border-th-secondary-200 text-th-primary-100"
+          >
+            <td className="p-4 pl-8">
               <Link
                 href={`${pathname
                   .replace('[locale]', locale)
@@ -87,25 +86,25 @@ function ChapterList({ id, chapters, steps, mutate }) {
                 </a>
               </Link>
             </td>
-            <td className="border-b border-slate-100 p-4 pl-8 text-slate-500">
+            <td className="p-4 pl-8 cursor-default">
               {steps[step].title} | {steps[step].intro}
             </td>
-            <td className="border-b border-slate-100 p-4 pl-8 text-slate-500">
+            <td className="p-4 pl-8">
               {step > 0 && (
                 <div
                   className="btn-primary text-base"
                   onClick={() => handleBackStep(chapter, step)}
                 >
-                  {t('GoToStep')} {step}
+                  {t('BackToStep')} {step}
                 </div>
               )}
             </td>
-            <td className="border-b border-slate-100 p-4 pl-8 text-slate-500">
-              <div
-                className="btn-primary text-base"
-                onClick={() => handleDownloadChapter(chapter)}
-              >
-                {t('common:Download')}
+            <td className="p-4 pl-8">
+              <div className="flex justify-center cursor-pointer">
+                <DownloadPDF
+                  className="w-8 hover:opacity-70"
+                  onClick={() => handleDownloadChapter(chapter)}
+                />
               </div>
             </td>
           </tr>

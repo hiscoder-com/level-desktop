@@ -12,6 +12,8 @@ import ListBox from './ListBox'
 import Modal from './Modal'
 import ChaptersMerger from './ChaptersMerger'
 
+import DownloadIcon from '../public/icons/download.svg'
+
 const styles = {
   currentPage: {
     fontSize: 16,
@@ -105,29 +107,22 @@ function ProjectsList({ projects }) {
     <>
       <table className="border-collapse table-auto w-full text-sm">
         <thead>
-          <tr>
-            <th className="border-b font-medium p-4 pl-8 pt-0 pb-3 text-slate-400 text-left">
-              {t('Book')}
-            </th>
-            <th className="border-b font-medium p-4 pl-8 pt-0 pb-3 text-slate-400 text-left">
-              {t('projects:Project')}
-            </th>
-            <th className="border-b font-medium p-4 pl-8 pt-0 pb-3 text-slate-400 text-left">
-              {t('projects:Method')}
-            </th>
-            <th className="border-b font-medium p-4 pl-8 pt-0 pb-3 text-slate-400 text-left">
-              {t('ID')}
-            </th>
-            <th className="border-b font-medium p-4 pl-8 pt-0 pb-3 text-slate-400 text-left">
-              {t('CreatedAt')}
-            </th>
-            <th className="border-b font-medium p-4 pl-8 pt-0 pb-3 text-slate-400 text-left"></th>
+          <tr className="text-left text-th-secondary-300 border-b border-th-secondary-200 cursor-default">
+            <th className="font-medium pt-0 pr-4 pb-3 pl-8">{t('Book')}</th>
+            <th className="font-medium pt-0 pr-4 pb-3 pl-8">{t('projects:Project')}</th>
+            <th className="font-medium pt-0 pr-4 pb-3 pl-8">{t('projects:Method')}</th>
+            <th className="font-medium pt-0 pr-4 pb-3 pl-8">{t('ID')}</th>
+            <th className="font-medium pt-0 pr-4 pb-3 pl-8">{t('CreatedAt')}</th>
+            <th className="font-medium pt-0 pr-4 pb-3 pl-8"></th>
           </tr>
         </thead>
-        <tbody className="bg-white">
+        <tbody className="bg-th-secondary-10">
           {projects.map((project) => (
-            <tr key={project.id}>
-              <td className="border-b border-slate-100 p-4 pl-8 text-slate-500">
+            <tr
+              key={project.id}
+              className="border-b border-th-secondary-200 text-th-primary-100"
+            >
+              <td className="p-4 pl-8">
                 <Link
                   href={`${pathname.replace('[locale]', locale)}/project/${project.id}`}
                   legacyBehavior
@@ -137,27 +132,21 @@ function ProjectsList({ projects }) {
                   </a>
                 </Link>
               </td>
-              <td className="border-b border-slate-100 p-4 pl-8 text-slate-500">
-                {project.name}
-              </td>
-              <td className="border-b border-slate-100 p-4 pl-8 text-slate-500">
-                {project.method}
-              </td>
-              <td className="border-b border-slate-100 p-4 pl-8 text-slate-500">
-                {project.id}
-              </td>
-              <td className="border-b border-slate-100 p-4 pl-8 text-slate-500">
+              <td className="p-4 pl-8">{project.name}</td>
+              <td className="p-4 pl-8">{project.method}</td>
+              <td className="p-4 pl-8">{project.id}</td>
+              <td className="p-4 pl-8">
                 {new Date(project.createdAt).toLocaleDateString()}
               </td>
-              <td className="border-b border-slate-100 p-4 pl-8 text-slate-500">
-                <div
-                  className="btn-primary"
-                  onClick={() => {
-                    setCurrentProject(project)
-                    setIsOpenModal(true)
-                  }}
-                >
-                  {t('Download')}
+              <td className="p-4 pl-8">
+                <div className="flex justify-center cursor-pointer">
+                  <DownloadIcon
+                    className="w-8 hover:opacity-70"
+                    onClick={() => {
+                      setCurrentProject(project)
+                      setIsOpenModal(true)
+                    }}
+                  />
                 </div>
               </td>
             </tr>
