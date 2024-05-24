@@ -716,6 +716,22 @@ ipcMain.on('get-project', async (event, id) => {
 })
 
 ipcMain.on('add-project', (event, url) => {
+  const defaultProperties = {
+    h: '',
+    toc1: '',
+    toc2: '',
+    toc3: '',
+    mt: '',
+    chapter_label: '',
+  }
+
+  const createPropertiesFile = (projectId, properties) => {
+    const projectPath = path.join(projectUrl, projectId)
+    const propertiesPath = path.join(projectPath, 'properties.json')
+
+    fs.writeFileSync(propertiesPath, JSON.stringify(properties, null, 2))
+  }
+
   if (url) {
     const projects = storeProjects.get('projects') || []
     const id = uuid()
@@ -731,6 +747,9 @@ ipcMain.on('add-project', (event, url) => {
       project.book = { ...config.book }
       project.name = config.project
       project.method = config.method
+
+      createPropertiesFile(id, defaultProperties)
+
       projects.push(project)
       storeProjects.set('projects', projects)
       event.sender.send('notify', 'Created')
@@ -738,6 +757,28 @@ ipcMain.on('add-project', (event, url) => {
     })
   } else {
     event.sender.send('notify', 'Url not set')
+  }
+})
+
+ipcMain.on('get-properties', (event, projectId) => {
+  const propertiesPath = path.join(projectUrl, projectId, 'properties.json')
+  try {
+    const propertiesData = fs.readFileSync(propertiesPath, 'utf8')
+    event.returnValue = JSON.parse(propertiesData)
+  } catch (err) {
+    console.error(`Error reading properties file for project ${projectId}:`, err)
+    event.returnValue = {}
+  }
+})
+
+ipcMain.on('update-properties', (event, projectId, properties) => {
+  const propertiesPath = path.join(projectUrl, projectId, 'properties.json')
+  try {
+    fs.writeFileSync(propertiesPath, JSON.stringify(properties, null, 2))
+    event.returnValue = true
+  } catch (err) {
+    console.error(`Error writing properties file for project ${projectId}:`, err)
+    event.returnValue = false
   }
 })
 

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -11,8 +11,10 @@ import { JsonToPdf } from '@texttree/obs-format-convert-rcl'
 import ListBox from './ListBox'
 import Modal from './Modal'
 import ChaptersMerger from './ChaptersMerger'
+import Property from './Property'
 
 import DownloadIcon from '../public/icons/download.svg'
+import Gear from '../public/icons/gear.svg'
 
 const styles = {
   currentPage: {
@@ -37,11 +39,18 @@ function ProjectsList({ projects }) {
     { label: t('projects:ExportToZIP'), value: 'zip' },
     { label: t('projects:ExportToUSFM'), value: 'usfm' },
   ]
+
   const { pathname } = useRouter()
   const [selectedOption, setSelectedOption] = useState(options[0].value)
   const [currentProject, setCurrentProject] = useState(null)
   const [isOpenModal, setIsOpenModal] = useState(false)
-  const exportToPdf = (chapters) => {
+  const [isOpenSettingsModal, setIsOpenSettingsModal] = useState(false)
+  const [properties, setProperties] = useState(null)
+
+  const exportToPdf = (chapters, project) => {
+    const formattedDate = new Date().toISOString().split('T')[0]
+    const fileName = `${project.name}_${project.book.code}_${formattedDate}`
+
     const book = []
     for (const chapterNum in chapters) {
       if (Object.hasOwnProperty.call(chapters, chapterNum)) {
@@ -56,7 +65,6 @@ function ProjectsList({ projects }) {
         })
       }
     }
-
     JsonToPdf({
       data: book,
       showImages: false,
@@ -64,28 +72,29 @@ function ProjectsList({ projects }) {
       showChapterTitlePage: false,
       showVerseNumber: true,
       showPageFooters: false,
+      fileName,
       styles,
     })
       .then(() => console.log('PDF creation completed'))
       .catch((error) => console.error('PDF creation failed:', error))
   }
-  const exportToZip = (chapters) => {
+  const exportToZip = (chapters, project) => {
     try {
-      if (!chapters) {
+      if (!chapters || !project) {
         throw new Error(t('NoData'))
       }
+
       const jsonContent = JSON.stringify(chapters, null, 2)
       const zip = new jszip()
-      const currentDate = new Date()
-      const formattedDate = currentDate.toISOString().split('T')[0]
-      const fileName = `chapters_${formattedDate}.json`
+      const formattedDate = new Date().toISOString().split('T')[0]
+      const fileName = `${project.name}_${project.book.code}_chapters_${formattedDate}.json`
       zip.file(fileName, jsonContent)
       zip.generateAsync({ type: 'blob' }).then(function (content) {
         const blob = content
         const url = window.URL.createObjectURL(blob)
         const downloadLink = document.createElement('a')
         downloadLink.href = url
-        downloadLink.download = `chapters_${formattedDate}.zip`
+        downloadLink.download = `${project.name}_${project.book.code}_chapters_${formattedDate}.zip`
         document.body.appendChild(downloadLink)
         downloadLink.click()
         document.body.removeChild(downloadLink)
@@ -98,11 +107,44 @@ function ProjectsList({ projects }) {
   const download = (project) => {
     const chapters = window.electronAPI.getBook(project.id)
     if (selectedOption === 'pdf') {
-      exportToPdf(chapters)
+      exportToPdf(chapters, project)
     } else {
-      exportToZip(chapters)
+      exportToZip(chapters, project)
     }
   }
+
+  useEffect(() => {
+    if (currentProject) {
+      const loadedProperties = window.electronAPI.getProperties(currentProject.id)
+      setProperties(loadedProperties)
+    }
+  }, [currentProject])
+
+  const updateProperty = (text, property) => {
+    setProperties((prev) => {
+      const newProperties = {
+        ...prev,
+        [property]: text,
+      }
+
+      window.electronAPI.updateProperties(currentProject.id, newProperties)
+
+      return newProperties
+    })
+  }
+
+  const renderProperties =
+    properties &&
+    Object.entries(properties)?.map(([property, content], index) => (
+      <Property
+        t={t}
+        key={index}
+        property={property}
+        content={content}
+        updateProperty={updateProperty}
+      />
+    ))
+
   return (
     <>
       <table className="border-collapse table-auto w-full text-sm">
@@ -139,12 +181,19 @@ function ProjectsList({ projects }) {
                 {new Date(project.createdAt).toLocaleDateString()}
               </td>
               <td className="p-4 pl-8">
-                <div className="flex justify-center cursor-pointer">
+                <div className="flex justify-center gap-5 cursor-pointer">
                   <DownloadIcon
                     className="w-8 hover:opacity-70"
                     onClick={() => {
                       setCurrentProject(project)
                       setIsOpenModal(true)
+                    }}
+                  />
+                  <Gear
+                    className="w-8 hover:opacity-70"
+                    onClick={() => {
+                      setCurrentProject(project)
+                      setIsOpenSettingsModal(true)
                     }}
                   />
                 </div>
@@ -181,6 +230,16 @@ function ProjectsList({ projects }) {
               </button>
             )}
           </div>
+        </div>
+      </Modal>
+      <Modal
+        title={`${currentProject?.book?.name} Project Settings`} //TODO перевод
+        closeHandle={() => setIsOpenSettingsModal(false)}
+        isOpen={isOpenSettingsModal}
+      >
+        <div className="flex flex-col gap-4 mt-7">
+          {renderProperties}
+          <button className="btn-primary mt-2.5">{t('Save')}</button>
         </div>
       </Modal>
     </>

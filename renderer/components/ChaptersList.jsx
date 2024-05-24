@@ -38,9 +38,9 @@ function ChapterList({ id, chapters, steps, mutate }) {
       .filter((v) => v.enabled)
 
     const project = window.electronAPI.getProject(id)
-    const currentDate = new Date().toISOString().slice(0, 10)
+    const currentDate = new Date().toISOString().split('T')[0]
 
-    const fileName = `${project.book.code}_chapter_${chapter}_${currentDate}`
+    const fileName = `${project.project}_${project.book.code}_c_${chapter}_${currentDate}`
 
     JsonToPdf({
       data: [{ title: 'Chapter ' + chapter, verseObjects: savedVerses }],

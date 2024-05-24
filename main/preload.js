@@ -11,6 +11,9 @@ process.once('loaded', () => {
     removeNotify: () => ipcRenderer.removeAllListeners('notify'),
     getProjects: () => ipcRenderer.sendSync('get-projects'),
     getProject: (id) => ipcRenderer.sendSync('get-project', id),
+    getProperties: (projectId) => ipcRenderer.sendSync('get-properties', projectId),
+    updateProperties: (projectId, properties) =>
+      ipcRenderer.sendSync('update-properties', projectId, properties),
     goToStep: (id, chapter, step) =>
       ipcRenderer.sendSync('go-to-step', id, chapter, step),
     getChapter: (projectid, chapter) =>
