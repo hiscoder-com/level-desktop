@@ -2,11 +2,17 @@ import { useEffect, useState } from 'react'
 
 import ReactTextareaAutosize from 'react-textarea-autosize'
 
-function Property({ t, property, content, updateProperty }) {
+function Property({ t, property, content, onContentChange }) {
   const [propertyContent, setPropertyContent] = useState()
+
   useEffect(() => {
     setPropertyContent(content)
   }, [content])
+
+  const handleChange = (e) => {
+    setPropertyContent(e.target.value)
+    onContentChange(e.target.value, property)
+  }
 
   return (
     <div className="flex flex-col gap-4">
@@ -16,8 +22,7 @@ function Property({ t, property, content, updateProperty }) {
         className="input-primary"
         placeholder={t(`projects:${property}_placeholder`)}
         value={propertyContent}
-        onChange={(e) => setPropertyContent(e.target.value)}
-        onBlur={() => updateProperty(propertyContent, property)}
+        onChange={handleChange}
       />
     </div>
   )

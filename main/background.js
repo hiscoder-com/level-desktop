@@ -782,5 +782,23 @@ ipcMain.on('update-properties', (event, projectId, properties) => {
   }
 })
 
+ipcMain.on('update-project-name', (event, projectId, newName) => {
+  const projects = storeProjects.get('projects') || []
+  const updatedProjects = projects.map((project) => {
+    if (project.id === projectId) {
+      return {
+        ...project,
+        book: {
+          ...project.book,
+          name: newName,
+        },
+      }
+    }
+    return project
+  })
+  storeProjects.set('projects', updatedProjects)
+  event.sender.send('project-name-updated', projectId, newName)
+})
+
 ipcMain.handle('dialog:openFile', handleFileOpen)
 ipcMain.handle('dialog:openConfig', handleConfigOpen)

@@ -14,6 +14,14 @@ process.once('loaded', () => {
     getProperties: (projectId) => ipcRenderer.sendSync('get-properties', projectId),
     updateProperties: (projectId, properties) =>
       ipcRenderer.sendSync('update-properties', projectId, properties),
+    updateProjectName: (projectId, newName) => {
+      ipcRenderer.send('update-project-name', projectId, newName),
+        ipcRenderer.on('project-name-updated', (event, projectId, newName) => {
+          window.dispatchEvent(
+            new CustomEvent('project-name-updated', { detail: { projectId, newName } })
+          )
+        })
+    },
     goToStep: (id, chapter, step) =>
       ipcRenderer.sendSync('go-to-step', id, chapter, step),
     getChapter: (projectid, chapter) =>

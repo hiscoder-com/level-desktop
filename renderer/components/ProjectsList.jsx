@@ -29,7 +29,7 @@ const styles = {
   text: { alignment: 'justify' },
 }
 
-function ProjectsList({ projects }) {
+function ProjectsList() {
   const {
     i18n: { language: locale },
     t,
@@ -41,11 +41,49 @@ function ProjectsList({ projects }) {
   ]
 
   const { pathname } = useRouter()
+  const [projectsList, setProjectsList] = useState([])
   const [selectedOption, setSelectedOption] = useState(options[0].value)
   const [currentProject, setCurrentProject] = useState(null)
   const [isOpenModal, setIsOpenModal] = useState(false)
   const [isOpenSettingsModal, setIsOpenSettingsModal] = useState(false)
   const [properties, setProperties] = useState(null)
+  const [editedProperties, setEditedProperties] = useState({})
+
+  useEffect(() => {
+    setProjectsList(window.electronAPI.getProjects())
+  }, [])
+
+  useEffect(() => {
+    if (currentProject) {
+      const loadedProperties = window.electronAPI.getProperties(currentProject.id)
+
+      if (loadedProperties.h === '') {
+        loadedProperties.h = currentProject.book.name
+      }
+
+      setProperties(loadedProperties)
+      setEditedProperties(loadedProperties)
+    }
+  }, [currentProject])
+
+  useEffect(() => {
+    const handleProjectNameUpdate = (event) => {
+      const { projectId, newName } = event.detail
+      setProjectsList((prevProjects) =>
+        prevProjects.map((project) =>
+          project.id === projectId
+            ? { ...project, book: { ...project.book, name: newName } }
+            : project
+        )
+      )
+    }
+
+    window.addEventListener('project-name-updated', handleProjectNameUpdate)
+
+    return () => {
+      window.removeEventListener('project-name-updated', handleProjectNameUpdate)
+    }
+  }, [])
 
   const exportToPdf = (chapters, project) => {
     const formattedDate = new Date().toISOString().split('T')[0]
@@ -78,6 +116,7 @@ function ProjectsList({ projects }) {
       .then(() => console.log('PDF creation completed'))
       .catch((error) => console.error('PDF creation failed:', error))
   }
+
   const exportToZip = (chapters, project) => {
     try {
       if (!chapters || !project) {
@@ -104,6 +143,7 @@ function ProjectsList({ projects }) {
       console.log(error.message)
     }
   }
+
   const download = (project) => {
     const chapters = window.electronAPI.getBook(project.id)
     if (selectedOption === 'pdf') {
@@ -113,24 +153,24 @@ function ProjectsList({ projects }) {
     }
   }
 
-  useEffect(() => {
-    if (currentProject) {
-      const loadedProperties = window.electronAPI.getProperties(currentProject.id)
-      setProperties(loadedProperties)
+  const updateEditedProperty = (text, property) => {
+    setEditedProperties((prev) => ({
+      ...prev,
+      [property]: property === 'h' && text === '' ? currentProject.book.name : text,
+    }))
+  }
+
+  const saveProperties = () => {
+    setProperties(editedProperties)
+    window.electronAPI.updateProperties(currentProject.id, editedProperties)
+    if (editedProperties.h) {
+      window.electronAPI.updateProjectName(currentProject.id, editedProperties.h)
     }
-  }, [currentProject])
+  }
 
-  const updateProperty = (text, property) => {
-    setProperties((prev) => {
-      const newProperties = {
-        ...prev,
-        [property]: text,
-      }
-
-      window.electronAPI.updateProperties(currentProject.id, newProperties)
-
-      return newProperties
-    })
+  const handleSettingsModalClose = () => {
+    setEditedProperties(properties)
+    setIsOpenSettingsModal(false)
   }
 
   const renderProperties =
@@ -140,8 +180,8 @@ function ProjectsList({ projects }) {
         t={t}
         key={index}
         property={property}
-        content={content}
-        updateProperty={updateProperty}
+        content={editedProperties[property] || content}
+        onContentChange={updateEditedProperty}
       />
     ))
 
@@ -159,7 +199,7 @@ function ProjectsList({ projects }) {
           </tr>
         </thead>
         <tbody className="bg-th-secondary-10">
-          {projects.map((project) => (
+          {projectsList.map((project) => (
             <tr
               key={project.id}
               className="border-b border-th-secondary-200 text-th-primary-100"
@@ -233,13 +273,15 @@ function ProjectsList({ projects }) {
         </div>
       </Modal>
       <Modal
-        title={`${currentProject?.book?.name} Project Settings`} //TODO перевод
-        closeHandle={() => setIsOpenSettingsModal(false)}
+        title={`Project Settings`} //TODO перевод
+        closeHandle={handleSettingsModalClose}
         isOpen={isOpenSettingsModal}
       >
         <div className="flex flex-col gap-4 mt-7">
           {renderProperties}
-          <button className="btn-primary mt-2.5">{t('Save')}</button>
+          <button className="btn-primary mt-2.5" onClick={saveProperties}>
+            {t('Save')}
+          </button>
         </div>
       </Modal>
     </>
