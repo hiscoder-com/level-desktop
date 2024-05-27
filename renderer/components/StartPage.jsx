@@ -11,7 +11,7 @@ import Gear from '../public/icons/gear.svg'
 export default function StartPage() {
   const router = useRouter()
 
-  const { t } = useTranslation()
+  const { t } = useTranslation('users')
 
   const checkAgreements = () => {
     const agreements = window.electronAPI.getItem('agreements')

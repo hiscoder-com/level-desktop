@@ -2,7 +2,6 @@ import React from 'react'
 import Head from 'next/head'
 
 import { useTranslation } from '@/next-i18next'
-// import { getStaticPaths, makeStaticProperties } from '@/lib/get-static'
 
 import StartPage from '../components/StartPage'
 
@@ -19,7 +18,3 @@ export default function Home() {
     </>
   )
 }
-
-// export const getStaticProps = makeStaticProperties(['common', 'users'])
-
-// export { getStaticPaths }

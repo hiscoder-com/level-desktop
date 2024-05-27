@@ -1,7 +1,5 @@
 /** @type {import('next').NextConfig} */
 
-import i18n from './i18n'
-
 module.exports = {
   trailingSlash: true,
   images: {

@@ -34,7 +34,6 @@ function ProjectsList({ projects }) {
     { label: t('projects:ExportToZIP'), value: 'zip' },
     { label: t('projects:ExportToUSFM'), value: 'usfm' },
   ]
-  const { pathname } = useRouter()
   const [selectedOption, setSelectedOption] = useState(options[0].value)
   const [currentProject, setCurrentProject] = useState(null)
   const [isOpenModal, setIsOpenModal] = useState(false)

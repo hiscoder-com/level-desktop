@@ -218,14 +218,31 @@ ipcMain.on('get-lang', (event) => {
   event.returnValue = localeStore.get('locale', i18next.i18n.defaultLocale)
 })
 
-ipcMain.on('get-i18n', (event) => {
-  lang = localeStore.get('locale', i18next.i18n.defaultLocale)
-  fs.writeFileSync(
-    path.join(projectUrl, projectid, 'dictionary', word.id + '.json'),
-    JSON.stringify(word, null, 2),
-    { encoding: 'utf-8' }
-  )
-  event.returnValue = i18next
+ipcMain.on('get-i18n', (event, ns = 'common') => {
+  const lang = localeStore.get('locale', i18next.i18n.defaultLocale)
+  let res = {}
+  if (Array.isArray(ns)) {
+    ns.forEach((n) => {
+      res[n] = JSON.parse(
+        fs.readFileSync(
+          path.resolve('./renderer/public/locales/' + lang + '/' + n + '.json'),
+          {
+            encoding: 'utf-8',
+          }
+        )
+      )
+    })
+  } else {
+    res[ns] = JSON.parse(
+      fs.readFileSync(
+        path.resolve('./renderer/public/locales/' + lang + '/' + ns + '.json'),
+        {
+          encoding: 'utf-8',
+        }
+      )
+    )
+  }
+  event.returnValue = res
 })
 
 ipcMain.on('get-word', (event, projectid, wordid) => {

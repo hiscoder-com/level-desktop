@@ -2,7 +2,6 @@ import React from 'react'
 import Head from 'next/head'
 import Link from 'next/link'
 import { useTranslation } from '@/next-i18next'
-// import { makeStaticProperties, getStaticPaths } from '@/lib/get-static'
 
 export default function Create() {
   const { t } = useTranslation(['common', 'projects'])
@@ -46,7 +45,3 @@ export default function Create() {
     </>
   )
 }
-
-// export const getStaticProps = makeStaticProperties(['common', 'projects'])
-
-// export { getStaticPaths }
