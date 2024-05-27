@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 
+import i18n from './i18n'
+
 module.exports = {
   trailingSlash: true,
   images: {
@@ -10,8 +12,8 @@ module.exports = {
       test: /\.svg$/i,
       issuer: /\.[jt]sx?$/,
       use: ['@svgr/webpack'],
-    });
+    })
 
-    return config;
+    return config
   },
-};
+}

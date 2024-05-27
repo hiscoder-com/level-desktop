@@ -2,18 +2,15 @@ import { useState, useEffect } from 'react'
 
 import { useRouter } from 'next/router'
 
-import { useTranslation } from 'next-i18next'
-import { getStaticPaths, makeStaticProperties } from '../../lib/get-static'
+import { useTranslation } from '@/next-i18next'
+// import { getStaticPaths, makeStaticProperties } from '@/lib/get-static'
 
 import CheckBox from '/components/CheckBox'
 
 import LeftArrow from '/public/icons/arrow-left.svg'
 
 export default function ConfessionSteps() {
-  const {
-    i18n: { language: locale },
-    t,
-  } = useTranslation(['confession-steps', 'common', 'users'])
+  const { t } = useTranslation(['confession-steps', 'common', 'users'])
   const router = useRouter()
   const [isChecked, setIsChecked] = useState(false)
   const [page, setPage] = useState(0)
@@ -83,7 +80,7 @@ export default function ConfessionSteps() {
       'agreements',
       JSON.stringify({ ...agreements, confession: isChecked })
     )
-    router.push(`/${locale}/agreements`)
+    router.push(`/agreements`)
   }
 
   return (
@@ -127,10 +124,10 @@ export default function ConfessionSteps() {
   )
 }
 
-export const getStaticProps = makeStaticProperties([
-  'confession-steps',
-  'common',
-  'users',
-])
+// export const getStaticProps = makeStaticProperties([
+//   'confession-steps',
+//   'common',
+//   'users',
+// ])
 
-export { getStaticPaths }
+// export { getStaticPaths }

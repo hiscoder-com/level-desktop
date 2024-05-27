@@ -1,14 +1,11 @@
 import React from 'react'
 import Head from 'next/head'
 import Link from 'next/link'
-import { useTranslation } from 'react-i18next'
-import { makeStaticProperties, getStaticPaths } from '../../lib/get-static'
+import { useTranslation } from '@/next-i18next'
+// import { makeStaticProperties, getStaticPaths } from '@/lib/get-static'
 
 export default function Create() {
-  const {
-    i18n: { language: locale },
-    t,
-  } = useTranslation(['common', 'projects'])
+  const { t } = useTranslation(['common', 'projects'])
   const [fileUrl, setFileUrl] = React.useState(false)
   const onSubmit = (e) => {
     e.preventDefault()
@@ -21,7 +18,7 @@ export default function Create() {
         <title>{t('V-CANA')}</title>
       </Head>
       <div className="text-2xl w-full">
-        <Link href={`/${locale}/account`} legacyBehavior>
+        <Link href={`/account`} legacyBehavior>
           <a className="btn-primary text-base">{t('Back')}</a>
         </Link>
         <br />
@@ -50,6 +47,6 @@ export default function Create() {
   )
 }
 
-export const getStaticProps = makeStaticProperties(['common', 'projects'])
+// export const getStaticProps = makeStaticProperties(['common', 'projects'])
 
-export { getStaticPaths }
+// export { getStaticPaths }

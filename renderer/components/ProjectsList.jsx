@@ -3,7 +3,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-import { useTranslation } from 'react-i18next'
+import { useTranslation } from '@/next-i18next'
 import jszip from 'jszip'
 
 import { JsonToPdf } from '@texttree/obs-format-convert-rcl'
@@ -28,10 +28,7 @@ const styles = {
 }
 
 function ProjectsList({ projects }) {
-  const {
-    i18n: { language: locale },
-    t,
-  } = useTranslation(['common', 'projects'])
+  const { t } = useTranslation(['common', 'projects'])
   const options = [
     { label: t('projects:ExportToPDF'), value: 'pdf' },
     { label: t('projects:ExportToZIP'), value: 'zip' },
@@ -123,10 +120,7 @@ function ProjectsList({ projects }) {
               className="border-b border-th-secondary-200 text-th-primary-100"
             >
               <td className="p-4 pl-8">
-                <Link
-                  href={`${pathname.replace('[locale]', locale)}/project/${project.id}`}
-                  legacyBehavior
-                >
+                <Link href={`/account/project/${project.id}`} legacyBehavior>
                   <a className="font-bold underline">
                     {project.book.name} ({project.book.code})
                   </a>

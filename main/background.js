@@ -66,13 +66,12 @@ async function handleConfigOpen() {
     },
   })
 
-  const locale = localeStore.get('locale', i18next.i18n.defaultLocale)
-
   if (isProd) {
-    await mainWindow.loadURL(`app://./${locale}/home`)
+    await mainWindow.loadURL(`app://./home`)
+    mainWindow.webContents.openDevTools()
   } else {
     const port = process.argv[2]
-    await mainWindow.loadURL(`http://localhost:${port}/${locale}/home`)
+    await mainWindow.loadURL(`http://localhost:${port}/home`)
     // mainWindow.webContents.openDevTools();
   }
 })()
@@ -213,6 +212,20 @@ ipcMain.on('update-word', (event, projectid, word) => {
   )
   event.returnValue = word.id
   event.sender.send('notify', 'Updated')
+})
+
+ipcMain.on('get-lang', (event) => {
+  event.returnValue = localeStore.get('locale', i18next.i18n.defaultLocale)
+})
+
+ipcMain.on('get-i18n', (event) => {
+  lang = localeStore.get('locale', i18next.i18n.defaultLocale)
+  fs.writeFileSync(
+    path.join(projectUrl, projectid, 'dictionary', word.id + '.json'),
+    JSON.stringify(word, null, 2),
+    { encoding: 'utf-8' }
+  )
+  event.returnValue = i18next
 })
 
 ipcMain.on('get-word', (event, projectid, wordid) => {

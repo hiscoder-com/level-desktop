@@ -1,15 +1,13 @@
 import React, { Fragment } from 'react'
 import Link from 'next/link'
-import { useTranslation } from 'react-i18next'
+import { useTranslation } from '@/next-i18next'
 
 import VcanaLogo from '../public/icons/vcana-logo.svg'
 
 export default function Breadcrumbs({ links = [], currentTitle }) {
-  const {
-    i18n: { language: locale },
-  } = useTranslation()
+  const {} = useTranslation()
 
-  const homeUrl = `/${locale}/account`
+  const homeUrl = `/account`
 
   return (
     <div className="absolute top-0 left-0 w-full bg-gray-200 dark:bg-slate-550 mb-4">

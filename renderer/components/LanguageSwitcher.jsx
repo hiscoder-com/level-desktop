@@ -4,8 +4,8 @@ import { useRouter } from 'next/router'
 import Link from 'next/link'
 
 import { Menu } from '@headlessui/react'
-import { useTranslation } from 'next-i18next'
-import i18next from '../../next-i18next.config'
+import { useTranslation } from '@/next-i18next'
+import i18next from '../../next-i18next.config.js'
 
 function LanguageSwitcher() {
   const { t, i18n } = useTranslation()
