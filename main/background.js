@@ -221,25 +221,26 @@ ipcMain.on('get-lang', (event) => {
 ipcMain.on('get-i18n', (event, ns = 'common') => {
   const lang = localeStore.get('locale', i18next.i18n.defaultLocale)
   let res = {}
+  let fileDest
+  if (isProd) {
+    fileDest = path.join(__dirname, 'locales/')
+  } else {
+    fileDest = path.resolve('./renderer/public/locales/')
+  }
+
   if (Array.isArray(ns)) {
     ns.forEach((n) => {
       res[n] = JSON.parse(
-        fs.readFileSync(
-          path.resolve('./renderer/public/locales/' + lang + '/' + n + '.json'),
-          {
-            encoding: 'utf-8',
-          }
-        )
+        fs.readFileSync(path.join(fileDest, lang, n + '.json'), {
+          encoding: 'utf-8',
+        })
       )
     })
   } else {
     res[ns] = JSON.parse(
-      fs.readFileSync(
-        path.resolve('./renderer/public/locales/' + lang + '/' + ns + '.json'),
-        {
-          encoding: 'utf-8',
-        }
-      )
+      fs.readFileSync(path.join(fileDest, lang, ns + '.json'), {
+        encoding: 'utf-8',
+      })
     )
   }
   event.returnValue = res
