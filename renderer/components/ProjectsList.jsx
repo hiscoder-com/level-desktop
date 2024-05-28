@@ -11,7 +11,7 @@ import { JsonToPdf } from '@texttree/obs-format-convert-rcl'
 import ListBox from './ListBox'
 import Modal from './Modal'
 import Property from './Property'
-import { convertToUsfm } from '../helpers/usfm'
+import { convertToUsfm, convertBookChapters } from '../helpers/usfm'
 
 import DownloadIcon from '../public/icons/download.svg'
 import Gear from '../public/icons/gear.svg'
@@ -145,9 +145,11 @@ function ProjectsList() {
   }
 
   const exportToUsfm = (chapters, project) => {
-    const convertedBook = convertJSON(chapters)
+    const convertedBook = convertBookChapters(chapters)
     const { h, toc1, toc2, toc3, mt, chapter_label } = properties
-    console.log(properties)
+    const formattedDate = new Date().toISOString().split('T')[0]
+    const fileName = `${project.name}_${project.book.code}_${formattedDate}`
+
     const merge = convertToUsfm({
       jsonChapters: convertedBook,
       book: {
@@ -165,25 +167,14 @@ function ProjectsList() {
       },
       project: { code: '', language: { code: '', orig_name: '' }, title: '' },
     })
-    console.log(merge)
-  }
 
-  function convertJSON(data) {
-    const result = []
-
-    for (const key in data) {
-      const obj = data[key]
-      const newObj = { num: parseInt(key), text: {} }
-
-      for (const innerKey in obj) {
-        const innerObj = obj[innerKey]
-        newObj.text[innerKey] = innerObj.text
-      }
-
-      result.push(newObj)
-    }
-
-    return result
+    const blob = new Blob([merge], { type: 'text/plain;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', `${fileName}.usfm`)
+    document.body.appendChild(link)
+    link.click()
   }
 
   const download = (project) => {
