@@ -10,8 +10,8 @@ import { JsonToPdf } from '@texttree/obs-format-convert-rcl'
 
 import ListBox from './ListBox'
 import Modal from './Modal'
-import ChaptersMerger from './ChaptersMerger'
 import Property from './Property'
+import { convertToUsfm } from '../helpers/usfm'
 
 import DownloadIcon from '../public/icons/download.svg'
 import Gear from '../public/icons/gear.svg'
@@ -144,10 +144,55 @@ function ProjectsList() {
     }
   }
 
+  const exportToUsfm = (chapters, project) => {
+    const convertedBook = convertJSON(chapters)
+    const { h, toc1, toc2, toc3, mt, chapter_label } = properties
+    console.log(properties)
+    const merge = convertToUsfm({
+      jsonChapters: convertedBook,
+      book: {
+        code: project.book.code,
+        properties: {
+          scripture: {
+            h,
+            toc1,
+            toc2,
+            toc3,
+            mt,
+            chapter_label,
+          },
+        },
+      },
+      project: { code: '', language: { code: '', orig_name: '' }, title: '' },
+    })
+    console.log(merge)
+  }
+
+  function convertJSON(data) {
+    const result = []
+
+    for (const key in data) {
+      const obj = data[key]
+      const newObj = { num: parseInt(key), text: {} }
+
+      for (const innerKey in obj) {
+        const innerObj = obj[innerKey]
+        newObj.text[innerKey] = innerObj.text
+      }
+
+      result.push(newObj)
+    }
+
+    return result
+  }
+
   const download = (project) => {
     const chapters = window.electronAPI.getBook(project.id)
+
     if (selectedOption === 'pdf') {
       exportToPdf(chapters, project)
+    } else if (selectedOption === 'usfm') {
+      exportToUsfm(chapters, project)
     } else {
       exportToZip(chapters, project)
     }
@@ -255,20 +300,17 @@ function ProjectsList() {
           setSelectedOption={setSelectedOption}
           options={options}
         />
-        {selectedOption === 'usfm' && <ChaptersMerger book={currentProject.book.code} />}
         <div className="flex justify-center">
           <div className="flex gap-4 text-xl w-1/2">
             <button className="btn-primary flex-1" onClick={() => setIsOpenModal(false)}>
               {t('Close')}
             </button>
-            {selectedOption !== 'usfm' && (
-              <button
-                className="btn-primary flex-1"
-                onClick={() => download(currentProject)}
-              >
-                {t('Download')}
-              </button>
-            )}
+            <button
+              className="btn-primary flex-1"
+              onClick={() => download(currentProject)}
+            >
+              {t('Download')}
+            </button>
           </div>
         </div>
       </Modal>
