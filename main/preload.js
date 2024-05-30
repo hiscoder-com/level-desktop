@@ -78,6 +78,7 @@ process.once('loaded', () => {
     getTWL: (id, resource, mainResource, chapter = false) =>
       ipcRenderer.sendSync('get-twl', id, resource, mainResource, chapter),
     addProject: (fileUrl) => ipcRenderer.send('add-project', fileUrl),
+    deleteProject: (projectId) => ipcRenderer.send('delete-project', projectId),
   })
 
   const handler = {

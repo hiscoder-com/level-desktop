@@ -51,6 +51,14 @@ function ProjectsList() {
 
   useEffect(() => {
     setProjectsList(window.electronAPI.getProjects())
+
+    const handleProjectsUpdated = (updatedProjects) => {
+      setProjectsList(updatedProjects)
+    }
+
+    const unsubscribe = window.ipc.on('projects-updated', handleProjectsUpdated)
+
+    return unsubscribe
   }, [])
 
   useEffect(() => {
@@ -221,6 +229,10 @@ function ProjectsList() {
       />
     ))
 
+  const projectRemove = (id) => {
+    window.electronAPI.deleteProject(id)
+  }
+
   return (
     <>
       <table className="border-collapse table-auto w-full text-sm">
@@ -314,6 +326,12 @@ function ProjectsList() {
           {renderProperties}
           <button className="btn-primary mt-2.5" onClick={saveProperties}>
             {t('Save')}
+          </button>
+          <button
+            className="btn-red mt-2.5"
+            onClick={() => projectRemove(currentProject.id)}
+          >
+            {t('Remove Project')}
           </button>
         </div>
       </Modal>

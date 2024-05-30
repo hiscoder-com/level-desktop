@@ -800,5 +800,29 @@ ipcMain.on('update-project-name', (event, projectId, newName) => {
   event.sender.send('project-name-updated', projectId, newName)
 })
 
+ipcMain.on('delete-project', (event, projectId) => {
+  const projectsFilePath = path.join(app.getPath('userData'), 'projects.json')
+  const projectsData = JSON.parse(fs.readFileSync(projectsFilePath, 'utf8'))
+
+  projectsData.projects = projectsData.projects.filter(
+    (project) => project.id !== projectId
+  )
+
+  fs.writeFileSync(projectsFilePath, JSON.stringify(projectsData, null, 2))
+
+  const projectDirPath = path.join(projectUrl, projectId)
+  fs.rm(projectDirPath, { recursive: true }, (err) => {
+    if (err) {
+      console.error(`Error when deleting project folder: ${err}`)
+      event.sender.send('notify', 'Error deleting project')
+      return
+    }
+    console.log('Project folder successfully deleted')
+    event.sender.send('notify', 'Project deleted')
+
+    event.sender.send('projects-updated', projectsData.projects)
+  })
+})
+
 ipcMain.handle('dialog:openFile', handleFileOpen)
 ipcMain.handle('dialog:openConfig', handleConfigOpen)
