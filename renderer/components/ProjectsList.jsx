@@ -41,6 +41,7 @@ function ProjectsList() {
   ]
 
   const { pathname } = useRouter()
+  const router = useRouter()
   const [projectsList, setProjectsList] = useState([])
   const [selectedOption, setSelectedOption] = useState(options[0].value)
   const [currentProject, setCurrentProject] = useState(null)
@@ -257,7 +258,7 @@ function ProjectsList() {
                   href={`${pathname.replace('[locale]', locale)}/project/${project.id}`}
                   legacyBehavior
                 >
-                  <a className="font-bold underline">
+                  <a className="font-bold hover:opacity-70">
                     {project.book.name} ({project.book.code})
                   </a>
                 </Link>
@@ -270,6 +271,17 @@ function ProjectsList() {
               </td>
               <td className="p-4 pl-8">
                 <div className="flex justify-center gap-5 cursor-pointer">
+                  <button
+                    className="btn-primary"
+                    onClick={() => {
+                      router.push(
+                        `${pathname.replace('[locale]', locale)}/project/${project.id}`
+                      )
+                    }}
+                  >
+                    {t('Open')}
+                  </button>
+
                   <DownloadIcon
                     className="w-8 hover:opacity-70"
                     onClick={() => {
@@ -291,44 +303,61 @@ function ProjectsList() {
         </tbody>
       </table>
       <Modal
+        title={t('Download')}
         closeHandle={() => setIsOpenModal(false)}
         className={{
           dialogPanel:
-            'w-full max-w-md align-middle p-6 bg-th-primary-100 text-th-text-secondary-100 overflow-y-visible rounded-3xl',
+            'w-full max-w-md align-middle px-6 bg-th-primary-100 text-th-text-secondary-100 overflow-y-visible rounded-3xl',
         }}
         isOpen={isOpenModal}
+        buttons={
+          <div className="flex justify-center self-center w-2/3 gap-7">
+            <button
+              className="btn-secondary flex-1"
+              onClick={() => download(currentProject)}
+            >
+              {t('Download')}
+            </button>
+            <button
+              className="btn-secondary flex-1"
+              onClick={() => setIsOpenModal(false)}
+            >
+              {t('Close')}
+            </button>
+          </div>
+        }
       >
         <ListBox
           selectedOption={selectedOption}
           setSelectedOption={setSelectedOption}
           options={options}
         />
-        <div className="flex justify-center">
-          <div className="flex gap-4 text-xl w-1/2">
-            <button className="btn-primary flex-1" onClick={() => setIsOpenModal(false)}>
-              {t('Close')}
-            </button>
-            <button
-              className="btn-primary flex-1"
-              onClick={() => download(currentProject)}
-            >
-              {t('Download')}
-            </button>
-          </div>
-        </div>
       </Modal>
       <Modal
         title={`Project Settings`} //TODO перевод
         closeHandle={handleSettingsModalClose}
         isOpen={isOpenSettingsModal}
+        className={{
+          contentBody: 'max-h-[70vh] overflow-y-auto px-6',
+        }}
+        buttons={
+          <div className="flex justify-center self-center gap-7 w-2/3">
+            <button className="btn-secondary flex-1" onClick={saveProperties}>
+              {t('Save')}
+            </button>
+            <button
+              className="btn-secondary flex-1"
+              onClick={() => setIsOpenSettingsModal(false)}
+            >
+              {t('Close')}
+            </button>
+          </div>
+        }
       >
-        <div className="flex flex-col gap-4 mt-7">
+        <div className="flex flex-col gap-4">
           {renderProperties}
-          <button className="btn-primary mt-2.5" onClick={saveProperties}>
-            {t('Save')}
-          </button>
           <button
-            className="btn-red mt-2.5"
+            className="btn-red my-2.5"
             onClick={() => projectRemove(currentProject.id)}
           >
             {t('Remove Project')}
