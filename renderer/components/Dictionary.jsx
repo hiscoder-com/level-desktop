@@ -83,7 +83,7 @@ function Dictionary({ config: { id } }) {
   }
 
   useEffect(() => {
-    if (dictionary) {
+    if (dictionary && !searchQuery) {
       getWords()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -110,12 +110,14 @@ function Dictionary({ config: { id } }) {
   const addWord = () => {
     const wordId = ('000000000' + Math.random().toString(36).substring(2)).slice(-9)
     window.electronAPI.addWord(id, wordId)
+    setSearchQuery('')
     mutate()
     setCurrentPage(0)
   }
 
   const removeWord = (wordid) => {
     window.electronAPI.removeWord(id, wordid)
+    setSearchQuery('')
     mutate()
     setCurrentPage(0)
   }
@@ -175,6 +177,7 @@ function Dictionary({ config: { id } }) {
     fileInput.click()
   }
   function exportWords() {
+    setSearchQuery('')
     try {
       if (!dictionary || !dictionary.length) {
         throw new Error(t('NoData'))
