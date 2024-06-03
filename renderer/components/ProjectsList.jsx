@@ -271,17 +271,6 @@ function ProjectsList() {
               </td>
               <td className="p-4 pl-8">
                 <div className="flex justify-center gap-5 cursor-pointer">
-                  <button
-                    className="btn-primary"
-                    onClick={() => {
-                      router.push(
-                        `${pathname.replace('[locale]', locale)}/project/${project.id}`
-                      )
-                    }}
-                  >
-                    {t('Open')}
-                  </button>
-
                   <DownloadIcon
                     className="w-8 hover:opacity-70"
                     onClick={() => {

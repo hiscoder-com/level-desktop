@@ -53,6 +53,7 @@ function Dictionary({ config: { id } }) {
     () => Math.ceil(words?.count / countWordsOnPage),
     [words]
   )
+
   const getAll = () => {
     setCurrentPage(0)
     setSearchQuery('')
@@ -110,16 +111,19 @@ function Dictionary({ config: { id } }) {
     const wordId = ('000000000' + Math.random().toString(36).substring(2)).slice(-9)
     window.electronAPI.addWord(id, wordId)
     mutate()
+    setCurrentPage(0)
   }
 
   const removeWord = (wordid) => {
     window.electronAPI.removeWord(id, wordid)
     mutate()
+    setCurrentPage(0)
   }
 
   const saveWord = async () => {
     window.electronAPI.updateWord(id, activeWord)
     mutate()
+    setCurrentPage(0)
   }
 
   function checkAndAppendNewTitle(title, allWords) {
@@ -425,36 +429,34 @@ function Dictionary({ config: { id } }) {
           </div>
         </Modal>
       </div>
-      <div
-        className={`flex bottom-0 justify-center absolute w-full gap-10 ${
-          totalPageCount > 1 ? 'opacity-100' : 'opacity-0'
-        }`}
-      >
-        <button
-          className="px-5 py-5 rounded-full duration-300 hover:bg-white active:bg-gray-100 disabled:opacity-50 disabled:hover:bg-transparent"
-          disabled={currentPage === 0}
-          onClick={() =>
-            setCurrentPage((prev) => {
-              getWords(searchQuery, prev - 1)
-              return prev - 1
-            })
-          }
-        >
-          <LeftArrow className="w-6 h-6" />
-        </button>
-        <button
-          className="px-5 py-5 rounded-full duration-300 hover:bg-white active:bg-gray-100 disabled:opacity-50 disabled:hover:bg-transparent"
-          disabled={currentPage >= totalPageCount - 1}
-          onClick={() => {
-            setCurrentPage((prev) => {
-              getWords(searchQuery, prev + 1)
-              return prev + 1
-            })
-          }}
-        >
-          <RightArrow className="w-6 h-6" />
-        </button>
-      </div>
+      {totalPageCount > 1 && !activeWord && (
+        <div className="w-full flex justify-center gap-10">
+          <button
+            className="px-5 py-5 rounded-full duration-300 hover:bg-white active:bg-gray-100 disabled:opacity-50 disabled:hover:bg-transparent"
+            disabled={currentPage === 0}
+            onClick={() =>
+              setCurrentPage((prev) => {
+                getWords(searchQuery, prev - 1)
+                return prev - 1
+              })
+            }
+          >
+            <LeftArrow className="w-6 h-6" />
+          </button>
+          <button
+            className="px-5 py-5 rounded-full duration-300 hover:bg-white active:bg-gray-100 disabled:opacity-50 disabled:hover:bg-transparent"
+            disabled={currentPage >= totalPageCount - 1}
+            onClick={() => {
+              setCurrentPage((prev) => {
+                getWords(searchQuery, prev + 1)
+                return prev + 1
+              })
+            }}
+          >
+            <RightArrow className="w-6 h-6" />
+          </button>
+        </div>
+      )}
     </div>
   )
 }

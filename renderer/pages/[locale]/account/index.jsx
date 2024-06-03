@@ -31,7 +31,7 @@ export default function Account() {
           </a>
         </Link>
         <h2 className="my-6 text-4xl">{t('Projects')}</h2>
-        <div className="py-4">
+        <div className="py-4 mb-10">
           <ProjectsList />
         </div>
         <Link href={`/${locale}/create`} legacyBehavior>
