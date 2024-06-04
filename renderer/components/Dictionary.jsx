@@ -5,31 +5,20 @@ import dynamic from 'next/dynamic'
 import { Disclosure } from '@headlessui/react'
 import { useTranslation } from 'react-i18next'
 
+import SearchAndAddWords from './SearchAndAddWords'
+import Alphabet from './Alphabet'
 import Modal from './Modal'
 import { useGetDictionary } from '../hooks/useGetDictionary'
 import { generateUniqueId } from '../helpers/noteEditor'
 
 import RightArrow from '../public/icons/right-arrow.svg'
 import LeftArrow from '../public/icons/left-arrow.svg'
-import Close from '../public/icons/close.svg'
-import Trash from '../public/icons/trash.svg'
-import Plus from '../public/icons/plus.svg'
 import Down from '../public/icons/arrow-down.svg'
+import Trash from '../public/icons/trash.svg'
 import Back from '../public/icons/left.svg'
-import Export from '../public/icons/export.svg'
-import Import from '../public/icons/import.svg'
-
-const t = (str) => str
 
 const Redactor = dynamic(
   () => import('@texttree/notepad-rcl').then((mod) => mod.Redactor),
-  {
-    ssr: false,
-  }
-)
-
-const MenuButtons = dynamic(
-  () => import('@texttree/v-cana-rcl').then((mod) => mod.MenuButtons),
   {
     ssr: false,
   }
@@ -39,16 +28,15 @@ const countWordsOnPage = 10
 
 function Dictionary({ config: { id } }) {
   const { t } = useTranslation()
-  const isRtl = false
   const [currentPage, setCurrentPage] = useState(0)
   const [isOpenModal, setIsOpenModal] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
-  const [errorText, setErrorText] = useState(false)
   const [wordToDel, setWordToDel] = useState(null)
   const [activeWord, setActiveWord] = useState()
   const [wordId, setWordId] = useState('')
   const [words, setWords] = useState({ data: [], count: 0 })
   const { data: dictionary, alphabet, mutate } = useGetDictionary(id)
+
   const totalPageCount = useMemo(
     () => Math.ceil(words?.count / countWordsOnPage),
     [words]
@@ -176,6 +164,7 @@ function Dictionary({ config: { id } }) {
 
     fileInput.click()
   }
+
   function exportWords() {
     setSearchQuery('')
     try {
@@ -215,14 +204,6 @@ function Dictionary({ config: { id } }) {
       toast.error(error.message)
     }
   }
-  const showError = (err, placeholder) => {
-    if (err?.response?.data?.error) {
-      setErrorText(`${t('WordExist')} "${placeholder}"`)
-    }
-    setTimeout(() => {
-      setErrorText(null)
-    }, 2000)
-  }
 
   useEffect(() => {
     if (!activeWord) {
@@ -237,93 +218,16 @@ function Dictionary({ config: { id } }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeWord])
 
-  const dropMenuClassNames = {
-    container: {
-      className: 'absolute border rounded z-[100] whitespace-nowrap bg-white shadow',
-    },
-    item: {
-      className: 'cursor-pointer bg-th-secondary-100 hover:bg-th-secondary-200',
-    },
-  }
-
-  const dropMenuItems = {
-    dots: [
-      {
-        id: 'export',
-        buttonContent: (
-          <span className="flex items-center gap-2.5 py-1 pr-7 pl-2.5">
-            <Export className="w-5 h-5" /> {t('Export')}
-          </span>
-        ),
-        action: () => exportWords(),
-      },
-      {
-        id: 'import',
-        buttonContent: (
-          <span className="flex items-center gap-2.5 py-1 pr-7 pl-2.5">
-            <Import className="w-5 h-5" /> {t('Import')}
-          </span>
-        ),
-        action: () => importWords(true),
-      },
-    ],
-  }
-
-  const icons = {
-    dots: (
-      <div className="flex items-center justify-center w-6 h-6 space-x-1">
-        {[...Array(3).keys()].map((key) => (
-          <div key={key} className="h-1 w-1 bg-white rounded-full" />
-        ))}
-      </div>
-    ),
-  }
-
   return (
     <div className="relative">
-      <div className="flex gap-2.5 w-full items-center">
-        <div className="relative w-full flex items-center">
-          <input
-            className="input-primary"
-            value={searchQuery}
-            onChange={(e) => {
-              setCurrentPage(0)
-              setSearchQuery(e.target.value)
-            }}
-            placeholder={t('Search')}
-            readOnly={activeWord}
-          />
-          {searchQuery && (
-            <Close
-              className="absolute р-6 w-6 z-10 cursor-pointer right-2 rtl:left-1"
-              onClick={() => {
-                !activeWord && getAll()
-              }}
-            />
-          )}
-        </div>
-        <div className="flex gap-2.5 ltr:flex-row rtl:flex-row-reverse">
-          <MenuButtons
-            classNames={{
-              dropdown: dropMenuClassNames,
-              button: 'btn-tertiary p-3',
-              container: 'flex gap-2 relative',
-              buttonContainer: 'relative',
-            }}
-            menuItems={dropMenuItems}
-            icons={icons}
-            disabled={activeWord}
-          />
-          <button
-            className="btn-tertiary p-3"
-            onClick={addWord}
-            title={t('AddWord')}
-            disabled={activeWord}
-          >
-            <Plus className="w-6 h-6 stroke-th-text-secondary-100 stroke-2" />
-          </button>
-        </div>
-      </div>
+      <SearchAndAddWords
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        addWord={addWord}
+        exportWords={exportWords}
+        importWords={importWords}
+        activeWord={activeWord}
+      />
       <Card t={t}>
         <div className="mt-4">
           <Alphabet
@@ -331,7 +235,6 @@ function Dictionary({ config: { id } }) {
             getAll={getAll}
             setSearchQuery={setSearchQuery}
             setCurrentPage={setCurrentPage}
-            t={t}
             disabled={activeWord}
           />
         </div>
@@ -339,13 +242,6 @@ function Dictionary({ config: { id } }) {
       <div className="relative">
         {!activeWord ? (
           <>
-            <div
-              className={`${
-                errorText ? 'block' : 'hidden'
-              } absolute top-11 right-0 p-3 bg-red-200`}
-            >
-              {errorText}
-            </div>
             {words?.data?.length ? (
               <div className="mt-2">
                 {words.data.map((el) => (
@@ -466,26 +362,6 @@ function Dictionary({ config: { id } }) {
 
 export default Dictionary
 
-function Alphabet({ alphabet, setCurrentPage, setSearchQuery, t, disabled }) {
-  return (
-    <div className="flex flex-wrap py-3 px-4 bg-th-secondary-100 rounded-lg w-full font-bold">
-      {alphabet &&
-        alphabet.map((letter) => (
-          <button
-            onClick={() => {
-              setCurrentPage(0)
-              setSearchQuery(letter.toLowerCase())
-            }}
-            className="px-1.5 cursor-pointer hover:opacity-50"
-            key={letter}
-            disabled={disabled}
-          >
-            {letter}
-          </button>
-        ))}
-    </div>
-  )
-}
 function Card({ children, t, isOpen = true, isHidden = false }) {
   return (
     <div className="flex flex-col w-full gap-3 bg-th-secondary-10 mt-6">
