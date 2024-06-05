@@ -16,12 +16,20 @@ const MenuButtons = dynamic(
 function SearchAndAddWords({
   searchQuery,
   setSearchQuery,
-  addWord,
+  projectId,
   exportWords,
+  listUpdate,
   importWords,
   activeWord,
 }) {
   const { t } = useTranslation()
+
+  const addWord = () => {
+    const wordId = ('000000000' + Math.random().toString(36).substring(2)).slice(-9)
+    window.electronAPI.addWord(projectId, wordId)
+    setSearchQuery('')
+    listUpdate()
+  }
 
   const dropMenuClassNames = {
     container: {

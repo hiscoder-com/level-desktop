@@ -1,28 +1,17 @@
 import { useEffect, useMemo, useState } from 'react'
 
-import dynamic from 'next/dynamic'
-
 import { Disclosure } from '@headlessui/react'
 import { useTranslation } from 'react-i18next'
 
 import SearchAndAddWords from './SearchAndAddWords'
 import Alphabet from './Alphabet'
-import Modal from './Modal'
+import WordList from './WordList'
 import { useGetDictionary } from '../hooks/useGetDictionary'
 import { generateUniqueId } from '../helpers/noteEditor'
 
 import RightArrow from '../public/icons/right-arrow.svg'
 import LeftArrow from '../public/icons/left-arrow.svg'
 import Down from '../public/icons/arrow-down.svg'
-import Trash from '../public/icons/trash.svg'
-import Back from '../public/icons/left.svg'
-
-const Redactor = dynamic(
-  () => import('@texttree/notepad-rcl').then((mod) => mod.Redactor),
-  {
-    ssr: false,
-  }
-)
 
 const countWordsOnPage = 10
 
@@ -95,20 +84,18 @@ function Dictionary({ config: { id } }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [wordId])
 
-  const addWord = () => {
-    const wordId = ('000000000' + Math.random().toString(36).substring(2)).slice(-9)
-    window.electronAPI.addWord(id, wordId)
-    setSearchQuery('')
-    mutate()
-    setCurrentPage(0)
-  }
-
-  const removeWord = (wordid) => {
-    window.electronAPI.removeWord(id, wordid)
-    setSearchQuery('')
-    mutate()
-    setCurrentPage(0)
-  }
+  useEffect(() => {
+    if (!activeWord) {
+      return
+    }
+    const timer = setTimeout(() => {
+      saveWord()
+    }, 2000)
+    return () => {
+      clearTimeout(timer)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeWord])
 
   const saveWord = async () => {
     window.electronAPI.updateWord(id, activeWord)
@@ -125,6 +112,7 @@ function Dictionary({ config: { id } }) {
     }
     return newTitle
   }
+
   const importWords = async () => {
     const fileInput = document.createElement('input')
     fileInput.type = 'file'
@@ -201,132 +189,58 @@ function Dictionary({ config: { id } }) {
 
       document.body.removeChild(link)
     } catch (error) {
-      toast.error(error.message)
+      console.log(error.message)
     }
   }
 
-  useEffect(() => {
-    if (!activeWord) {
-      return
-    }
-    const timer = setTimeout(() => {
-      saveWord()
-    }, 2000)
-    return () => {
-      clearTimeout(timer)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeWord])
+  const listUpdate = () => {
+    mutate()
+    setCurrentPage(0)
+  }
+
+  const sharedProps = {
+    searchQuery,
+    setSearchQuery,
+    projectId: id,
+    listUpdate,
+    activeWord,
+  }
 
   return (
     <div className="relative">
       <SearchAndAddWords
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        addWord={addWord}
-        exportWords={exportWords}
+        {...sharedProps}
         importWords={importWords}
-        activeWord={activeWord}
+        exportWords={exportWords}
       />
-      <Card t={t}>
-        <div className="mt-4">
-          <Alphabet
-            alphabet={alphabet}
-            getAll={getAll}
-            setSearchQuery={setSearchQuery}
-            setCurrentPage={setCurrentPage}
-            disabled={activeWord}
-          />
-        </div>
-      </Card>
-      <div className="relative">
-        {!activeWord ? (
-          <>
-            {words?.data?.length ? (
-              <div className="mt-2">
-                {words.data.map((el) => (
-                  <div
-                    key={el.id}
-                    className="flex justify-between items-start group my-3 bg-th-secondary-100 rounded-lg cursor-pointer"
-                    onClick={() => {
-                      setWordId(el.id)
-                    }}
-                  >
-                    <div className="p-2 mr-4 font-bold">{el.title}</div>
-                    <button
-                      className="p-2 m-1 top-0 opacity-0 group-hover:opacity-100"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        setIsOpenModal(true)
-                        setWordToDel(el)
-                      }}
-                    >
-                      <Trash className={'w-4 h-4 text-cyan-800'} />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="mt-2">{t('NoMatches')}</div>
-            )}
-          </>
-        ) : (
-          <>
-            <div
-              className="flex w-fit p-1 cursor-pointer hover:opacity-70 rounded-full bg-th-secondary-100 absolute"
-              onClick={() => {
-                saveWord()
-                setActiveWord(null)
-                setWordId(null)
-              }}
-            >
-              <Back className="w-8 stroke-th-primary-200" />
-            </div>
-            <Redactor
-              classes={{
-                title: 'bg-th-secondary-100 p-2 my-4 ml-12 font-bold rounded-lg',
-                redactor:
-                  'p-4 my-4 pb-20 bg-th-secondary-100 overflow-hidden break-words rounded-lg',
-              }}
-              activeNote={activeWord}
-              setActiveNote={setActiveWord}
-              readOnly={false}
-              placeholder={t('TextDescriptionWord')}
-              isSelectableTitle
+      {alphabet.length ? (
+        <Card t={t}>
+          <div className="mt-4">
+            <Alphabet
+              alphabet={alphabet}
+              getAll={getAll}
+              setSearchQuery={setSearchQuery}
+              setCurrentPage={setCurrentPage}
+              disabled={activeWord}
             />
-          </>
-        )}
-
-        <Modal isOpen={isOpenModal} closeHandle={() => setIsOpenModal(false)}>
-          <div className="flex flex-col gap-7 items-center">
-            <div className="text-center text-2xl">
-              {t('AreYouSureDelete') + ' ' + wordToDel?.title + '?'}
-            </div>
-            <div className="flex w-1/2 gap-7">
-              <button
-                className="btn-secondary flex-1"
-                onClick={() => {
-                  setIsOpenModal(false)
-                  if (wordToDel) {
-                    removeWord(wordToDel.id)
-                    setWordToDel(null)
-                  }
-                }}
-              >
-                {t('Yes')}
-              </button>
-              <button
-                className="btn-secondary flex-1"
-                onClick={() => {
-                  setWordToDel(null)
-                  setIsOpenModal(false)
-                }}
-              >
-                {t('No')}
-              </button>
-            </div>
           </div>
-        </Modal>
+        </Card>
+      ) : (
+        <p className="py-8 opacity-40 cursor-default">{t('emptyAlphabet')}</p>
+      )}
+
+      <div className="relative">
+        <WordList
+          {...sharedProps}
+          words={words}
+          setWordId={setWordId}
+          isOpenModal={isOpenModal}
+          setActiveWord={setActiveWord}
+          setIsOpenModal={setIsOpenModal}
+          wordToDel={wordToDel}
+          saveWord={saveWord}
+          setWordToDel={setWordToDel}
+        />
       </div>
       {totalPageCount > 1 && !activeWord && (
         <div className="w-full flex justify-center gap-10">
