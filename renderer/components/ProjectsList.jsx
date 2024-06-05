@@ -41,7 +41,6 @@ function ProjectsList() {
   ]
 
   const { pathname } = useRouter()
-  const router = useRouter()
   const [projectsList, setProjectsList] = useState([])
   const [selectedOption, setSelectedOption] = useState(options[0].value)
   const [currentProject, setCurrentProject] = useState(null)
@@ -49,6 +48,7 @@ function ProjectsList() {
   const [isOpenSettingsModal, setIsOpenSettingsModal] = useState(false)
   const [properties, setProperties] = useState(null)
   const [editedProperties, setEditedProperties] = useState({})
+  const [isConfirmDelete, setIsConfirmDelete] = useState(false)
 
   useEffect(() => {
     setProjectsList(window.electronAPI.getProjects())
@@ -323,35 +323,65 @@ function ProjectsList() {
         />
       </Modal>
       <Modal
-        title={`Project Settings`} //TODO перевод
-        closeHandle={handleSettingsModalClose}
+        title={
+          isConfirmDelete ? t('projects:ProjectDelete') : t('projects:ProjectSettings')
+        }
+        closeHandle={
+          isConfirmDelete ? () => setIsConfirmDelete(false) : handleSettingsModalClose
+        }
         isOpen={isOpenSettingsModal}
         className={{
           contentBody: 'max-h-[70vh] overflow-y-auto px-6',
         }}
         buttons={
-          <div className="flex justify-center self-center gap-7 w-2/3">
-            <button className="btn-secondary flex-1" onClick={saveProperties}>
-              {t('Save')}
-            </button>
-            <button
-              className="btn-secondary flex-1"
-              onClick={() => setIsOpenSettingsModal(false)}
-            >
-              {t('Close')}
-            </button>
-          </div>
+          isConfirmDelete ? (
+            <div className="flex justify-center self-center gap-7 w-2/3 pt-6">
+              <button
+                className="btn-secondary flex-1"
+                onClick={() => {
+                  projectRemove(currentProject.id)
+                  setIsOpenSettingsModal(false)
+                  setIsConfirmDelete(false)
+                }}
+              >
+                {t('Yes')}
+              </button>
+              <button
+                className="btn-secondary flex-1"
+                onClick={() => setIsConfirmDelete(false)}
+              >
+                {t('No')}
+              </button>
+            </div>
+          ) : (
+            <div className="flex justify-center self-center gap-7 w-2/3">
+              <button className="btn-secondary flex-1" onClick={saveProperties}>
+                {t('Save')}
+              </button>
+              <button
+                className="btn-secondary flex-1"
+                onClick={() => setIsOpenSettingsModal(false)}
+              >
+                {t('Close')}
+              </button>
+            </div>
+          )
         }
       >
-        <div className="flex flex-col gap-4">
-          {renderProperties}
-          <button
-            className="btn-red my-2.5"
-            onClick={() => projectRemove(currentProject.id)}
-          >
-            {t('Remove Project')}
-          </button>
-        </div>
+        {isConfirmDelete ? (
+          <div className="flex flex-col gap-7 items-center">
+            <div className="text-center text-2xl">
+              {t('AreYouSureDelete') + ' ' + currentProject?.book.name + '?'}
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-4">
+            {renderProperties}
+            <button className="btn-red my-2.5" onClick={() => setIsConfirmDelete(true)}>
+              {t('projects:RemoveProject')}
+            </button>
+          </div>
+        )}
       </Modal>
     </>
   )
