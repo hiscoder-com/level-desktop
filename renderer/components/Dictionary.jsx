@@ -226,7 +226,7 @@ function Dictionary({ config: { id } }) {
           </div>
         </Card>
       ) : (
-        <p className="py-8 opacity-40 cursor-default">{t('emptyAlphabet')}</p>
+        <p className="py-8 opacity-40 cursor-default">{t('EmptyAlphabet')}</p>
       )}
 
       <div className="relative">
