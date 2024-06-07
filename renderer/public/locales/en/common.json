@@ -42,11 +42,13 @@
   "NoData": "No data",
   "NoFileSelected": "No file selected",
   "NoMatches": "No matches",
+  "NoPartner": "No way to tell your partner?",
   "NotSelected": "Not selected",
   "NoWords": "Your dictionary does not contain a single word. Click \"+\" to add the first word",
   "Ok": "Ok",
   "Open": "Open",
   "OriginalRecording": "Retelling in the original language:",
+  "PartnerRetelling": "Retelling to a partner",
   "personalNotes": "Personal notes",
   "Projects": "Projects",
   "RemoveAll": "Remove all",
@@ -67,5 +69,6 @@
   "V-CANA": "V-CANA",
   "WordExist": "Duplicated word exists:",
   "WrongResource": "Wrong resource",
-  "Yes": "Yes"
+  "Yes": "Yes",
+  "YourselfRetelling": "Retelling to myself"
 }

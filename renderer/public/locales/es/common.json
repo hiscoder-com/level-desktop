@@ -42,11 +42,13 @@
   "NoData": "Sin datos",
   "NoFileSelected": "Ningún archivo seleccionado",
   "NoMatches": "No hay coincidencias",
+  "NoPartner": "¿No hay forma de decírselo a tu pareja?",
   "NotSelected": "No seleccionado",
   "NoWords": "Tu diccionario no contiene una sola palabra. Presione \"+\" para agregar la primera palabra",
   "Ok": "Ok",
   "Open": "Abierto",
   "OriginalRecording": "Volver a contar en la lengua original:",
+  "PartnerRetelling": "Contarle a un compañero",
   "personalNotes": "Personal notes",
   "Projects": "Proyectos",
   "RemoveAll": "Eliminar todo",
@@ -67,5 +69,6 @@
   "V-CANA": "V-CANA",
   "WordExist": "Existe una palabra duplicada:",
   "WrongResource": "recurso equivocado",
-  "Yes": "Sí"
+  "Yes": "Sí",
+  "YourselfRetelling": "contándome a mí mismo"
 }

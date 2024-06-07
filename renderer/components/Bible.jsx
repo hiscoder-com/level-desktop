@@ -83,6 +83,7 @@ function VersesExtended({ verseObjects, handleSaveScroll, currentScrollVerse = 1
     <>
       {verseObjects?.map((verseObject) => {
         const checkedCurrent = checkedVersesBible.includes(verseObject.verse)
+
         return (
           <div
             key={verseObject.verse}
