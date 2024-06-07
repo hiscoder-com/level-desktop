@@ -13,30 +13,31 @@ import TrashButton from '../public/icons/trash.svg'
 import PlayButton from '../public/icons/play.svg'
 import PauseButton from '../public/icons/pause.svg'
 
-export default function Recorder() {
+export default function Recorder({ setIsRecording, voice, setVoice }) {
   const { t } = useTranslation()
   const setInactive = useSetRecoilState(inactiveState)
   const [showModal, setShowModal] = useState(false)
   const [mediaRec, setMediaRec] = useState()
-  const [voice, setVoice] = useState([])
   const [buttonRecord, setButtonRecord] = useState(
-    <RecorderButton className="stroke-cyan-700 stroke-2" />
+    <RecorderButton className="stroke-th-primary-200 stroke-2" />
   )
-  const [buttonPlay, setButtonPlay] = useState(
-    <PlayButton className="stroke-gray-300 stroke-2" />
-  )
+  const [buttonPlay, setButtonPlay] = useState(<PlayButton />)
   const audioRef = useRef(null)
 
   const startStop = () => {
     if (mediaRec?.state === 'inactive') {
       setVoice([])
       mediaRec.start()
-      setButtonRecord(<StopButton className="stroke-cyan-700 stroke-2 animate-pulse" />)
+      setButtonRecord(
+        <StopButton className="stroke-th-primary-200 stroke-2 animate-pulse" />
+      )
       setInactive(true)
+      setIsRecording(true)
     } else if (mediaRec?.state === 'recording') {
       mediaRec.stop()
-      setButtonRecord(<RecorderButton className="stroke-cyan-700 stroke-2" />)
+      setButtonRecord(<RecorderButton className="stroke-th-primary-200 stroke-2" />)
       setInactive(false)
+      setIsRecording(false)
     } else {
       setShowModal(true)
     }
@@ -53,34 +54,37 @@ export default function Recorder() {
         setMediaRec(mediaRecorder)
       })
       .catch((err) => {
-        setButtonRecord(<RecorderCrossedButton className="stroke-red-700 stroke-2" />)
+        setButtonRecord(<RecorderCrossedButton className="stroke-th-invalid stroke-2" />)
         console.error(`You have not given access to the microphone: ${err}`)
       })
   }, [])
 
   useEffect(() => {
     if (voice.length > 0) {
-      setButtonPlay(<PlayButton className="stroke-cyan-700 stroke-2" />)
+      setButtonPlay(<PlayButton className="stroke-th-primary-200 stroke-2" />)
       const blobUrl = window.URL.createObjectURL(
         new Blob(voice, { type: 'audio/webm;codecs=opus' })
       )
       audioRef.current.src = blobUrl
+      setVoice(voice)
     } else if (audioRef.current) {
-      setButtonPlay(<PlayButton className="stroke-gray-300 stroke-2" />)
+      setButtonPlay(<PlayButton className="stroke-th-secondary-200 stroke-2" />)
       audioRef.current.src = ''
     }
     audioRef.current.onended = () => {
-      setButtonPlay(<PlayButton className={'stroke-cyan-700 stroke-2'} />)
+      setButtonPlay(<PlayButton className={'stroke-th-primary-200 stroke-2'} />)
     }
   }, [voice])
 
   const playPause = () => {
     if (audioRef.current.paused) {
       audioRef.current.play()
-      setButtonPlay(<PauseButton className="stroke-cyan-700 stroke-2 animate-pulse" />)
+      setButtonPlay(
+        <PauseButton className="stroke-th-primary-200 stroke-2 animate-pulse" />
+      )
     } else {
       audioRef.current.pause()
-      setButtonPlay(<PlayButton className="stroke-cyan-700 stroke-2" />)
+      setButtonPlay(<PlayButton className="stroke-th-primary-200 stroke-2" />)
     }
   }
 
@@ -101,7 +105,7 @@ export default function Recorder() {
       >
         <TrashButton
           className={`stroke-2 ${
-            voice.length > 0 ? 'stroke-cyan-700' : 'stroke-gray-300'
+            voice.length > 0 ? 'stroke-th-primary-200' : 'stroke-th-secondary-200'
           }`}
         />
       </button>

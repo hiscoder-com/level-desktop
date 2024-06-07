@@ -13,7 +13,10 @@ import Back from '../public/icons/left.svg'
 export default function Retelling() {
   const { t } = useTranslation()
   const [option, setOption] = useState(null)
-
+  const [isRecordingOriginal, setIsRecordingOriginal] = useState(false)
+  const [isRecordingTarget, setIsRecordingTarget] = useState(false)
+  const [voiceOriginal, setVoiceOriginal] = useState([])
+  const [voiceTarget, setVoiceTarget] = useState([])
   const setInactive = useSetRecoilState(inactiveState)
   const router = useRouter()
 
@@ -31,6 +34,14 @@ export default function Retelling() {
 
   const handleOption = (selectedOption) => {
     setOption(selectedOption)
+  }
+
+  const resetState = () => {
+    setOption(null)
+    setVoiceOriginal([])
+    setVoiceTarget([])
+    setIsRecordingOriginal(false)
+    setIsRecordingTarget(false)
   }
 
   return (
@@ -57,23 +68,45 @@ export default function Retelling() {
         <div className="flex flex-wrap gap-4">
           <button
             className="w-fit h-fit p-1 cursor-pointer hover:opacity-70 rounded-full bg-th-secondary-100"
-            onClick={() => setOption(null)}
+            onClick={resetState}
           >
             <Back className="w-8 stroke-th-primary-200" />
           </button>
           <p className="self-center font-bold text-xl">
             {option === 'partner' ? t('PartnerRetelling') : t('YourselfRetelling')}
           </p>
-          <div className="w-full pb-4 px-2 border-b-4">
-            <p className="mb-4">{t('OriginalRecording')}</p>
-            <Recorder />
-          </div>
-          <div className="w-full pb-4 px-2 border-b-4">
-            <p className="mb-4">{t('TargetRecording')}</p>
-            <Recorder />
-          </div>
+          <RecorderSection
+            isRecording={isRecordingOriginal}
+            voice={voiceOriginal}
+            setIsRecording={setIsRecordingOriginal}
+            setVoice={setVoiceOriginal}
+            label={t('OriginalRecording')}
+          />
+          <RecorderSection
+            isRecording={isRecordingTarget}
+            voice={voiceTarget}
+            setIsRecording={setIsRecordingTarget}
+            setVoice={setVoiceTarget}
+            label={t('TargetRecording')}
+          />
         </div>
       )}
     </>
+  )
+}
+
+function RecorderSection({ isRecording, voice, setIsRecording, setVoice, label }) {
+  return (
+    <div className="w-full pb-4 px-2">
+      <p className="mb-4">{label}</p>
+      <Recorder setIsRecording={setIsRecording} voice={voice} setVoice={setVoice} />
+      <div
+        className={`pb-4 px-2 border-b-4 ${
+          isRecording || voice.length > 0
+            ? 'border-th-primary-200'
+            : 'border-th-secondary-200'
+        } ${isRecording ? 'animate-pulse' : ''}`}
+      />
+    </div>
   )
 }
