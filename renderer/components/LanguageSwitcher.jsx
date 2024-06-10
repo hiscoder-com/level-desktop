@@ -32,7 +32,7 @@ function LanguageSwitcher() {
                     window.location.reload()
                   }}
                   className={`cursor-pointer px-4 py-2 ${
-                    locale === loc ? 'text-gray-450' : ''
+                    locale === loc ? 'text-th-secondary-300' : ''
                   }`}
                 >
                   {t(loc.toUpperCase())}

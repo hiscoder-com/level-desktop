@@ -62,8 +62,8 @@ export function AutoSizeTextArea({ updateVerse, verseObject, idx }) {
           updateVerse(idx, verseObject.num, e.target.innerText.trim())
         }
       }}
-      className={`block w-full mx-3 focus:outline-none focus:inline-none whitespace-pre-line focus:bg-white  ${
-        verseObject.verse ? '' : 'bg-gray-300'
+      className={`block w-full mx-3 focus:outline-none focus:inline-none whitespace-pre-line focus:bg-th-secondary-10  ${
+        verseObject.verse ? '' : 'bg-th-secondary-200'
       }`}
       // eslint-disable-next-line prettier/prettier
     >
