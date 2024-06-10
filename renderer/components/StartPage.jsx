@@ -24,7 +24,7 @@ export default function StartPage() {
     router.push(allAgreed ? `/account` : `/agreements`)
   }
   return (
-    <div className="relative flex flex-col justify-center items-center gap-4 h-screen w-full mx-auto max-w-7xl ">
+    <div className="relative flex flex-col justify-center items-center gap-4 h-screen w-full mx-auto max-w-7xl">
       <div className="w-full absolute flex justify-between items-center top-10">
         <LanguageSwitcher />
         <Link href={`/chapter-merger`}>
@@ -33,11 +33,11 @@ export default function StartPage() {
       </div>
 
       <div>
-        <div className="flex flex-grow items-center justify-center p-5 h-24 bg-white rounded-2xl cursor-pointer mb-4">
+        <div className="flex flex-grow items-center justify-center p-5 h-32 bg-th-secondary-10 rounded-2xl cursor-pointer mb-4">
           <VcanaLogo className="w-44" />
         </div>
         <div
-          className="h-32 rounded-2xl bg-slate-550"
+          className="h-24 rounded-2xl bg-th-primary-200"
           onClick={() => {
             checkAgreements()
           }}
