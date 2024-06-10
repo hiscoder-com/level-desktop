@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 
 import { JsonToPdf } from '@texttree/obs-format-convert-rcl'
 import { useTranslation } from '@/next-i18next'
@@ -21,7 +20,6 @@ const styles = {
 
 function ChapterList({ id, chapters, steps, mutate }) {
   const { t } = useTranslation(['projects', 'common'])
-  const { pathname } = useRouter()
 
   const handleBackStep = (chapter, step) => {
     const backStep = window.electronAPI.goToStep(id, chapter, step - 1)
@@ -57,9 +55,15 @@ function ChapterList({ id, chapters, steps, mutate }) {
     <table className="border-collapse table-auto w-full text-sm">
       <thead>
         <tr className="text-th-secondary-300 border-b border-th-secondary-200 cursor-default">
-          <th className="font-medium pt-0 pr-4 pb-3 pl-8 text-left">{t('Chapter')}</th>
-          <th className="font-medium pt-0 pr-4 pb-3 pl-8 text-left">{t('Step')}</th>
-          <th className="font-medium pt-0 pr-4 pb-3 pl-8 text-center">{t('StepBack')}</th>
+          <th className="font-medium pt-0 pr-4 pb-3 pl-8 text-left">
+            {t('projects:Chapter')}
+          </th>
+          <th className="font-medium pt-0 pr-4 pb-3 pl-8 text-left">
+            {t('projects:Step')}
+          </th>
+          <th className="font-medium pt-0 pr-4 pb-3 pl-8 text-center">
+            {t('projects:StepBack')}
+          </th>
           <th className="font-medium pt-0 pr-4 pb-3 pl-8 text-center">
             {t('common:Download')}
           </th>
@@ -74,7 +78,7 @@ function ChapterList({ id, chapters, steps, mutate }) {
             <td className="p-4 pl-8">
               <Link href={`/account/project/${id}/${chapter}/${step}`} legacyBehavior>
                 <a className="font-bold hover:opacity-70">
-                  {t('Chapter')} {chapter}
+                  {t('projects:Chapter')} {chapter}
                 </a>
               </Link>
             </td>
@@ -87,7 +91,7 @@ function ChapterList({ id, chapters, steps, mutate }) {
                   className="btn-primary text-base select-none"
                   onClick={() => handleBackStep(chapter, step)}
                 >
-                  {t('BackToStep')} {step}
+                  {t('projects:BackToStep')} {step}
                 </div>
               )}
             </td>
