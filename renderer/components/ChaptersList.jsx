@@ -36,11 +36,16 @@ function ChapterList({ id, chapters, steps, mutate }) {
     const savedVerses = Object.entries(window.electronAPI.getChapter(id, chapter))
       .map(([k, v]) => ({ verse: k, text: v.text, enabled: v.enabled }))
       .filter((v) => v.enabled)
-    const filename = 'chapter_' + chapter
+
+    const project = window.electronAPI.getProject(id)
+    const currentDate = new Date().toISOString().split('T')[0]
+
+    const fileName = `${project.project}_${project.book.code}_c_${chapter}_${currentDate}`
+
     JsonToPdf({
       data: [{ title: 'Chapter ' + chapter, verseObjects: savedVerses }],
       styles,
-      filename,
+      fileName,
       showImages: false,
       combineVerses: false,
       showChapterTitlePage: false,
@@ -76,7 +81,7 @@ function ChapterList({ id, chapters, steps, mutate }) {
                   .replace('[id]', id)}/${chapter}/${step}`}
                 legacyBehavior
               >
-                <a className="font-bold underline">
+                <a className="font-bold hover:opacity-70">
                   {t('Chapter')} {chapter}
                 </a>
               </Link>
@@ -87,7 +92,7 @@ function ChapterList({ id, chapters, steps, mutate }) {
             <td className="p-4 pl-8">
               {step > 0 && (
                 <div
-                  className="btn-primary text-base"
+                  className="btn-primary text-base select-none"
                   onClick={() => handleBackStep(chapter, step)}
                 >
                   {t('BackToStep')} {step}

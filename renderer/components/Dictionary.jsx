@@ -1,58 +1,36 @@
 import { useEffect, useMemo, useState } from 'react'
 
-import dynamic from 'next/dynamic'
-
 import { Disclosure } from '@headlessui/react'
 import { useTranslation } from 'react-i18next'
 
-import Modal from './Modal'
+import SearchAndAddWords from './SearchAndAddWords'
+import Alphabet from './Alphabet'
+import WordList from './WordList'
 import { useGetDictionary } from '../hooks/useGetDictionary'
 import { generateUniqueId } from '../helpers/noteEditor'
 
 import RightArrow from '../public/icons/right-arrow.svg'
 import LeftArrow from '../public/icons/left-arrow.svg'
-import Close from '../public/icons/close.svg'
-import Trash from '../public/icons/trash.svg'
-import Plus from '../public/icons/plus.svg'
 import Down from '../public/icons/arrow-down.svg'
-import Back from '../public/icons/left.svg'
-import Export from '../public/icons/export.svg'
-import Import from '../public/icons/import.svg'
-
-const t = (str) => str
-
-const Redactor = dynamic(
-  () => import('@texttree/notepad-rcl').then((mod) => mod.Redactor),
-  {
-    ssr: false,
-  }
-)
-
-const MenuButtons = dynamic(
-  () => import('@texttree/v-cana-rcl').then((mod) => mod.MenuButtons),
-  {
-    ssr: false,
-  }
-)
 
 const countWordsOnPage = 10
 
 function Dictionary({ config: { id } }) {
   const { t } = useTranslation()
-  const isRtl = false
   const [currentPage, setCurrentPage] = useState(0)
   const [isOpenModal, setIsOpenModal] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
-  const [errorText, setErrorText] = useState(false)
   const [wordToDel, setWordToDel] = useState(null)
   const [activeWord, setActiveWord] = useState()
   const [wordId, setWordId] = useState('')
   const [words, setWords] = useState({ data: [], count: 0 })
   const { data: dictionary, alphabet, mutate } = useGetDictionary(id)
+
   const totalPageCount = useMemo(
     () => Math.ceil(words?.count / countWordsOnPage),
     [words]
   )
+
   const getAll = () => {
     setCurrentPage(0)
     setSearchQuery('')
@@ -82,7 +60,7 @@ function Dictionary({ config: { id } }) {
   }
 
   useEffect(() => {
-    if (dictionary) {
+    if (dictionary && !searchQuery) {
       getWords()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -106,20 +84,18 @@ function Dictionary({ config: { id } }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [wordId])
 
-  const addWord = () => {
-    const wordId = ('000000000' + Math.random().toString(36).substring(2)).slice(-9)
-    window.electronAPI.addWord(id, wordId)
-    mutate()
-  }
-
-  const removeWord = (wordid) => {
-    window.electronAPI.removeWord(id, wordid)
-    mutate()
-  }
+  useEffect(() => {
+    if (!activeWord) {
+      return
+    }
+    saveWord()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeWord])
 
   const saveWord = async () => {
     window.electronAPI.updateWord(id, activeWord)
     mutate()
+    setCurrentPage(0)
   }
 
   function checkAndAppendNewTitle(title, allWords) {
@@ -131,6 +107,7 @@ function Dictionary({ config: { id } }) {
     }
     return newTitle
   }
+
   const importWords = async () => {
     const fileInput = document.createElement('input')
     fileInput.type = 'file'
@@ -170,7 +147,9 @@ function Dictionary({ config: { id } }) {
 
     fileInput.click()
   }
+
   function exportWords() {
+    setSearchQuery('')
     try {
       if (!dictionary || !dictionary.length) {
         throw new Error(t('NoData'))
@@ -205,282 +184,93 @@ function Dictionary({ config: { id } }) {
 
       document.body.removeChild(link)
     } catch (error) {
-      toast.error(error.message)
+      console.log(error.message)
     }
   }
-  const showError = (err, placeholder) => {
-    if (err?.response?.data?.error) {
-      setErrorText(`${t('WordExist')} "${placeholder}"`)
-    }
-    setTimeout(() => {
-      setErrorText(null)
-    }, 2000)
+
+  const listUpdate = () => {
+    mutate()
+    setCurrentPage(0)
   }
 
-  useEffect(() => {
-    if (!activeWord) {
-      return
-    }
-    const timer = setTimeout(() => {
-      saveWord()
-    }, 2000)
-    return () => {
-      clearTimeout(timer)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeWord])
-
-  const dropMenuClassNames = {
-    container: {
-      className: 'absolute border rounded z-[100] whitespace-nowrap bg-white shadow',
-    },
-    item: {
-      className: 'cursor-pointer bg-th-secondary-100 hover:bg-th-secondary-200',
-    },
-  }
-
-  const dropMenuItems = {
-    dots: [
-      {
-        id: 'export',
-        buttonContent: (
-          <span className="flex items-center gap-2.5 py-1 pr-7 pl-2.5">
-            <Export className="w-5 h-5" /> {t('Export')}
-          </span>
-        ),
-        action: () => exportWords(),
-      },
-      {
-        id: 'import',
-        buttonContent: (
-          <span className="flex items-center gap-2.5 py-1 pr-7 pl-2.5">
-            <Import className="w-5 h-5" /> {t('Import')}
-          </span>
-        ),
-        action: () => importWords(true),
-      },
-    ],
-  }
-
-  const icons = {
-    dots: (
-      <div className="flex items-center justify-center w-6 h-6 space-x-1">
-        {[...Array(3).keys()].map((key) => (
-          <div key={key} className="h-1 w-1 bg-white rounded-full" />
-        ))}
-      </div>
-    ),
+  const sharedProps = {
+    searchQuery,
+    setSearchQuery,
+    projectId: id,
+    listUpdate,
+    activeWord,
   }
 
   return (
     <div className="relative">
-      <div className="flex gap-2.5 w-full items-center">
-        <div className="relative w-full flex items-center">
-          <input
-            className="input-primary"
-            value={searchQuery}
-            onChange={(e) => {
-              setCurrentPage(0)
-              setSearchQuery(e.target.value)
-            }}
-            placeholder={t('Search')}
-            readOnly={activeWord}
-          />
-          {searchQuery && (
-            <Close
-              className="absolute р-6 w-6 z-10 cursor-pointer right-2 rtl:left-1"
-              onClick={() => {
-                !activeWord && getAll()
-              }}
+      <SearchAndAddWords
+        {...sharedProps}
+        importWords={importWords}
+        exportWords={exportWords}
+      />
+      {alphabet.length ? (
+        <Card t={t}>
+          <div className="mt-4">
+            <Alphabet
+              alphabet={alphabet}
+              getAll={getAll}
+              setSearchQuery={setSearchQuery}
+              setCurrentPage={setCurrentPage}
+              disabled={activeWord}
             />
-          )}
-        </div>
-        <div className="flex gap-2.5 ltr:flex-row rtl:flex-row-reverse">
-          <MenuButtons
-            classNames={{
-              dropdown: dropMenuClassNames,
-              button: 'btn-tertiary p-3',
-              container: 'flex gap-2 relative',
-              buttonContainer: 'relative',
-            }}
-            menuItems={dropMenuItems}
-            icons={icons}
-            disabled={activeWord}
-          />
+          </div>
+        </Card>
+      ) : (
+        <p className="py-8 opacity-40 cursor-default">{t('EmptyAlphabet')}</p>
+      )}
+
+      <div className="relative">
+        <WordList
+          {...sharedProps}
+          words={words}
+          setWordId={setWordId}
+          isOpenModal={isOpenModal}
+          setActiveWord={setActiveWord}
+          setIsOpenModal={setIsOpenModal}
+          wordToDel={wordToDel}
+          saveWord={saveWord}
+          setWordToDel={setWordToDel}
+        />
+      </div>
+      {totalPageCount > 1 && !activeWord && (
+        <div className="w-full flex justify-center gap-10">
           <button
-            className="btn-tertiary p-3"
-            onClick={addWord}
-            title={t('AddWord')}
-            disabled={activeWord}
+            className="px-5 py-5 rounded-full duration-300 hover:bg-white active:bg-gray-100 disabled:opacity-50 disabled:hover:bg-transparent"
+            disabled={currentPage === 0}
+            onClick={() =>
+              setCurrentPage((prev) => {
+                getWords(searchQuery, prev - 1)
+                return prev - 1
+              })
+            }
           >
-            <Plus className="w-6 h-6 stroke-th-text-secondary-100 stroke-2" />
+            <LeftArrow className="w-6 h-6" />
+          </button>
+          <button
+            className="px-5 py-5 rounded-full duration-300 hover:bg-white active:bg-gray-100 disabled:opacity-50 disabled:hover:bg-transparent"
+            disabled={currentPage >= totalPageCount - 1}
+            onClick={() => {
+              setCurrentPage((prev) => {
+                getWords(searchQuery, prev + 1)
+                return prev + 1
+              })
+            }}
+          >
+            <RightArrow className="w-6 h-6" />
           </button>
         </div>
-      </div>
-      <Card t={t}>
-        <div className="mt-4">
-          <Alphabet
-            alphabet={alphabet}
-            getAll={getAll}
-            setSearchQuery={setSearchQuery}
-            setCurrentPage={setCurrentPage}
-            t={t}
-            disabled={activeWord}
-          />
-        </div>
-      </Card>
-      <div className="relative">
-        {!activeWord ? (
-          <>
-            <div
-              className={`${
-                errorText ? 'block' : 'hidden'
-              } absolute top-11 right-0 p-3 bg-red-200`}
-            >
-              {errorText}
-            </div>
-            {words?.data?.length ? (
-              <div className="mt-2">
-                {words.data.map((el) => (
-                  <div
-                    key={el.id}
-                    className="flex justify-between items-start group my-3 bg-th-secondary-100 rounded-lg cursor-pointer"
-                    onClick={() => {
-                      setWordId(el.id)
-                    }}
-                  >
-                    <div className="p-2 mr-4 font-bold">{el.title}</div>
-                    <button
-                      className="p-2 m-1 top-0 opacity-0 group-hover:opacity-100"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        setIsOpenModal(true)
-                        setWordToDel(el)
-                      }}
-                    >
-                      <Trash className={'w-4 h-4 text-cyan-800'} />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="mt-2">{t('NoMatches')}</div>
-            )}
-          </>
-        ) : (
-          <>
-            <div
-              className="flex w-fit p-1 cursor-pointer hover:opacity-70 rounded-full bg-th-secondary-100 absolute"
-              onClick={() => {
-                saveWord()
-                setActiveWord(null)
-                setWordId(null)
-              }}
-            >
-              <Back className="w-8 stroke-th-primary-200" />
-            </div>
-            <Redactor
-              classes={{
-                title: 'bg-th-secondary-100 p-2 my-4 ml-12 font-bold rounded-lg',
-                redactor:
-                  'p-4 my-4 pb-20 bg-th-secondary-100 overflow-hidden break-words rounded-lg',
-              }}
-              activeNote={activeWord}
-              setActiveNote={setActiveWord}
-              readOnly={false}
-              placeholder={t('TextDescriptionWord')}
-              isSelectableTitle
-            />
-          </>
-        )}
-
-        <Modal isOpen={isOpenModal} closeHandle={() => setIsOpenModal(false)}>
-          <div className="flex flex-col gap-7 items-center">
-            <div className="text-center text-2xl">
-              {t('AreYouSureDelete') + ' ' + wordToDel?.title + '?'}
-            </div>
-            <div className="flex w-1/2 gap-7">
-              <button
-                className="btn-secondary flex-1"
-                onClick={() => {
-                  setIsOpenModal(false)
-                  if (wordToDel) {
-                    removeWord(wordToDel.id)
-                    setWordToDel(null)
-                  }
-                }}
-              >
-                {t('Yes')}
-              </button>
-              <button
-                className="btn-secondary flex-1"
-                onClick={() => {
-                  setWordToDel(null)
-                  setIsOpenModal(false)
-                }}
-              >
-                {t('No')}
-              </button>
-            </div>
-          </div>
-        </Modal>
-      </div>
-      <div
-        className={`flex bottom-0 justify-center absolute w-full gap-10 ${
-          totalPageCount > 1 ? 'opacity-100' : 'opacity-0'
-        }`}
-      >
-        <button
-          className="px-5 py-5 rounded-full duration-300 hover:bg-white active:bg-gray-100 disabled:opacity-50 disabled:hover:bg-transparent"
-          disabled={currentPage === 0}
-          onClick={() =>
-            setCurrentPage((prev) => {
-              getWords(searchQuery, prev - 1)
-              return prev - 1
-            })
-          }
-        >
-          <LeftArrow className="w-6 h-6" />
-        </button>
-        <button
-          className="px-5 py-5 rounded-full duration-300 hover:bg-white active:bg-gray-100 disabled:opacity-50 disabled:hover:bg-transparent"
-          disabled={currentPage >= totalPageCount - 1}
-          onClick={() => {
-            setCurrentPage((prev) => {
-              getWords(searchQuery, prev + 1)
-              return prev + 1
-            })
-          }}
-        >
-          <RightArrow className="w-6 h-6" />
-        </button>
-      </div>
+      )}
     </div>
   )
 }
 
 export default Dictionary
 
-function Alphabet({ alphabet, setCurrentPage, setSearchQuery, t, disabled }) {
-  return (
-    <div className="flex flex-wrap py-3 px-4 bg-th-secondary-100 rounded-lg w-full font-bold">
-      {alphabet &&
-        alphabet.map((letter) => (
-          <button
-            onClick={() => {
-              setCurrentPage(0)
-              setSearchQuery(letter.toLowerCase())
-            }}
-            className="px-1.5 cursor-pointer hover:opacity-50"
-            key={letter}
-            disabled={disabled}
-          >
-            {letter}
-          </button>
-        ))}
-    </div>
-  )
-}
 function Card({ children, t, isOpen = true, isHidden = false }) {
   return (
     <div className="flex flex-col w-full gap-3 bg-th-secondary-10 mt-6">

@@ -15,11 +15,9 @@ export default function Account() {
     t,
   } = useTranslation(['common', 'projects'])
 
-  const [projects, setProjects] = React.useState([])
-
-  React.useEffect(() => {
-    setProjects(window.electronAPI.getProjects())
-  }, [])
+  if (!locale) {
+    return <div>Loading...</div>
+  }
 
   return (
     <>
@@ -33,8 +31,8 @@ export default function Account() {
           </a>
         </Link>
         <h2 className="my-6 text-4xl">{t('Projects')}</h2>
-        <div className="py-4">
-          <ProjectsList projects={projects} />
+        <div className="py-4 mb-10">
+          <ProjectsList />
         </div>
         <Link href={`/${locale}/create`} legacyBehavior>
           <a className="btn-primary text-base">{t('Import')}</a>

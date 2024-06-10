@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -10,9 +10,11 @@ import { JsonToPdf } from '@texttree/obs-format-convert-rcl'
 
 import ListBox from './ListBox'
 import Modal from './Modal'
-import ChaptersMerger from './ChaptersMerger'
+import Property from './Property'
+import { convertToUsfm, convertBookChapters } from '../helpers/usfm'
 
 import DownloadIcon from '../public/icons/download.svg'
+import Gear from '../public/icons/gear.svg'
 
 const styles = {
   currentPage: {
@@ -27,7 +29,7 @@ const styles = {
   text: { alignment: 'justify' },
 }
 
-function ProjectsList({ projects }) {
+function ProjectsList() {
   const {
     i18n: { language: locale },
     t,
@@ -37,11 +39,65 @@ function ProjectsList({ projects }) {
     { label: t('projects:ExportToZIP'), value: 'zip' },
     { label: t('projects:ExportToUSFM'), value: 'usfm' },
   ]
+
   const { pathname } = useRouter()
+  const [projectsList, setProjectsList] = useState([])
   const [selectedOption, setSelectedOption] = useState(options[0].value)
   const [currentProject, setCurrentProject] = useState(null)
   const [isOpenModal, setIsOpenModal] = useState(false)
-  const exportToPdf = (chapters) => {
+  const [isOpenSettingsModal, setIsOpenSettingsModal] = useState(false)
+  const [properties, setProperties] = useState(null)
+  const [editedProperties, setEditedProperties] = useState({})
+  const [isConfirmDelete, setIsConfirmDelete] = useState(false)
+
+  useEffect(() => {
+    setProjectsList(window.electronAPI.getProjects())
+
+    const handleProjectsUpdated = (updatedProjects) => {
+      setProjectsList(updatedProjects)
+    }
+
+    const unsubscribe = window.ipc.on('projects-updated', handleProjectsUpdated)
+
+    return unsubscribe
+  }, [])
+
+  useEffect(() => {
+    if (currentProject) {
+      const loadedProperties = window.electronAPI.getProperties(currentProject.id)
+
+      if (loadedProperties.h === '') {
+        loadedProperties.h = currentProject.book.name
+      }
+
+      setProperties(loadedProperties)
+      setEditedProperties(loadedProperties)
+    }
+  }, [currentProject])
+
+  useEffect(() => {
+    const handleProjectNameUpdate = (event) => {
+      const { projectId, newName } = event.detail
+      setProjectsList((prevProjects) =>
+        prevProjects.map((project) =>
+          project.id === projectId
+            ? { ...project, book: { ...project.book, name: newName } }
+            : project
+        )
+      )
+    }
+
+    window.addEventListener('project-name-updated', handleProjectNameUpdate)
+
+    return () => {
+      window.removeEventListener('project-name-updated', handleProjectNameUpdate)
+    }
+  }, [])
+
+  const exportToPdf = (chapters, project) => {
+    const formattedDate = new Date().toISOString().split('T')[0]
+    const fileName = `${project.name}_${project.book.code}_${formattedDate}`
+
     const book = []
     for (const chapterNum in chapters) {
       if (Object.hasOwnProperty.call(chapters, chapterNum)) {
@@ -56,7 +112,6 @@ function ProjectsList({ projects }) {
         })
       }
     }
-
     JsonToPdf({
       data: book,
       showImages: false,
@@ -64,28 +119,30 @@ function ProjectsList({ projects }) {
       showChapterTitlePage: false,
       showVerseNumber: true,
       showPageFooters: false,
+      fileName,
       styles,
     })
       .then(() => console.log('PDF creation completed'))
       .catch((error) => console.error('PDF creation failed:', error))
   }
-  const exportToZip = (chapters) => {
+
+  const exportToZip = (chapters, project) => {
     try {
-      if (!chapters) {
+      if (!chapters || !project) {
         throw new Error(t('NoData'))
       }
+
       const jsonContent = JSON.stringify(chapters, null, 2)
       const zip = new jszip()
-      const currentDate = new Date()
-      const formattedDate = currentDate.toISOString().split('T')[0]
-      const fileName = `chapters_${formattedDate}.json`
+      const formattedDate = new Date().toISOString().split('T')[0]
+      const fileName = `${project.name}_${project.book.code}_chapters_${formattedDate}.json`
       zip.file(fileName, jsonContent)
       zip.generateAsync({ type: 'blob' }).then(function (content) {
         const blob = content
         const url = window.URL.createObjectURL(blob)
         const downloadLink = document.createElement('a')
         downloadLink.href = url
-        downloadLink.download = `chapters_${formattedDate}.zip`
+        downloadLink.download = `${project.name}_${project.book.code}_chapters_${formattedDate}.zip`
         document.body.appendChild(downloadLink)
         downloadLink.click()
         document.body.removeChild(downloadLink)
@@ -95,14 +152,88 @@ function ProjectsList({ projects }) {
       console.log(error.message)
     }
   }
+
+  const exportToUsfm = (chapters, project) => {
+    const convertedBook = convertBookChapters(chapters)
+    const { h, toc1, toc2, toc3, mt, chapter_label } = properties
+    const formattedDate = new Date().toISOString().split('T')[0]
+    const fileName = `${project.name}_${project.book.code}_${formattedDate}`
+
+    const merge = convertToUsfm({
+      jsonChapters: convertedBook,
+      book: {
+        code: project.book.code,
+        properties: {
+          scripture: {
+            h,
+            toc1,
+            toc2,
+            toc3,
+            mt,
+            chapter_label,
+          },
+        },
+      },
+      project: { code: '', language: { code: '', orig_name: '' }, title: '' },
+    })
+
+    const blob = new Blob([merge], { type: 'text/plain;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', `${fileName}.usfm`)
+    document.body.appendChild(link)
+    link.click()
+  }
+
   const download = (project) => {
     const chapters = window.electronAPI.getBook(project.id)
+
     if (selectedOption === 'pdf') {
-      exportToPdf(chapters)
+      exportToPdf(chapters, project)
+    } else if (selectedOption === 'usfm') {
+      exportToUsfm(chapters, project)
     } else {
-      exportToZip(chapters)
+      exportToZip(chapters, project)
     }
   }
+
+  const updateEditedProperty = (text, property) => {
+    setEditedProperties((prev) => ({
+      ...prev,
+      [property]: property === 'h' && text === '' ? currentProject.book.name : text,
+    }))
+  }
+
+  const saveProperties = () => {
+    setProperties(editedProperties)
+    window.electronAPI.updateProperties(currentProject.id, editedProperties)
+    if (editedProperties.h) {
+      window.electronAPI.updateProjectName(currentProject.id, editedProperties.h)
+    }
+  }
+
+  const handleSettingsModalClose = () => {
+    setEditedProperties(properties)
+    setIsOpenSettingsModal(false)
+  }
+
+  const renderProperties =
+    properties &&
+    Object.entries(properties)?.map(([property, content], index) => (
+      <Property
+        t={t}
+        key={index}
+        property={property}
+        content={editedProperties[property] || content}
+        onContentChange={updateEditedProperty}
+      />
+    ))
+
+  const projectRemove = (id) => {
+    window.electronAPI.deleteProject(id)
+  }
+
   return (
     <>
       <table className="border-collapse table-auto w-full text-sm">
@@ -117,7 +248,7 @@ function ProjectsList({ projects }) {
           </tr>
         </thead>
         <tbody className="bg-th-secondary-10">
-          {projects.map((project) => (
+          {projectsList.map((project) => (
             <tr
               key={project.id}
               className="border-b border-th-secondary-200 text-th-primary-100"
@@ -127,7 +258,7 @@ function ProjectsList({ projects }) {
                   href={`${pathname.replace('[locale]', locale)}/project/${project.id}`}
                   legacyBehavior
                 >
-                  <a className="font-bold underline">
+                  <a className="font-bold hover:opacity-70">
                     {project.book.name} ({project.book.code})
                   </a>
                 </Link>
@@ -139,12 +270,19 @@ function ProjectsList({ projects }) {
                 {new Date(project.createdAt).toLocaleDateString()}
               </td>
               <td className="p-4 pl-8">
-                <div className="flex justify-center cursor-pointer">
+                <div className="flex justify-center gap-5 cursor-pointer">
                   <DownloadIcon
                     className="w-8 hover:opacity-70"
                     onClick={() => {
                       setCurrentProject(project)
                       setIsOpenModal(true)
+                    }}
+                  />
+                  <Gear
+                    className="w-8 hover:opacity-70"
+                    onClick={() => {
+                      setCurrentProject(project)
+                      setIsOpenSettingsModal(true)
                     }}
                   />
                 </div>
@@ -154,34 +292,96 @@ function ProjectsList({ projects }) {
         </tbody>
       </table>
       <Modal
+        title={t('Download')}
         closeHandle={() => setIsOpenModal(false)}
         className={{
           dialogPanel:
-            'w-full max-w-md align-middle p-6 bg-th-primary-100 text-th-text-secondary-100 overflow-y-visible rounded-3xl',
+            'w-full max-w-md align-middle px-6 bg-th-primary-100 text-th-text-secondary-100 overflow-y-visible rounded-3xl',
         }}
         isOpen={isOpenModal}
+        buttons={
+          <div className="flex justify-center self-center w-2/3 gap-7">
+            <button
+              className="btn-secondary flex-1"
+              onClick={() => download(currentProject)}
+            >
+              {t('Download')}
+            </button>
+            <button
+              className="btn-secondary flex-1"
+              onClick={() => setIsOpenModal(false)}
+            >
+              {t('Close')}
+            </button>
+          </div>
+        }
       >
         <ListBox
           selectedOption={selectedOption}
           setSelectedOption={setSelectedOption}
           options={options}
         />
-        {selectedOption === 'usfm' && <ChaptersMerger book={currentProject.book.code} />}
-        <div className="flex justify-center">
-          <div className="flex gap-4 text-xl w-1/2">
-            <button className="btn-primary flex-1" onClick={() => setIsOpenModal(false)}>
-              {t('Close')}
-            </button>
-            {selectedOption !== 'usfm' && (
+      </Modal>
+      <Modal
+        title={
+          isConfirmDelete ? t('projects:ProjectDelete') : t('projects:ProjectSettings')
+        }
+        closeHandle={
+          isConfirmDelete ? () => setIsConfirmDelete(false) : handleSettingsModalClose
+        }
+        isOpen={isOpenSettingsModal}
+        className={{
+          contentBody: 'max-h-[70vh] overflow-y-auto px-6',
+        }}
+        buttons={
+          isConfirmDelete ? (
+            <div className="flex justify-center self-center gap-7 w-2/3 pt-6">
               <button
-                className="btn-primary flex-1"
-                onClick={() => download(currentProject)}
+                className="btn-secondary flex-1"
+                onClick={() => {
+                  projectRemove(currentProject.id)
+                  setIsOpenSettingsModal(false)
+                  setIsConfirmDelete(false)
+                }}
               >
-                {t('Download')}
+                {t('Yes')}
               </button>
-            )}
+              <button
+                className="btn-secondary flex-1"
+                onClick={() => setIsConfirmDelete(false)}
+              >
+                {t('No')}
+              </button>
+            </div>
+          ) : (
+            <div className="flex justify-center self-center gap-7 w-2/3">
+              <button className="btn-secondary flex-1" onClick={saveProperties}>
+                {t('Save')}
+              </button>
+              <button
+                className="btn-secondary flex-1"
+                onClick={() => setIsOpenSettingsModal(false)}
+              >
+                {t('Close')}
+              </button>
+            </div>
+          )
+        }
+      >
+        {isConfirmDelete ? (
+          <div className="flex flex-col gap-7 items-center">
+            <div className="text-center text-2xl">
+              {t('AreYouSureDelete') + ' ' + currentProject?.book.name + '?'}
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="flex flex-col gap-4">
+            {renderProperties}
+            <button className="btn-red my-2.5" onClick={() => setIsConfirmDelete(true)}>
+              {t('projects:RemoveProject')}
+            </button>
+          </div>
+        )}
       </Modal>
     </>
   )

@@ -716,6 +716,22 @@ ipcMain.on('get-project', async (event, id) => {
 })
 
 ipcMain.on('add-project', (event, url) => {
+  const defaultProperties = {
+    h: '',
+    toc1: '',
+    toc2: '',
+    toc3: '',
+    mt: '',
+    chapter_label: '',
+  }
+
+  const createPropertiesFile = (projectId, properties) => {
+    const projectPath = path.join(projectUrl, projectId)
+    const propertiesPath = path.join(projectPath, 'properties.json')
+
+    fs.writeFileSync(propertiesPath, JSON.stringify(properties, null, 2))
+  }
+
   if (url) {
     const projects = storeProjects.get('projects') || []
     const id = uuid()
@@ -731,6 +747,9 @@ ipcMain.on('add-project', (event, url) => {
       project.book = { ...config.book }
       project.name = config.project
       project.method = config.method
+
+      createPropertiesFile(id, defaultProperties)
+
       projects.push(project)
       storeProjects.set('projects', projects)
       event.sender.send('notify', 'Created')
@@ -739,6 +758,69 @@ ipcMain.on('add-project', (event, url) => {
   } else {
     event.sender.send('notify', 'Url not set')
   }
+})
+
+ipcMain.on('get-properties', (event, projectId) => {
+  const propertiesPath = path.join(projectUrl, projectId, 'properties.json')
+  try {
+    const propertiesData = fs.readFileSync(propertiesPath, 'utf8')
+    event.returnValue = JSON.parse(propertiesData)
+  } catch (err) {
+    console.error(`Error reading properties file for project ${projectId}:`, err)
+    event.returnValue = {}
+  }
+})
+
+ipcMain.on('update-properties', (event, projectId, properties) => {
+  const propertiesPath = path.join(projectUrl, projectId, 'properties.json')
+  try {
+    fs.writeFileSync(propertiesPath, JSON.stringify(properties, null, 2))
+    event.returnValue = true
+  } catch (err) {
+    console.error(`Error writing properties file for project ${projectId}:`, err)
+    event.returnValue = false
+  }
+})
+
+ipcMain.on('update-project-name', (event, projectId, newName) => {
+  const projects = storeProjects.get('projects') || []
+  const updatedProjects = projects.map((project) => {
+    if (project.id === projectId) {
+      return {
+        ...project,
+        book: {
+          ...project.book,
+          name: newName,
+        },
+      }
+    }
+    return project
+  })
+  storeProjects.set('projects', updatedProjects)
+  event.sender.send('project-name-updated', projectId, newName)
+})
+
+ipcMain.on('delete-project', (event, projectId) => {
+  const projectsFilePath = path.join(app.getPath('userData'), 'projects.json')
+  const projectsData = JSON.parse(fs.readFileSync(projectsFilePath, 'utf8'))
+
+  projectsData.projects = projectsData.projects.filter(
+    (project) => project.id !== projectId
+  )
+
+  fs.writeFileSync(projectsFilePath, JSON.stringify(projectsData, null, 2))
+
+  const projectDirPath = path.join(projectUrl, projectId)
+  fs.rm(projectDirPath, { recursive: true }, (err) => {
+    if (err) {
+      console.error(`Error when deleting project folder: ${err}`)
+      event.sender.send('notify', 'Error deleting project')
+      return
+    }
+    event.sender.send('notify', 'Project deleted')
+
+    event.sender.send('projects-updated', projectsData.projects)
+  })
 })
 
 ipcMain.handle('dialog:openFile', handleFileOpen)

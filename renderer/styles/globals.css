@@ -302,7 +302,7 @@
 }
 
 .btn-red {
-  @apply btn-base text-th-invalid border-th-invalid border  hover:bg-th-invalid hover:text-th-text-secondary-100;
+  @apply btn-base text-th-invalid border-th-invalid border hover:bg-th-invalid hover:text-th-text-secondary-100;
 }
 
 .step-link {

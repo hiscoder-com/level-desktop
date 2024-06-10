@@ -7,18 +7,21 @@ function Modal({
   isOpen,
   children,
   closeHandle,
+  buttons,
   className: propsClassNames = {},
   handleCloseDisabled = false,
 }) {
   const classNames = {
     ...{
       main: 'z-50 relative',
-      dialogTitle: 'text-center text-2xl font-medium leading-6',
+      dialogTitle: 'text-2xl font-medium leading-6 p-6',
       dialogPanel:
-        'w-full max-w-md p-6 align-middle transform overflow-y-auto shadow-xl transition-all bg-th-primary-100 text-th-text-secondary-100 rounded-3xl',
+        'w-full max-w-md align-middle transform overflow-hidden shadow-xl transition-all bg-th-primary-100 text-th-text-secondary-100 rounded-3xl',
       transitionChild: 'fixed inset-0 bg-opacity-25 backdrop-brightness-90',
       content:
-        'inset-0 fixed flex items-center justify-center p-4 min-h-full overflow-y-auto',
+        'inset-0 fixed flex items-center justify-center min-h-full overflow-y-auto',
+      contentBody: '',
+      buttonsContainer: 'p-6 flex justify-center',
     },
     ...propsClassNames,
   }
@@ -56,7 +59,8 @@ function Modal({
                 <Dialog.Title as="h3" className={classNames.dialogTitle}>
                   {title}
                 </Dialog.Title>
-                {children}
+                <div className={classNames.contentBody}>{children}</div>
+                <div className={classNames.buttonsContainer}>{buttons}</div>
               </Dialog.Panel>
             </Transition.Child>
           </div>
