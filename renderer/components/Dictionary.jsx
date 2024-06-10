@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 
 import { Disclosure } from '@headlessui/react'
-import { useTranslation } from 'react-i18next'
+import { useTranslation } from '@/next-i18next'
 
 import SearchAndAddWords from './SearchAndAddWords'
 import Alphabet from './Alphabet'

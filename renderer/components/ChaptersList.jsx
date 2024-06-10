@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 
 import { JsonToPdf } from '@texttree/obs-format-convert-rcl'
-import { useTranslation } from 'react-i18next'
+import { useTranslation } from '@/next-i18next'
 
 import DownloadPDF from '../public/icons/download-pdf.svg'
 
@@ -20,10 +20,7 @@ const styles = {
 }
 
 function ChapterList({ id, chapters, steps, mutate }) {
-  const {
-    i18n: { language: locale },
-    t,
-  } = useTranslation(['projects', 'common'])
+  const { t } = useTranslation(['projects', 'common'])
   const { pathname } = useRouter()
 
   const handleBackStep = (chapter, step) => {
@@ -75,12 +72,7 @@ function ChapterList({ id, chapters, steps, mutate }) {
             className="border-b border-th-secondary-200 text-th-primary-100"
           >
             <td className="p-4 pl-8">
-              <Link
-                href={`${pathname
-                  .replace('[locale]', locale)
-                  .replace('[id]', id)}/${chapter}/${step}`}
-                legacyBehavior
-              >
+              <Link href={`/account/project/${id}/${chapter}/${step}`} legacyBehavior>
                 <a className="font-bold hover:opacity-70">
                   {t('Chapter')} {chapter}
                 </a>

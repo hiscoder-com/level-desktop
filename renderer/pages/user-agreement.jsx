@@ -2,9 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 
 import { useRouter } from 'next/router'
 
-import { useTranslation } from 'next-i18next'
-import CheckBox from '../../components/CheckBox'
-import { getStaticPaths, makeStaticProperties } from '../../lib/get-static'
+import { useTranslation } from '@/next-i18next'
+import CheckBox from '../components/CheckBox'
 
 export default function UserAgreement() {
   const endOfTextRef = useRef(null)
@@ -12,10 +11,7 @@ export default function UserAgreement() {
   const [isDisabled, setIsDisabled] = useState(true)
   const [hasReadText, setHasReadText] = useState(false)
   const router = useRouter()
-  const {
-    i18n: { language: locale },
-    t,
-  } = useTranslation(['user-agreement', 'common', 'users'])
+  const { t } = useTranslation(['user-agreement', 'common', 'users'])
 
   const handleClick = async () => {
     const agreements = JSON.parse(window.electronAPI.getItem('agreements'))
@@ -23,7 +19,7 @@ export default function UserAgreement() {
       'agreements',
       JSON.stringify({ ...agreements, userAgreement: isChecked })
     )
-    router.push(`/${locale}/agreements`)
+    router.push(`/agreements`)
   }
 
   useEffect(() => {
@@ -100,7 +96,3 @@ export default function UserAgreement() {
     </div>
   )
 }
-
-export const getStaticProps = makeStaticProperties(['user-agreement', 'common', 'users'])
-
-export { getStaticPaths }

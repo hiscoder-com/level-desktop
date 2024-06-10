@@ -1,7 +1,8 @@
 import { useRef, useEffect, useState } from 'react'
 
 import { useSetRecoilState } from 'recoil'
-import { useTranslation } from 'react-i18next'
+
+import { useTranslation } from '@/next-i18next'
 
 import { inactiveState } from '../helpers/atoms'
 import Modal from './Modal'
@@ -22,6 +23,7 @@ export default function Recorder({ setIsRecording, voice, setVoice }) {
     <RecorderButton className="stroke-th-primary-200 stroke-2" />
   )
   const [buttonPlay, setButtonPlay] = useState(<PlayButton />)
+
   const audioRef = useRef(null)
 
   const startStop = () => {
