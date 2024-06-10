@@ -817,7 +817,6 @@ ipcMain.on('delete-project', (event, projectId) => {
       event.sender.send('notify', 'Error deleting project')
       return
     }
-    console.log('Project folder successfully deleted')
     event.sender.send('notify', 'Project deleted')
 
     event.sender.send('projects-updated', projectsData.projects)
