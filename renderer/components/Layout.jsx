@@ -12,14 +12,9 @@ function Layout({ children }) {
 
   const homePath = '/[locale]/home'
   const accountPath = '/[locale]/account'
-  const createPath = '/[locale]/create'
 
   const getMainClassName = () => {
-    if (
-      router.pathname === homePath ||
-      router.pathname === accountPath ||
-      router.pathname === createPath
-    ) {
+    if (router.pathname === homePath || router.pathname === accountPath) {
       return 'mx-auto min-h-screen'
     } else {
       return 'mx-auto h-[calc(100vh-5rem)] mt-20'

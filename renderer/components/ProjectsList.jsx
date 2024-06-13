@@ -29,7 +29,7 @@ const styles = {
   text: { alignment: 'justify' },
 }
 
-function ProjectsList() {
+function ProjectsList({ projectsList, setProjectsList }) {
   const {
     i18n: { language: locale },
     t,
@@ -41,7 +41,6 @@ function ProjectsList() {
   ]
 
   const { pathname } = useRouter()
-  const [projectsList, setProjectsList] = useState([])
   const [selectedOption, setSelectedOption] = useState(options[0].value)
   const [currentProject, setCurrentProject] = useState(null)
   const [isOpenModal, setIsOpenModal] = useState(false)
