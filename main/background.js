@@ -754,6 +754,8 @@ ipcMain.on('add-project', (event, url) => {
       storeProjects.set('projects', projects)
       event.sender.send('notify', 'Created')
       event.returnValue = projects
+
+      event.sender.send('project-added', id, project)
     })
   } else {
     event.sender.send('notify', 'Url not set')

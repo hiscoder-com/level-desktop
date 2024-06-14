@@ -1,28 +1,30 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react'
 
 export default function ProgressBar({ amountSteps, currentStep }) {
-  const [steps, setSteps] = useState([]);
+  const [steps, setSteps] = useState([])
 
   useEffect(() => {
-    let steps = [];
-    let step;
+    let steps = []
+    let step
     for (step = 0; step < amountSteps; step++) {
       const circle = (
         <div key={step} className="flex items-center justify-center">
           <div
             className={`step ${step < currentStep - 1 ? 'passed' : ''} ${
               step === currentStep - 1 ? 'active' : ''
-            }`}></div>
+            }`}
+          ></div>
           <div
             className={`dash ${step < currentStep - 1 ? 'active' : ''} ${
               step === amountSteps - 1 ? 'hidden' : ''
-            }`}></div>
+            }`}
+          ></div>
         </div>
-      );
-      steps.push(circle);
+      )
+      steps.push(circle)
     }
-    setSteps(steps);
-  }, [amountSteps, currentStep]);
+    setSteps(steps)
+  }, [amountSteps, currentStep])
 
   return (
     <>
@@ -33,5 +35,5 @@ export default function ProgressBar({ amountSteps, currentStep }) {
         {steps}
       </div>
     </>
-  );
+  )
 }

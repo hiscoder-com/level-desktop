@@ -77,7 +77,14 @@ process.once('loaded', () => {
       ipcRenderer.sendSync('get-tq', id, resource, mainResource, chapter),
     getTWL: (id, resource, mainResource, chapter = false) =>
       ipcRenderer.sendSync('get-twl', id, resource, mainResource, chapter),
-    addProject: (fileUrl) => ipcRenderer.send('add-project', fileUrl),
+    addProject: (fileUrl) => {
+      ipcRenderer.once('project-added', (event, projectId, project) => {
+        window.dispatchEvent(
+          new CustomEvent('project-added', { detail: { projectId, project } })
+        )
+      })
+      ipcRenderer.send('add-project', fileUrl)
+    },
     deleteProject: (projectId) => ipcRenderer.send('delete-project', projectId),
   })
 
