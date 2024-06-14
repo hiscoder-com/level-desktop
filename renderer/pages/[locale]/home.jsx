@@ -20,6 +20,6 @@ export default function Home() {
   )
 }
 
-export const getStaticProps = makeStaticProperties(['common', 'users'])
+export const getStaticProps = makeStaticProperties(['common', 'users', 'projects'])
 
 export { getStaticPaths }
