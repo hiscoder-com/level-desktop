@@ -82,7 +82,6 @@ function StepPage() {
   }
 
   const getCurrentTranslationStepIndex = (steps, currentStep) => {
-    const translationSteps = (steps || []).filter((step) => !step.isTech)
     let currentTranslationStep = 0
     let translationStepIndex = 0
 
