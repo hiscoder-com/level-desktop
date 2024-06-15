@@ -52,28 +52,28 @@ export default function UserAgreement() {
       >
         <h1 className="pt-4 text-2xl md:text-4xl">{t('users:Agreement')}:</h1>
         <div className="mt-7 text-sm">
-          <b className="font-bold">{t('License')}</b>
+          <b className="font-bold">{t('user-agreement:License')}</b>
           <p
             dangerouslySetInnerHTML={{
-              __html: t('TextLicense', {
+              __html: t('user-agreement:TextLicense', {
                 interpolation: { escapeValue: false },
               }),
             }}
             className="py-4"
           />
-          <b className="font-bold">{t('Recommendations')}</b>
+          <b className="font-bold">{t('user-agreement:Recommendations')}</b>
           <p
             dangerouslySetInnerHTML={{
-              __html: t('TextRecommendation', {
+              __html: t('user-agreement:TextRecommendation', {
                 interpolation: { escapeValue: false },
               }),
             }}
             className="py-4"
           />
-          <b className="font-bold">{t('Definition')}</b>
+          <b className="font-bold">{t('user-agreement:Definition')}</b>
           <p
             dangerouslySetInnerHTML={{
-              __html: t('TextDefinition', {
+              __html: t('user-agreement:TextDefinition', {
                 interpolation: { escapeValue: false },
               }),
             }}

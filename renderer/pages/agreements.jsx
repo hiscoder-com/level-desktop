@@ -4,8 +4,6 @@ import { useRouter } from 'next/router'
 
 import { useTranslation } from '@/next-i18next'
 
-// import { getStaticPaths, makeStaticProperties } from '@/lib/get-static'
-
 import Check from '@/public/icons/check.svg'
 
 export default function Agreements() {
@@ -94,7 +92,3 @@ export default function Agreements() {
 }
 
 Agreements.backgroundColor = 'bg-th-secondary-100'
-
-// export const getStaticProps = makeStaticProperties(['users', 'common', 'user-agreement'])
-
-// export { getStaticPaths }
