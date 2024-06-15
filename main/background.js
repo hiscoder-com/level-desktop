@@ -783,6 +783,8 @@ ipcMain.on('add-project', (event, url) => {
       storeProjects.set('projects', projects)
       event.sender.send('notify', 'Created')
       event.returnValue = projects
+
+      event.sender.send('project-added', id, project)
     })
   } else {
     event.sender.send('notify', 'Url not set')
@@ -846,7 +848,6 @@ ipcMain.on('delete-project', (event, projectId) => {
       event.sender.send('notify', 'Error deleting project')
       return
     }
-    console.log('Project folder successfully deleted')
     event.sender.send('notify', 'Project deleted')
 
     event.sender.send('projects-updated', projectsData.projects)

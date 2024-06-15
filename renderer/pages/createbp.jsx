@@ -3,7 +3,6 @@ import Head from 'next/head'
 import Link from 'next/link'
 import { useTranslation } from '@/next-i18next'
 import { books } from '../helpers/books'
-// import { makeStaticProperties, getStaticPaths } from '@/lib/get-static'
 
 function Create() {
   const { t } = useTranslation()
@@ -80,7 +79,3 @@ function Create() {
 }
 
 export default Create
-
-// export const getStaticProps = makeStaticProperties(['common'])
-
-// export { getStaticPaths }

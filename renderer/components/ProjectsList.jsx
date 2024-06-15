@@ -29,14 +29,15 @@ const styles = {
   text: { alignment: 'justify' },
 }
 
-function ProjectsList({ projects }) {
+function ProjectsList({ projectsList, setProjectsList }) {
   const { t } = useTranslation(['common', 'projects'])
+
   const options = [
     { label: t('projects:ExportToPDF'), value: 'pdf' },
     { label: t('projects:ExportToZIP'), value: 'zip' },
     { label: t('projects:ExportToUSFM'), value: 'usfm' },
   ]
-  const [projectsList, setProjectsList] = useState([])
+
   const [selectedOption, setSelectedOption] = useState(options[0].value)
   const [currentProject, setCurrentProject] = useState(null)
   const [isOpenModal, setIsOpenModal] = useState(false)

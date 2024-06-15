@@ -2,7 +2,7 @@ import React from 'react'
 
 import dynamic from 'next/dynamic'
 
-import { useTranslation } from 'react-i18next'
+import { useTranslation } from '@/next-i18next'
 
 import Modal from './Modal'
 

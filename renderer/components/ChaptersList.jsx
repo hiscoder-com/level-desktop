@@ -91,7 +91,7 @@ function ChapterList({ id, chapters, steps, mutate }) {
                   className="btn-primary text-base select-none"
                   onClick={() => handleBackStep(chapter, step)}
                 >
-                  {t('projects:BackToStep')} {step}
+                  {t('projects:BackToStep')}
                 </div>
               )}
             </td>

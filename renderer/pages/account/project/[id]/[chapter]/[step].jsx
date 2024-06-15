@@ -73,6 +73,25 @@ function StepPage() {
     }
     setChecked(false)
   }
+
+  const getTotalTranslationSteps = (steps) => {
+    return (steps || []).filter((step) => !step.isTech).length || 0
+  }
+
+  const getCurrentTranslationStepIndex = (steps, currentStep) => {
+    let currentTranslationStep = 0
+    let translationStepIndex = 0
+
+    for (let i = 0; i <= currentStep; i++) {
+      if (steps && !steps[i].isTech) {
+        currentTranslationStep = translationStepIndex
+        translationStepIndex++
+      }
+    }
+
+    return currentTranslationStep + 1
+  }
+
   return (
     <div className="w-full">
       <Breadcrumbs
@@ -107,10 +126,12 @@ function StepPage() {
       </div>
       <div className="relative flex flex-col justify-center items-center px-4 mx-auto w-full md:flex-row-reverse lg:px-0 mt-2 h-16">
         <div className="pb-3 md:pb-0">
-          <ProgressBar
-            amountSteps={project?.steps?.length}
-            currentStep={parseInt(step) + 1}
-          />
+          {project && !project.steps[step].isTech && (
+            <ProgressBar
+              amountSteps={getTotalTranslationSteps(project.steps)}
+              currentStep={getCurrentTranslationStepIndex(project.steps, parseInt(step))}
+            />
+          )}
         </div>
         <div className="absolute right-0 flex items-center h-12 md:h-16">
           <div className="flex flex-row items-center space-x-6">

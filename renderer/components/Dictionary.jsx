@@ -88,12 +88,7 @@ function Dictionary({ config: { id } }) {
     if (!activeWord) {
       return
     }
-    const timer = setTimeout(() => {
-      saveWord()
-    }, 2000)
-    return () => {
-      clearTimeout(timer)
-    }
+    saveWord()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeWord])
 
