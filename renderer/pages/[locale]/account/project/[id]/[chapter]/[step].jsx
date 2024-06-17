@@ -168,16 +168,35 @@ function classNames(...classes) {
 }
 
 function Panel({ tools, mainResource, id, chapter, toolNames, stepConfig, t }) {
+  const [isSingleTab, setIsSingleTab] = useState(false)
+
+  useEffect(() => {
+    handleTabsCount()
+  }, [tools])
+
+  const handleTabsCount = () => {
+    if (tools.length === 1) {
+      setIsSingleTab(true)
+    } else {
+      setIsSingleTab(false)
+    }
+  }
+
   return (
     <Tab.Group>
-      <Tab.List className="space-x-3 text-xs px-3 -mb-2 lg:-mb-7 flex overflow-auto">
+      <Tab.List
+        className={`flex overflow-auto text-xs -mb-2 lg:-mb-7
+      ${!isSingleTab ? 'px-3 space-x-3' : ''}
+      `}
+      >
         {tools?.map((tool, idx) => (
           <Tab
             key={tool.name + idx}
             className={({ selected }) =>
               classNames(
-                'text-xs p-1 flex-1 lg:pb-3 md:p-2 md:text-sm lg:text-base text-ellipsis overflow-hidden whitespace-nowrap',
-                selected ? 'tab-active' : 'tab-inactive'
+                'text-xs p-1 lg:pb-3 md:p-2 md:text-sm lg:text-base text-ellipsis overflow-hidden whitespace-nowrap',
+                isSingleTab ? 'flex' : 'flex-1',
+                selected ? (isSingleTab ? 'tab-single' : 'tab-active') : 'tab-inactive'
               )
             }
           >
@@ -189,14 +208,27 @@ function Panel({ tools, mainResource, id, chapter, toolNames, stepConfig, t }) {
               'personalNotes',
               'retelling',
               'dictionary',
+              'merger',
               'info',
             ].includes(tool.name) ? (
               <span title={t(tool.name)}>
-                {icons[tool.name]}
-                <span className="hidden ml-2 sm:inline">{t(tool.name)}</span>
+                {icons[tool.name] ? (
+                  <div className={`${!isSingleTab ? 'truncate' : 'px-5 sm:px-10'}`}>
+                    {icons[tool.name]}
+                    <span className="hidden ml-2 sm:inline">{t(tool.name)}</span>
+                  </div>
+                ) : (
+                  <span
+                    className={`${!isSingleTab ? 'hidden sm:inline' : 'px-10 sm:px-20'}`}
+                  >
+                    {t(tool.name)}
+                  </span>
+                )}
               </span>
             ) : (
-              toolNames[tool.config.resource]
+              <p className={`${!isSingleTab ? 'truncate' : 'px-10 sm:px-20'} `}>
+                {toolNames[tool.config.resource]}
+              </p>
             )}
           </Tab>
         ))}
@@ -205,7 +237,7 @@ function Panel({ tools, mainResource, id, chapter, toolNames, stepConfig, t }) {
         {tools?.map((tool, index) => {
           return (
             <Tab.Panel key={index}>
-              <div className="flex flex-col bg-white rounded-lg h-full">
+              <div className="flex flex-col bg-white rounded-xl h-full">
                 <Tool
                   config={{
                     mainResource,
@@ -215,6 +247,7 @@ function Panel({ tools, mainResource, id, chapter, toolNames, stepConfig, t }) {
                     wholeChapter: stepConfig.whole_chapter,
                   }}
                   toolName={tool.name}
+                  isSingleTab={isSingleTab}
                 />
               </div>
             </Tab.Panel>

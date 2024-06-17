@@ -258,10 +258,15 @@
 }
 
 .tab {
-  @apply py-2 px-2 text-base border-x border-t rounded-t-2xl;
+  @apply py-2 px-2 text-base border-x border-t rounded-t-xl;
 }
 .tab-active {
   @apply tab text-th-text-secondary-100 bg-th-primary-400 border-th-primary-400
+  cursor-default focus:outline-none shadow;
+}
+
+.tab-single {
+  @apply tab text-th-text-secondary-100 bg-th-primary-200 border-th-primary-400
   cursor-default focus:outline-none shadow;
 }
 
