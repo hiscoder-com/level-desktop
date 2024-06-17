@@ -11,7 +11,6 @@ import ProgressBar from '@/components/ProgressBar'
 
 import { useRecoilValue } from 'recoil'
 
-// import { makeStaticProperties } from '@/lib/get-static'
 import { inactiveState } from '@/helpers/atoms'
 
 import Dict from '@/public/icons/dictionary.svg'
@@ -223,9 +222,3 @@ function Panel({ tools, mainResource, id, chapter, toolNames, stepConfig, t }) {
 }
 
 export default StepPage
-
-// export const getStaticProps = makeStaticProperties(['common', 'projects'])
-
-// export async function getStaticPaths() {
-//   return { paths: [], fallback: true }
-// }
