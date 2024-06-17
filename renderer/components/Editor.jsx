@@ -1,27 +1,25 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react'
 
-import { obsCheckAdditionalVerses } from "./Bible";
+import { obsCheckAdditionalVerses } from './Bible'
 
 function Editor({ config: { id, chapter = false, wholeChapter } }) {
-  const [verseObjects, setVerseObjects] = useState([]);
+  const [verseObjects, setVerseObjects] = useState([])
 
   useEffect(() => {
-    const savedVerses = Object.entries(
-      window.electronAPI.getChapter(id, chapter)
-    ).map(([k, v]) => ({ num: k, verse: v.text, enabled: v.enabled }));
+    const savedVerses = Object.entries(window.electronAPI.getChapter(id, chapter)).map(
+      ([k, v]) => ({ num: k, verse: v.text, enabled: v.enabled })
+    )
 
-    setVerseObjects(
-      wholeChapter ? savedVerses : savedVerses.filter((v) => v.enabled)
-    );
-  }, [id, chapter]);
+    setVerseObjects(wholeChapter ? savedVerses : savedVerses.filter((v) => v.enabled))
+  }, [id, chapter])
 
   const updateVerse = (idx, verseNum, text) => {
     setVerseObjects((prev) => {
-      prev[idx].verse = text;
-      window.electronAPI.updateVerse(id, chapter, verseNum.toString(), text);
-      return [...prev];
-    });
-  };
+      prev[idx].verse = text
+      window.electronAPI.updateVerse(id, chapter, verseNum.toString(), text)
+      return [...prev]
+    })
+  }
   return (
     <div>
       {verseObjects.map((verseObject, idx) => (
@@ -36,20 +34,20 @@ function Editor({ config: { id, chapter = false, wholeChapter } }) {
       ))}
       <div className="select-none">ㅤ</div>
     </div>
-  );
+  )
 }
 
-export default Editor;
+export default Editor
 
 export function AutoSizeTextArea({ updateVerse, verseObject, idx }) {
-  const [startValue, setStartValue] = useState(false);
+  const [startValue, setStartValue] = useState(false)
 
   useEffect(() => {
     if (startValue === false) {
-      setStartValue(verseObject.verse?.trim());
+      setStartValue(verseObject.verse?.trim())
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [verseObject.verse]);
+  }, [verseObject.verse])
 
   return (
     <div
@@ -57,19 +55,19 @@ export function AutoSizeTextArea({ updateVerse, verseObject, idx }) {
       contentEditable={true}
       suppressContentEditableWarning={true}
       onBlur={(el) => {
-        updateVerse(idx, verseObject.num, el.target.innerText.trim());
+        updateVerse(idx, verseObject.num, el.target.innerText.trim())
       }}
       onInput={(e) => {
-        if (["historyUndo", "historyRedo"].includes(e.nativeEvent.inputType)) {
-          updateVerse(idx, verseObject.num, e.target.innerText.trim());
+        if (['historyUndo', 'historyRedo'].includes(e.nativeEvent.inputType)) {
+          updateVerse(idx, verseObject.num, e.target.innerText.trim())
         }
       }}
-      className={`block w-full mx-3 focus:outline-none focus:inline-none whitespace-pre-line focus:bg-white  ${
-        verseObject.verse ? "" : "bg-gray-300"
+      className={`block w-full mx-3 focus:outline-none focus:inline-none whitespace-pre-line focus:bg-th-secondary-10  ${
+        verseObject.verse ? '' : 'bg-th-secondary-200'
       }`}
       // eslint-disable-next-line prettier/prettier
     >
       {startValue}
     </div>
-  );
+  )
 }

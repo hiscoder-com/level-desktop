@@ -1,20 +1,15 @@
 import { useEffect, useState } from 'react'
 import Head from 'next/head'
 import Link from 'next/link'
-import { useTranslation } from 'react-i18next'
+import { useTranslation } from '@/next-i18next'
 
-import { getStaticPaths, makeStaticProperties } from '../../../lib/get-static'
+import ProjectsList from '@/components/ProjectsList'
+import Modal from '@/components/Modal'
 
-import ProjectsList from '../../../components/ProjectsList'
-import Modal from '../../../components/Modal'
-
-import VcanaLogo from '../../../public/icons/vcana-logo-color.svg'
+import VcanaLogo from '@/public/icons/vcana-logo-color.svg'
 
 export default function Account() {
-  const {
-    i18n: { language: locale },
-    t,
-  } = useTranslation(['common', 'projects'])
+  const { t } = useTranslation(['common', 'projects'])
 
   const [projectsList, setProjectsList] = useState([])
   const [isOpenImportModal, setIsOpenImportModal] = useState(false)
@@ -23,10 +18,6 @@ export default function Account() {
   const onSubmit = (e) => {
     e.preventDefault()
     window.electronAPI.addProject(fileUrl)
-  }
-
-  if (!locale) {
-    return <p>{t('Loading')}</p>
   }
 
   useEffect(() => {
@@ -50,7 +41,7 @@ export default function Account() {
         <title>{t('V-CANA')}</title>
       </Head>
       <div className="text-2xl w-full">
-        <Link href={`/${locale}/home`} legacyBehavior>
+        <Link href={`/home`} legacyBehavior>
           <a>
             <VcanaLogo className="w-32 pt-6" />
           </a>
@@ -106,7 +97,3 @@ export default function Account() {
     </>
   )
 }
-
-export const getStaticProps = makeStaticProperties(['common', 'projects'])
-
-export { getStaticPaths }

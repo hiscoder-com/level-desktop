@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 
-import { useTranslation } from 'next-i18next'
+import { useTranslation } from '@/next-i18next'
 
 import LanguageSwitcher from './LanguageSwitcher'
 
@@ -11,36 +11,33 @@ import Gear from '../public/icons/gear.svg'
 export default function StartPage() {
   const router = useRouter()
 
-  const {
-    i18n: { language: locale },
-    t,
-  } = useTranslation()
+  const { t } = useTranslation('users')
 
   const checkAgreements = () => {
     const agreements = window.electronAPI.getItem('agreements')
     if (!agreements) {
-      return router.push(`/${locale}/agreements`)
+      return router.push(`/agreements`)
     }
     const agreementsObj = JSON.parse(agreements)
     const allAgreed = agreementsObj.userAgreement && agreementsObj.confession
 
-    router.push(allAgreed ? `/${locale}/account` : `/${locale}/agreements`)
+    router.push(allAgreed ? `/account` : `/agreements`)
   }
   return (
-    <div className="relative flex flex-col justify-center items-center gap-4 h-screen w-full mx-auto max-w-7xl ">
+    <div className="relative flex flex-col justify-center items-center gap-4 h-screen w-full mx-auto max-w-7xl">
       <div className="w-full absolute flex justify-between items-center top-10">
         <LanguageSwitcher />
-        <Link href={`/${locale}/chapter-merger`}>
+        <Link href={`/chapter-merger`}>
           <Gear className="w-10 h-10" />
         </Link>
       </div>
 
       <div>
-        <div className="flex flex-grow items-center justify-center p-5 h-24 bg-white rounded-2xl cursor-pointer mb-4">
+        <div className="flex flex-grow items-center justify-center p-5 h-32 bg-th-secondary-10 rounded-2xl cursor-pointer mb-4">
           <VcanaLogo className="w-44" />
         </div>
         <div
-          className="h-32 rounded-2xl bg-slate-550"
+          className="h-24 rounded-2xl bg-th-primary-200"
           onClick={() => {
             checkAgreements()
           }}
