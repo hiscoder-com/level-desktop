@@ -1,6 +1,7 @@
-import JSZip from 'jszip'
 import { useRef, useState } from 'react'
-import ChaptersMerger from './ChaptersMerger'
+
+import JSZip from 'jszip'
+
 import Close from '../public/icons/close.svg'
 
 function Merger({ config }) {
@@ -51,6 +52,7 @@ function Merger({ config }) {
       console.error('Error reading ZIP file:', error)
     }
   }
+
   const merge = () => {
     window.electronAPI.updateChapter(
       config.id,
@@ -61,21 +63,33 @@ function Merger({ config }) {
 
   return (
     <div className="flex flex-col gap-4">
-      <button onClick={() => exportChapterToZip()} className="btn-primary w-fit">
-        Export archive
-      </button>
-
+      <div className="flex gap-2.5 pb-4 border-b">
+        <button onClick={() => exportChapterToZip()} className="w-fit btn-strong">
+          Export your archive
+        </button>
+        <button className="w-fit btn-strong" onClick={() => fileInputRef.current.click()}>
+          Import moderated archive
+        </button>
+        <button
+          onClick={() => merge()}
+          className="btn-strong w-fit"
+          disabled={!importedChapter}
+        >
+          Merge with your verses
+        </button>
+      </div>
       <input
         ref={fileInputRef}
         type="file"
         onChange={(e) => e.target.files.length > 0 && importChapter(e.target.files)}
+        style={{ display: 'none' }}
       />
 
       {importedChapter && (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5 py-4 px-5 border w-fit rounded-full border-th-text-primary">
           <p>Chapter {Object.keys(importedChapter)[0]}</p>
           <Close
-            className="w-5 h-5 cursor-pointer"
+            className="w-5 h-5 cursor-pointer stroke-2"
             onClick={() => {
               setImportedChapter(null)
               if (fileInputRef.current) {
@@ -85,14 +99,6 @@ function Merger({ config }) {
           />
         </div>
       )}
-      <button
-        onClick={() => merge()}
-        className="btn-primary w-fit"
-        disabled={!importedChapter}
-      >
-        Merge with your verses
-      </button>
-      <ChaptersMerger />
     </div>
   )
 }

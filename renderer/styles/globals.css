@@ -294,6 +294,10 @@
   disabled:text-th-text-secondary-100 disabled:cursor-default;
 }
 
+.btn-strong {
+  @apply rounded-md py-2.5 px-4 text-center cursor-pointer text-sm md:text-base text-th-text-secondary-100 bg-th-primary-200 hover:opacity-70 disabled:opacity-50 disabled:cursor-auto;
+}
+
 .btn-secondary {
   @apply btn-base text-th-text-primary bg-th-secondary-10 hover:opacity-70;
 }
