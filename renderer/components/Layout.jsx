@@ -3,6 +3,7 @@ import { Fragment, useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 
 import { Transition } from '@headlessui/react'
+import { Toaster } from 'react-hot-toast'
 
 import Progress from '../public/icons/progress.svg'
 
@@ -50,6 +51,8 @@ function Layout({ children }) {
         </Transition>
         <main>{children}</main>
       </div>
+
+      <Toaster />
     </>
   )
 }

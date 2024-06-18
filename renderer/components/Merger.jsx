@@ -1,12 +1,27 @@
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 
 import JSZip from 'jszip'
+import toast from 'react-hot-toast'
 
 import Close from '../public/icons/close.svg'
 
 function Merger({ config }) {
   const [importedChapter, setImportedChapter] = useState(null)
+
   const fileInputRef = useRef()
+
+  useEffect(() => {
+    const handleUpdate = () => {
+      setImportedChapter(null)
+    }
+
+    window.electronAPI.onUpdateChapter(handleUpdate)
+
+    return () => {
+      window.electronAPI.onUpdateChapter(null)
+    }
+  }, [])
+
   const exportChapterToZip = () => {
     const chapter = window.electronAPI.getChapter(config.id, config.chapter)
     try {
@@ -59,6 +74,7 @@ function Merger({ config }) {
       config.chapter,
       Object.values(importedChapter)[0]
     )
+    toast.success('Chapter updated successfully') // TODO translate this
   }
 
   return (
@@ -67,7 +83,11 @@ function Merger({ config }) {
         <button onClick={() => exportChapterToZip()} className="w-fit btn-strong">
           Export your archive
         </button>
-        <button className="w-fit btn-strong" onClick={() => fileInputRef.current.click()}>
+        <button
+          className="w-fit btn-strong"
+          onClick={() => fileInputRef.current.click()}
+          disabled={importedChapter}
+        >
           Import moderated archive
         </button>
         <button
