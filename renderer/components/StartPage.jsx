@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 
-import { useTranslation } from 'next-i18next'
+import { useTranslation } from '@/next-i18next'
 
 import LanguageSwitcher from './LanguageSwitcher'
 
@@ -11,32 +11,29 @@ import Gear from '../public/icons/gear.svg'
 export default function StartPage() {
   const router = useRouter()
 
-  const {
-    i18n: { language: locale },
-    t,
-  } = useTranslation(['projects', 'users'])
+  const { t } = useTranslation(['projects', 'users'])
 
   const checkAgreements = () => {
     const agreements = window.electronAPI.getItem('agreements')
     if (!agreements) {
-      return router.push(`/${locale}/agreements`)
+      return router.push(`/agreements`)
     }
     const agreementsObj = JSON.parse(agreements)
     const allAgreed = agreementsObj.userAgreement && agreementsObj.confession
 
-    router.push(allAgreed ? `/${locale}/account` : `/${locale}/agreements`)
+    router.push(allAgreed ? `/account` : `/agreements`)
   }
   return (
     <div className="relative flex flex-col justify-center items-center gap-4 h-screen w-full mx-auto max-w-7xl ">
       <div className="absolute top-10 right-0">
-        <Link href={`/${locale}/chapter-merger`}>
+        <Link href={`/chapter-merger`}>
           <Gear className="w-10 h-10" />
         </Link>
       </div>
 
       <div className="w-72">
         <div className="flex flex-grow items-center justify-between p-5 h-20 bg-white rounded-3xl cursor-pointer mb-4">
-          <p className="font-semibold text-xl">{t('Language')}</p>
+          <p className="font-semibold text-xl">{t('projects:Language')}</p>
           <LanguageSwitcher />
         </div>
         <div className="flex flex-grow items-center justify-center p-5 h-32 bg-white rounded-3xl cursor-pointer mb-4">

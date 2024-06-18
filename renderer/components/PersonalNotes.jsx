@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 
 import dynamic from 'next/dynamic'
-import { useTranslation } from 'react-i18next'
+import { useTranslation } from '@/next-i18next'
 
 import { useGetPersonalNotes } from '../hooks/useGetPersonalNotes'
 import Modal from './Modal'

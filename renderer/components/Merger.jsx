@@ -1,11 +1,14 @@
 import { useRef, useState, useEffect } from 'react'
 
+import { useTranslation } from '@/next-i18next'
+
 import JSZip from 'jszip'
 import toast from 'react-hot-toast'
 
 import Close from '../public/icons/close.svg'
 
 function Merger({ config }) {
+  const { t } = useTranslation(['common', 'projects'])
   const [importedChapter, setImportedChapter] = useState(null)
 
   const fileInputRef = useRef()
@@ -74,30 +77,31 @@ function Merger({ config }) {
       config.chapter,
       Object.values(importedChapter)[0]
     )
-    toast.success('Chapter updated successfully') // TODO translate this
+    toast.success(t('ChapterUpdated'))
   }
 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex gap-2.5 pb-4 border-b">
         <button onClick={() => exportChapterToZip()} className="w-fit btn-strong">
-          Export your archive
+          {t('ExportArchive')}
         </button>
         <button
           className="w-fit btn-strong"
           onClick={() => fileInputRef.current.click()}
           disabled={importedChapter}
         >
-          Import moderated archive
+          {t('ImportArchive')}
         </button>
         <button
           onClick={() => merge()}
           className="btn-strong w-fit"
           disabled={!importedChapter}
         >
-          Merge with your verses
+          {t('MergeVerses')}
         </button>
       </div>
+
       <input
         ref={fileInputRef}
         type="file"
@@ -107,7 +111,9 @@ function Merger({ config }) {
 
       {importedChapter && (
         <div className="flex items-center gap-2.5 py-4 px-5 border w-fit rounded-full border-th-text-primary">
-          <p>Chapter {Object.keys(importedChapter)[0]}</p>
+          <p>
+            {t('Projects:Chapter')} {Object.keys(importedChapter)[0]}
+          </p>
           <Close
             className="w-5 h-5 cursor-pointer stroke-2"
             onClick={() => {

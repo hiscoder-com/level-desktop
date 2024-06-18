@@ -27,6 +27,7 @@
     "fs-extra": "^11.2.0",
     "github-markdown-css": "^5.5.1",
     "i18next": "^23.11.2",
+    "i18next-electron-fs-backend": "^3.0.2",
     "jszip": "^3.10.1",
     "localforage": "^1.10.0",
     "next-i18next": "^15.3.0",

@@ -2,18 +2,14 @@ import { useState, useEffect } from 'react'
 
 import { useRouter } from 'next/router'
 
-import { useTranslation } from 'next-i18next'
-import { getStaticPaths, makeStaticProperties } from '../../lib/get-static'
+import { useTranslation } from '@/next-i18next'
 
 import CheckBox from '/components/CheckBox'
 
 import LeftArrow from '/public/icons/arrow-left.svg'
 
 export default function ConfessionSteps() {
-  const {
-    i18n: { language: locale },
-    t,
-  } = useTranslation(['confession-steps', 'common', 'users'])
+  const { t } = useTranslation(['confession-steps', 'common', 'users'])
   const router = useRouter()
   const [isChecked, setIsChecked] = useState(false)
   const [page, setPage] = useState(0)
@@ -21,31 +17,40 @@ export default function ConfessionSteps() {
   const confessionSteps = [
     <p
       dangerouslySetInnerHTML={{
-        __html: t('Step1', { interpolation: { escapeValue: false } }),
+        __html: t('confession-steps:Step1', { interpolation: { escapeValue: false } }),
       }}
       key={1}
       className="text-center"
     />,
     <ul key={2} className="list-disc">
-      <li className="pb-5">{t('Step2.li1')}</li>
-      <li className="pb-5">{t('Step2.li2')}</li>
-      <li>{t('Step2.li3')}</li>
+      {Object.entries(t('confession-steps:Step2')).map(([key, value]) => (
+        <li key={key} className="pb-5">
+          {value}
+        </li>
+      ))}
     </ul>,
     <ul key={3} className="list-disc">
-      <li className="pb-5">{t('Step3.li1')}</li>
-      <li>{t('Step3.li2')}</li>
+      {Object.entries(t('confession-steps:Step3')).map(([key, value]) => (
+        <li key={key} className="pb-5">
+          {value}
+        </li>
+      ))}
     </ul>,
     <ul key={4} className="list-disc">
-      <li className="pb-5">{t('Step4.li1')}</li>
-      <li className="pb-5">{t('Step4.li2')}</li>
-      <li>{t('Step4.li3')}</li>
+      {Object.entries(t('confession-steps:Step4')).map(([key, value]) => (
+        <li key={key} className="pb-5">
+          {value}
+        </li>
+      ))}
     </ul>,
     <ul key={5} className="list-disc">
-      <li className="pb-5">{t('Step5.li1')}</li>
-      <li className="pb-5">{t('Step5.li2')}</li>
-      <li>{t('Step5.li3')}</li>
+      {Object.entries(t('confession-steps:Step5')).map(([key, value]) => (
+        <li key={key} className="pb-5">
+          {value}
+        </li>
+      ))}
     </ul>,
-    <p key={6}>{t('Step6')}</p>,
+    <p key={6}>{t('confession-steps:Step6')}</p>,
   ]
 
   const prevPage = () => {
@@ -83,7 +88,7 @@ export default function ConfessionSteps() {
       'agreements',
       JSON.stringify({ ...agreements, confession: isChecked })
     )
-    router.push(`/${locale}/agreements`)
+    router.push(`/agreements`)
   }
 
   return (
@@ -126,11 +131,3 @@ export default function ConfessionSteps() {
     </div>
   )
 }
-
-export const getStaticProps = makeStaticProperties([
-  'confession-steps',
-  'common',
-  'users',
-])
-
-export { getStaticPaths }

@@ -1,45 +1,46 @@
-import ReactMarkdown from 'react-markdown';
+import ReactMarkdown from 'react-markdown'
 
-import rehypeRaw from 'rehype-raw';
-import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw'
+import remarkGfm from 'remark-gfm'
 
-import 'github-markdown-css/github-markdown-light.css';
+import 'github-markdown-css/github-markdown-light.css'
 
 export const fixUrl = (content) => {
   if (!content) {
-    return;
+    return
   }
-  const links = content.match(/\[{2}\S+\]{2}/g);
+  const links = content.match(/\[{2}\S+\]{2}/g)
   if (!links) {
-    return content;
+    return content
   }
-  let contentWithUrl = content;
+  let contentWithUrl = content
 
   links.forEach((el) => {
     const changeUrl = contentWithUrl
       .replace('[[', `[${el.replace(/\[{2}|\]{2}/g, '')}](`)
-      .replace(']]', ')');
-    contentWithUrl = changeUrl;
-  });
+      .replace(']]', ')')
+    contentWithUrl = changeUrl
+  })
 
-  return contentWithUrl;
-};
+  return contentWithUrl
+}
 
 function MarkdownExtended({ children }) {
-  const content = (typeof children === 'string' ? fixUrl(children) : '')
+  // const content = (typeof children === 'string' ? fixUrl(children) : '')
+  const content = (typeof children === 'string' ? children : '')
     .replace(/< *br *\/?>/gi, '\n')
     .replaceAll('\\n', '\n')
-    .replaceAll('rc://', 'http://');
+  // .replaceAll('rc://', 'http://');
 
   const convertYoutube = (props) => {
     function getVideoID(userInput) {
       var res = userInput.match(
         /^.*(?:(?:youtu.be\/)|(?:v\/)|(?:\/u\/\w\/)|(?:embed\/)|(?:watch\?))\??v?=?([^#\&\?]*).*/
-      );
-      if (res) return res[1];
-      return false;
+      )
+      if (res) return res[1]
+      return false
     }
-    const youtubeId = getVideoID(props?.href);
+    const youtubeId = getVideoID(props?.href)
     if (youtubeId) {
       return (
         <iframe
@@ -51,25 +52,27 @@ function MarkdownExtended({ children }) {
             width: '100%',
             aspectRatio: '16/9',
             outline: 'none',
-          }}></iframe>
-      );
+          }}
+        ></iframe>
+      )
     }
 
     if (props.href.indexOf('tn/help/') > 0) {
-      return <b>{props.children}</b>;
+      return <b>{props.children}</b>
     }
     // надо проверить что ссылка ведет именно на академию. Из материалов будет скорее всего абсолютная ссылка, но внутри академии будут скорее всего относительные. Надо это учесть. Можно записать все папки. У академии и у вордсов они отличаются
     return (
       <a
         href={props.href}
         onClick={(e) => {
-          e.preventDefault();
-          alert(props.href);
-        }}>
+          e.preventDefault()
+          alert(props.href)
+        }}
+      >
         {props.children}
       </a>
-    );
-  };
+    )
+  }
 
   return (
     <ReactMarkdown
@@ -78,10 +81,11 @@ function MarkdownExtended({ children }) {
       components={{
         a: convertYoutube,
       }}
-      remarkPlugins={[remarkGfm]}>
+      remarkPlugins={[remarkGfm]}
+    >
       {content}
     </ReactMarkdown>
-  );
+  )
 }
 
-export default MarkdownExtended;
+export default MarkdownExtended

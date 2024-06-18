@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-import { useTranslation } from 'react-i18next'
+import { useTranslation } from '@/next-i18next'
 import jszip from 'jszip'
 
 import { JsonToPdf } from '@texttree/obs-format-convert-rcl'
@@ -30,17 +30,14 @@ const styles = {
 }
 
 function ProjectsList({ projectsList, setProjectsList }) {
-  const {
-    i18n: { language: locale },
-    t,
-  } = useTranslation(['common', 'projects'])
+  const { t } = useTranslation(['common', 'projects'])
+
   const options = [
     { label: t('projects:ExportToPDF'), value: 'pdf' },
     { label: t('projects:ExportToZIP'), value: 'zip' },
     { label: t('projects:ExportToUSFM'), value: 'usfm' },
   ]
 
-  const { pathname } = useRouter()
   const [selectedOption, setSelectedOption] = useState(options[0].value)
   const [currentProject, setCurrentProject] = useState(null)
   const [isOpenModal, setIsOpenModal] = useState(false)
@@ -253,10 +250,7 @@ function ProjectsList({ projectsList, setProjectsList }) {
               className="border-b border-th-secondary-200 text-th-primary-100"
             >
               <td className="p-4 pl-8">
-                <Link
-                  href={`${pathname.replace('[locale]', locale)}/project/${project.id}`}
-                  legacyBehavior
-                >
+                <Link href={`/account/project/${project.id}`} legacyBehavior>
                   <a className="font-bold hover:opacity-70">
                     {project.book.name} ({project.book.code})
                   </a>

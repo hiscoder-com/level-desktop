@@ -2,24 +2,23 @@ import React, { useEffect, useState } from 'react'
 
 import { useRouter } from 'next/router'
 
-import { useTranslation } from 'react-i18next'
+import { useTranslation } from '@/next-i18next'
 import { Tab } from '@headlessui/react'
-import Tool from '../../../../../../components/Tool'
-import CheckBox from '../../../../../../components/CheckBox'
-import Breadcrumbs from '../../../../../../components/Breadcrumbs'
-import ProgressBar from '../../../../../../components/ProgressBar'
+import Tool from '@/components/Tool'
+import CheckBox from '@/components/CheckBox'
+import Breadcrumbs from '@/components/Breadcrumbs'
+import ProgressBar from '@/components/ProgressBar'
 
 import { useRecoilValue } from 'recoil'
 
-import { makeStaticProperties } from '../../../../../../lib/get-static'
-import { inactiveState } from '../../../../../../helpers/atoms'
+import { inactiveState } from '@/helpers/atoms'
 
-import Dict from '../../../../../../public/icons/dictionary.svg'
-import Notepad from '../../../../../../public/icons/notepad.svg'
-import Audio from '../../../../../../public/icons/audio.svg'
-import Pencil from '../../../../../../public/icons/editor-pencil.svg'
-import Info from '../../../../../../public/icons/info.svg'
-import TeamNote from '../../../../../../public/icons/team-note.svg'
+import Dict from '@/public/icons/dictionary.svg'
+import Notepad from '@/public/icons/notepad.svg'
+import Audio from '@/public/icons/audio.svg'
+import Pencil from '@/public/icons/editor-pencil.svg'
+import Info from '@/public/icons/info.svg'
+import TeamNote from '@/public/icons/team-note.svg'
 
 const sizes = {
   1: 'lg:w-1/6',
@@ -43,10 +42,7 @@ const icons = {
 }
 
 function StepPage() {
-  const {
-    i18n: { language: locale },
-    t,
-  } = useTranslation()
+  const { t } = useTranslation()
   const {
     query: { id, chapter, step },
     push,
@@ -70,9 +66,9 @@ function StepPage() {
     const nextStep = window.electronAPI.goToStep(id, chapter, parseInt(step) + 1)
 
     if (nextStep !== parseInt(step)) {
-      push(`/${locale}/account/project/${id}/${chapter}/${nextStep}`)
+      push(`/account/project/${id}/${chapter}/${nextStep}`)
     } else {
-      push(`/${locale}/account/project/${id}`)
+      push(`/account/project/${id}`)
     }
     setChecked(false)
   }
@@ -100,7 +96,7 @@ function StepPage() {
       <Breadcrumbs
         links={[
           {
-            href: `/${locale}/account/project/${id}`,
+            href: `/account/project/${id}`,
             title: `${project?.book?.name} ${chapter}`,
           },
         ]}
@@ -259,9 +255,3 @@ function Panel({ tools, mainResource, id, chapter, toolNames, stepConfig, t }) {
 }
 
 export default StepPage
-
-export const getStaticProps = makeStaticProperties(['common', 'projects'])
-
-export async function getStaticPaths() {
-  return { paths: [], fallback: 'blocking' }
-}

@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react'
-import { useTranslation } from 'react-i18next'
+import { useTranslation } from '@/next-i18next'
 
 import JSZip from 'jszip'
 
@@ -230,14 +230,14 @@ export default function ChaptersMerger({ book }) {
             <p>{t('projects:NoConflicts')}</p>
             <div className="flex gap-2 items-center justify-center">
               <button className="btn-primary" onClick={() => downloadUsfm(mergedContent)}>
-                USFM
+                {t('USFM')}
               </button>
 
               <button
                 className="btn-primary"
                 onClick={() => exportToZip(mergedContent, 'merged')}
               >
-                Архив для переводчиков
+                {t('ArchiveTranslators')}
               </button>
             </div>
           </div>

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 
 import dynamic from 'next/dynamic'
 
-import { useTranslation } from 'react-i18next'
+import { useTranslation } from '@/next-i18next'
 
 import { useGetTeamNotes } from '../hooks/useGetTeamNotes'
 import { convertNotesToTree, generateUniqueId } from '../helpers/noteEditor'

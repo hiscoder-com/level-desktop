@@ -2,17 +2,12 @@ import { useEffect, useState } from 'react'
 
 import { useRouter } from 'next/router'
 
-import { useTranslation } from 'next-i18next'
+import { useTranslation } from '@/next-i18next'
 
-import { getStaticPaths, makeStaticProperties } from '../../lib/get-static'
-
-import Check from '../../public/icons/check.svg'
+import Check from '@/public/icons/check.svg'
 
 export default function Agreements() {
-  const {
-    i18n: { language: locale },
-    t,
-  } = useTranslation(['users', 'common', 'user-agreement'])
+  const { t } = useTranslation(['users', 'common', 'user-agreement'])
   const { push } = useRouter()
   const [agreements, setAgreements] = useState({
     userAgreement: false,
@@ -57,10 +52,10 @@ export default function Agreements() {
                   ? 'bg-th-primary-100 text-th-text-secondary-100'
                   : 'bg-th-secondary-200 text-th-text-primary'
               } cursor-pointer rounded-md`}
-              onClick={() => push(`/${locale}/${agreement.link}`)}
+              onClick={() => push(`/${agreement.link}`)}
             >
               <div
-                className={`absolute top-0 right-0 w-0 h-0 border-[24px] border-solid border-transparent 
+                className={`absolute top-0 right-0 w-0 h-0 border-[24px] border-solid border-transparent
               ${
                 agreement.done
                   ? 'border-b-th-primary-400 border-l-th-primary-400'
@@ -85,7 +80,7 @@ export default function Agreements() {
         </div>
 
         <button
-          onClick={() => push(`/${locale}/account`)}
+          onClick={() => push(`/account`)}
           disabled={!agreements?.userAgreement || !agreements?.confession}
           className="btn-primary"
         >
@@ -97,7 +92,3 @@ export default function Agreements() {
 }
 
 Agreements.backgroundColor = 'bg-th-secondary-100'
-
-export const getStaticProps = makeStaticProperties(['users', 'common', 'user-agreement'])
-
-export { getStaticPaths }

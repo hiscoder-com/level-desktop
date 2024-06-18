@@ -11,8 +11,8 @@ function Layout({ children }) {
   const [loadingPage, setLoadingPage] = useState(false)
   const router = useRouter()
 
-  const homePath = '/[locale]/home'
-  const accountPath = '/[locale]/account'
+  const homePath = '/home'
+  const accountPath = '/account'
 
   const getMainClassName = () => {
     if (router.pathname === homePath || router.pathname === accountPath) {

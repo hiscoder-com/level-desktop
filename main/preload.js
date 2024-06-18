@@ -9,6 +9,11 @@ process.once('loaded', () => {
         handler(data)
       }),
     removeNotify: () => ipcRenderer.removeAllListeners('notify'),
+    localeChanged: (handler) =>
+      ipcRenderer.on('localeChanged', (event, data) => {
+        handler(data)
+      }),
+    removeLocaleChanged: () => ipcRenderer.removeAllListeners('localeChanged'),
     getProjects: () => ipcRenderer.sendSync('get-projects'),
     getProject: (id) => ipcRenderer.sendSync('get-project', id),
     getProperties: (projectId) => ipcRenderer.sendSync('get-properties', projectId),
@@ -41,6 +46,8 @@ process.once('loaded', () => {
     addWord: (projectid, wordid) => ipcRenderer.sendSync('add-word', projectid, wordid),
     updateWord: (projectid, word) => ipcRenderer.sendSync('update-word', projectid, word),
     getWord: (projectid, wordid) => ipcRenderer.sendSync('get-word', projectid, wordid),
+    getI18n: (ns) => ipcRenderer.sendSync('get-i18n', ns),
+    getLang: () => ipcRenderer.sendSync('get-lang'),
     getWordsWithData: (projectid, wordids) =>
       ipcRenderer.sendSync('get-words-with-data', projectid, wordids),
     importWord: (projectid, note) => ipcRenderer.sendSync('import-word', projectid, note),

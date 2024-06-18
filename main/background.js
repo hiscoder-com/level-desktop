@@ -66,14 +66,11 @@ async function handleConfigOpen() {
     },
   })
 
-  const locale = localeStore.get('locale', i18next.i18n.defaultLocale)
-
   if (isProd) {
-    await mainWindow.loadURL(`app://./${locale}/home`)
+    await mainWindow.loadURL(`app://./home`)
   } else {
     const port = process.argv[2]
-    await mainWindow.loadURL(`http://localhost:${port}/${locale}/home`)
-    // mainWindow.webContents.openDevTools();
+    await mainWindow.loadURL(`http://localhost:${port}/home`)
   }
 })()
 
@@ -213,6 +210,38 @@ ipcMain.on('update-word', (event, projectid, word) => {
   )
   event.returnValue = word.id
   event.sender.send('notify', 'Updated')
+})
+
+ipcMain.on('get-lang', (event) => {
+  event.returnValue = localeStore.get('locale', i18next.i18n.defaultLocale)
+})
+
+ipcMain.on('get-i18n', (event, ns = 'common') => {
+  const lang = localeStore.get('locale', i18next.i18n.defaultLocale)
+  let res = {}
+  let fileDest
+  if (isProd) {
+    fileDest = path.join(__dirname, 'locales/')
+  } else {
+    fileDest = path.resolve('./renderer/public/locales/')
+  }
+
+  if (Array.isArray(ns)) {
+    ns.forEach((n) => {
+      res[n] = JSON.parse(
+        fs.readFileSync(path.join(fileDest, lang, n + '.json'), {
+          encoding: 'utf-8',
+        })
+      )
+    })
+  } else {
+    res[ns] = JSON.parse(
+      fs.readFileSync(path.join(fileDest, lang, ns + '.json'), {
+        encoding: 'utf-8',
+      })
+    )
+  }
+  event.returnValue = res
 })
 
 ipcMain.on('get-word', (event, projectid, wordid) => {

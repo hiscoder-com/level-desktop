@@ -1,6 +1,6 @@
 import dynamic from 'next/dynamic'
 
-import { useTranslation } from 'react-i18next'
+import { useTranslation } from '@/next-i18next'
 
 import Close from '../public/icons/close.svg'
 import Plus from '../public/icons/plus.svg'
