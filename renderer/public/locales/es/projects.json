@@ -43,6 +43,7 @@
   "Resume": "Resumen",
   "SaveProject": "Save the project",
   "SelectArchiveProject": "Seleccionar archivo con proyecto",
+  "SelectFiles": "Seleccionar archivos para crear un archivo",
   "Step": "Paso",
   "StepBack": "Paso atrás",
   "Title": "Project name",
@@ -55,5 +56,6 @@
   "Translator": "translator",
   "Translators": "Traductores",
   "V-CANAProjects": "V-CANA projects",
-  "Verse": "Verso"
+  "Verse": "Verso",
+  "VerseMerge": "fusión de versos"
 }

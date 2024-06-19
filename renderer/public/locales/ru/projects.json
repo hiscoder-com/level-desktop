@@ -43,6 +43,7 @@
   "Resume": "Резюме",
   "SaveProject": "Сохранить проект",
   "SelectArchiveProject": "Выбрать архив с проектом",
+  "SelectFiles": "Выбрать файлы для создания архива",
   "Step": "Шаг",
   "StepBack": "Вернуться назад",
   "Title": "Название проекта",
@@ -55,5 +56,6 @@
   "Translator": "переводчика",
   "Translators": "Переводчики",
   "V-CANAProjects": "Проекты V-CANA",
-  "Verse": "Стих"
+  "Verse": "Стих",
+  "VerseMerge": "Объединение Стихов"
 }

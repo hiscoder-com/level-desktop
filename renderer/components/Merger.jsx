@@ -21,7 +21,7 @@ function Merger({ config }) {
     window.electronAPI.onUpdateChapter(handleUpdate)
 
     return () => {
-      window.electronAPI.onUpdateChapter(null)
+      window.electronAPI.onUpdateChapter(handleUpdate)
     }
   }, [])
 

@@ -170,36 +170,49 @@ export default function ChaptersMerger({ book }) {
   }
 
   return (
-    <div className="layout-appbar">
+    <div className="flex flex-col gap-4 self-start">
+      <h2 className="my-6 text-4xl">{t('projects:VerseMerge')}</h2>
       <input
         ref={fileInputRef}
         type="file"
         multiple
         onChange={(e) => handleFiles(e.target.files)}
+        style={{ display: 'none' }}
       />
-      <div>
-        <p>{t('UploadedFiles')}</p>
-        {jsonDataArray.map((json, index) => (
-          <div className="flex gap-2 items-center" key={index}>
-            <h1 key={index}>{json.filename}</h1>
-            <Close
-              className="w-5 h-5 cursor-pointer"
-              onClick={() => {
-                setJsonDataArray(jsonDataArray.filter((_, i) => i !== index))
-                setConflicts(null)
-                if (fileInputRef.current) {
-                  fileInputRef.current.value = ''
-                }
-                setMergedContent(null)
-              }}
-            />
-          </div>
-          // <pre key={index}>{JSON.stringify(json, null, 2)}</pre>
-        ))}
+      <div className="flex gap-4 items-center">
+        <button className="w-fit btn-strong" onClick={() => fileInputRef.current.click()}>
+          {t('projects:SelectFiles')}
+        </button>
       </div>
       {jsonDataArray.length > 0 && (
+        <div className="py-5 border-y">
+          <p>{t('UploadedFiles')}</p>
+          <div className="flex gap-2.5 pt-4">
+            {jsonDataArray.map((json, index) => (
+              <div
+                className="flex items-center gap-2.5 py-4 px-5 border w-fit rounded-full border-th-text-primary"
+                key={index}
+              >
+                <p key={index}>{json.filename}</p>
+                <Close
+                  className="w-5 h-5 cursor-pointer stroke-2"
+                  onClick={() => {
+                    setJsonDataArray(jsonDataArray.filter((_, i) => i !== index))
+                    setConflicts(null)
+                    if (fileInputRef.current) {
+                      fileInputRef.current.value = ''
+                    }
+                    setMergedContent(null)
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      {jsonDataArray.length > 0 && (
         <button
-          className="btn-primary"
+          className="w-fit btn-strong"
           disabled={jsonDataArray.length < 2}
           onClick={() => mergeChapters()}
         >
@@ -207,10 +220,10 @@ export default function ChaptersMerger({ book }) {
         </button>
       )}
       {conflicts ? (
-        <div>
-          <p className="font-bold mb-2">{t('ConflictTitle')}</p>
+        <>
+          <p className="font-bold">{t('ConflictTitle')}</p>
           {conflicts.map((conflict, index) => (
-            <div key={index}>
+            <div key={index} className="py-5 border-y">
               <p>
                 {t('projects:Chapter')} {conflict.chapter}, {t('projects:Verse')}
                 {conflict.verse}
@@ -223,24 +236,27 @@ export default function ChaptersMerger({ book }) {
               </p>
             </div>
           ))}
-        </div>
+        </>
       ) : (
         mergedContent && (
-          <div>
+          <>
             <p>{t('projects:NoConflicts')}</p>
-            <div className="flex gap-2 items-center justify-center">
-              <button className="btn-primary" onClick={() => downloadUsfm(mergedContent)}>
+            <div className="flex gap-2.5 pt-5 border-t">
+              <button
+                className="w-fit btn-strong"
+                onClick={() => downloadUsfm(mergedContent)}
+              >
                 {t('USFM')}
               </button>
 
               <button
-                className="btn-primary"
+                className="w-fit btn-strong"
                 onClick={() => exportToZip(mergedContent, 'merged')}
               >
                 {t('ArchiveTranslators')}
               </button>
             </div>
-          </div>
+          </>
         )
       )}
     </div>
