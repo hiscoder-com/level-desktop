@@ -6,6 +6,7 @@ import { useTranslation } from '@/next-i18next'
 
 import CheckBox from '@/components/CheckBox'
 import MarkdownExtended from '@/components/MarkdownExtended'
+import Breadcrumbs from '@/components/Breadcrumbs'
 
 export default function IntroPage() {
   const { t } = useTranslation()
@@ -50,6 +51,8 @@ export default function IntroPage() {
       </Head>
 
       <div className="f-screen-appbar mb-4 w-full max-w-3xl">
+        <Breadcrumbs currentTitle={project?.book?.name} />
+
         <div
           style={{ height: 'calc(100vh - 11rem)' }}
           className="mb-4 mx-auto py-6 px-6 lg:px-8 bg-th-secondary-10 overflow-auto rounded-lg"
