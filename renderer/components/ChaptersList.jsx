@@ -76,7 +76,10 @@ function ChapterList({ id, chapters, steps, mutate }) {
             className="border-b border-th-secondary-200 text-th-primary-100"
           >
             <td className="p-4 pl-8">
-              <Link href={`/account/project/${id}/${chapter}/${step}`} legacyBehavior>
+              <Link
+                href={`/account/project/${id}/${chapter}/intro?step=${step}`}
+                legacyBehavior
+              >
                 <a className="font-bold hover:opacity-70">
                   {t('projects:Chapter')} {chapter}
                 </a>

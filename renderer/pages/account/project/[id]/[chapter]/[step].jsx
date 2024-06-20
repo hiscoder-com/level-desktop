@@ -64,9 +64,8 @@ function StepPage() {
 
   const nextStepHandle = () => {
     const nextStep = window.electronAPI.goToStep(id, chapter, parseInt(step) + 1)
-
     if (nextStep !== parseInt(step)) {
-      push(`/account/project/${id}/${chapter}/${nextStep}`)
+      push(`/account/project/${id}/${chapter}/intro?step=${nextStep}`)
     } else {
       push(`/account/project/${id}`)
     }
