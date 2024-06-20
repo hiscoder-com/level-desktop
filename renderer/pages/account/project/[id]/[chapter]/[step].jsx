@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { useRouter } from 'next/router'
 
-import { useTranslation } from '@/next-i18next'
 import { Tab } from '@headlessui/react'
+import { useTranslation } from '@/next-i18next'
+import { useRecoilValue } from 'recoil'
+
 import Tool from '@/components/Tool'
 import CheckBox from '@/components/CheckBox'
 import Breadcrumbs from '@/components/Breadcrumbs'
 import ProgressBar from '@/components/ProgressBar'
-
-import { useRecoilValue } from 'recoil'
 
 import { inactiveState } from '@/helpers/atoms'
 
@@ -51,6 +51,7 @@ function StepPage() {
 
   const [project, setProject] = useState(false)
   const [checked, setChecked] = useState(false)
+
   useEffect(() => {
     if (id) {
       const _project = window.electronAPI.getProject(id)
@@ -64,11 +65,19 @@ function StepPage() {
 
   const nextStepHandle = () => {
     const nextStep = window.electronAPI.goToStep(id, chapter, parseInt(step) + 1)
+    const config = window.electronAPI.getProject(id)
+    const showIntro = config.showIntro
+
     if (nextStep !== parseInt(step)) {
-      push(`/account/project/${id}/${chapter}/intro?step=${nextStep}`)
+      if (showIntro) {
+        push(`/account/project/${id}/${chapter}/intro?step=${nextStep}`)
+      } else {
+        push(`/account/project/${id}/${chapter}/${nextStep}`)
+      }
     } else {
       push(`/account/project/${id}`)
     }
+
     setChecked(false)
   }
 

@@ -16,6 +16,8 @@
   "Coordinator": "coordinator",
   "Coordinators": "Coordinadores",
   "Delete": "Delete",
+  "DisableIntro": "Deshabilitar la introducción en los pasos",
+  "EnableIntro": "Habilitar introducción a los pasos",
   "ExistingText": "Texto existente:",
   "ExportToPDF": "Exportar a PDF",
   "ExportToUSFM": "Exportar a USFM",

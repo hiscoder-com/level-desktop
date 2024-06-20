@@ -703,6 +703,28 @@ const restoreStepData = (projectid, chapter, step) => {
   )
 }
 
+ipcMain.on('update-project-config', (event, id, updatedConfig) => {
+  const configPath = path.join(projectUrl, id, 'config.json')
+
+  try {
+    const currentConfig = JSON.parse(fs.readFileSync(configPath, { encoding: 'utf-8' }))
+    const mergedConfig = { ...currentConfig, ...updatedConfig }
+
+    if (updatedConfig.hasOwnProperty('showIntro')) {
+      mergedConfig.showIntro = updatedConfig.showIntro
+    }
+
+    fs.writeFileSync(configPath, JSON.stringify(mergedConfig, null, 2), {
+      encoding: 'utf-8',
+    })
+
+    event.sender.send('update-project-config-reply', true)
+  } catch (error) {
+    console.error(`Error updating project config: ${error}`)
+    event.sender.send('update-project-config-reply', false)
+  }
+})
+
 ipcMain.on('go-to-step', async (event, id, chapter, step) => {
   const config = JSON.parse(
     fs.readFileSync(path.join(projectUrl, id, 'config.json'), {

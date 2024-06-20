@@ -16,6 +16,8 @@
   "Coordinator": "координатора",
   "Coordinators": "Координаторы",
   "Delete": "Удалить",
+  "DisableIntro": "Отключить Интро на Шагах",
+  "EnableIntro": "Включить Интро на Шагах",
   "ExistingText": "Существующий текст:",
   "ExportToPDF": "Экспортировать в PDF",
   "ExportToUSFM": "Экспортировать в USFM",

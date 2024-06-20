@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react'
+
 import Link from 'next/link'
 
 import { JsonToPdf } from '@texttree/obs-format-convert-rcl'
@@ -20,6 +22,13 @@ const styles = {
 
 function ChapterList({ id, chapters, steps, mutate }) {
   const { t } = useTranslation(['projects', 'common'])
+
+  const [showIntro, setShowIntro] = useState(true)
+
+  useEffect(() => {
+    const config = window.electronAPI.getProject(id)
+    setShowIntro(config.showIntro)
+  }, [id])
 
   const handleBackStep = (chapter, step) => {
     const backStep = window.electronAPI.goToStep(id, chapter, step - 1)
@@ -77,7 +86,9 @@ function ChapterList({ id, chapters, steps, mutate }) {
           >
             <td className="p-4 pl-8">
               <Link
-                href={`/account/project/${id}/${chapter}/intro?step=${step}`}
+                href={`/account/project/${id}/${chapter}/${showIntro ? 'intro' : step}${
+                  showIntro ? `?step=${step}` : ''
+                }`}
                 legacyBehavior
               >
                 <a className="font-bold hover:opacity-70">
