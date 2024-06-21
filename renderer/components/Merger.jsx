@@ -21,7 +21,7 @@ function Merger({ config }) {
     window.electronAPI.onUpdateChapter(handleUpdate)
 
     return () => {
-      window.electronAPI.onUpdateChapter(handleUpdate)
+      window.electronAPI.removeUpdateChapterListener(handleUpdate)
     }
   }, [])
 

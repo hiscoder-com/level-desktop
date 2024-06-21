@@ -18,6 +18,7 @@ export default function Account() {
   const onSubmit = (e) => {
     e.preventDefault()
     window.electronAPI.addProject(fileUrl)
+    closeModal()
   }
 
   useEffect(() => {
@@ -34,6 +35,11 @@ export default function Account() {
       window.removeEventListener('project-added', handleProjectAdded)
     }
   }, [])
+
+  const closeModal = () => {
+    setIsOpenImportModal(false)
+    setFileUrl('')
+  }
 
   return (
     <>
@@ -59,16 +65,13 @@ export default function Account() {
       </div>
       <Modal
         title={t('projects:ImportProject')}
-        closeHandle={() => setIsOpenImportModal(false)}
+        closeHandle={closeModal}
         isOpen={isOpenImportModal}
         className={{
           contentBody: 'max-h-[70vh] overflow-y-auto px-8',
         }}
         buttons={
-          <button
-            className="btn-secondary my-4"
-            onClick={() => setIsOpenImportModal(false)}
-          >
+          <button className="btn-secondary my-4" onClick={closeModal}>
             {t('Close')}
           </button>
         }

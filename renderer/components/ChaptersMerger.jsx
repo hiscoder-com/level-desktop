@@ -193,7 +193,7 @@ export default function ChaptersMerger({ book }) {
                 className="flex items-center gap-2.5 py-4 px-5 border w-fit rounded-full border-th-text-primary"
                 key={index}
               >
-                <p key={index}>{json.filename}</p>
+                <p>{json.filename}</p>
                 <Close
                   className="w-5 h-5 cursor-pointer stroke-2"
                   onClick={() => {
