@@ -150,6 +150,7 @@ function StepPage() {
                 cursor:
                   'fill-th-secondary-10 text-th-secondary-10 stroke-th-secondary-10',
               }}
+              id="goToNextStepCheckBox"
               label={t('Done')}
             />
             <button
