@@ -51,6 +51,8 @@ function StepPage() {
 
   const [project, setProject] = useState(false)
   const [checked, setChecked] = useState(false)
+  const [activeTabIndexes, setActiveTabIndexes] = useState({})
+
   useEffect(() => {
     if (id) {
       const _project = window.electronAPI.getProject(id)
@@ -64,6 +66,8 @@ function StepPage() {
 
   const nextStepHandle = () => {
     const nextStep = window.electronAPI.goToStep(id, chapter, parseInt(step) + 1)
+
+    setActiveTabIndexes({})
 
     if (nextStep !== parseInt(step)) {
       push(`/account/project/${id}/${chapter}/${nextStep}`)
@@ -104,12 +108,12 @@ function StepPage() {
       />
       <div className="layout-step">
         {project?.steps?.[step] &&
-          project.steps[step].cards.map((el, index) => (
+          project.steps[step].cards.map((el, columnIndex) => (
             <div
-              key={index}
-              className={`layout-step-col ${index === 0 && inactive ? 'inactive' : ''} ${
-                sizes[el.size]
-              }`}
+              key={columnIndex}
+              className={`layout-step-col ${
+                columnIndex === 0 && inactive ? 'inactive' : ''
+              } ${sizes[el.size]}`}
             >
               <Panel
                 t={t}
@@ -119,6 +123,9 @@ function StepPage() {
                 chapter={chapter}
                 toolNames={project.resources}
                 stepConfig={project.steps[step]}
+                columnIndex={columnIndex}
+                activeTabIndexes={activeTabIndexes}
+                setActiveTabIndexes={setActiveTabIndexes}
               />
             </div>
           ))}
@@ -163,7 +170,18 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-function Panel({ tools, mainResource, id, chapter, toolNames, stepConfig, t }) {
+function Panel({
+  tools,
+  mainResource,
+  id,
+  chapter,
+  toolNames,
+  stepConfig,
+  t,
+  columnIndex,
+  activeTabIndexes,
+  setActiveTabIndexes,
+}) {
   const [isSingleTab, setIsSingleTab] = useState(false)
 
   useEffect(() => {
@@ -179,7 +197,15 @@ function Panel({ tools, mainResource, id, chapter, toolNames, stepConfig, t }) {
   }
 
   return (
-    <Tab.Group>
+    <Tab.Group
+      selectedIndex={activeTabIndexes[columnIndex] || 0}
+      onChange={(index) =>
+        setActiveTabIndexes((prev) => ({
+          ...prev,
+          [columnIndex]: index,
+        }))
+      }
+    >
       <Tab.List
         className={`flex overflow-auto text-xs -mb-2 lg:-mb-7
       ${!isSingleTab ? 'px-3 space-x-3' : ''}
