@@ -790,11 +790,18 @@ ipcMain.on('add-project', (event, url) => {
     const project = { id, createdAt }
     const decompress = require('decompress')
     decompress(url, path.join(projectUrl, id)).then(() => {
+      const configPath = path.join(projectUrl, id, 'config.json')
+
       const config = JSON.parse(
-        fs.readFileSync(path.join(projectUrl, id, 'config.json'), {
+        fs.readFileSync(configPath, {
           encoding: 'utf-8',
         })
       )
+
+      config.showIntro = true
+
+      fs.writeFileSync(configPath, JSON.stringify(config, null, 2))
+
       project.book = { ...config.book }
       project.name = config.project
       project.method = config.method
