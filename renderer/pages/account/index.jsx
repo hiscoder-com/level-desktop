@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react'
+
 import Head from 'next/head'
 import Link from 'next/link'
+
 import { useTranslation } from '@/next-i18next'
+import toast from 'react-hot-toast'
 
 import ProjectsList from '@/components/ProjectsList'
 import Modal from '@/components/Modal'
@@ -15,18 +18,23 @@ export default function Account() {
   const [isOpenImportModal, setIsOpenImportModal] = useState(false)
   const [fileUrl, setFileUrl] = useState(false)
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault()
-    window.electronAPI.addProject(fileUrl)
-    closeModal()
+    try {
+      const { updatedProjects } = await window.electronAPI.addProject(fileUrl)
+      setProjectsList(updatedProjects || [])
+      closeModal()
+      toast.success(t('projects:SuccessfullyAddedProject'))
+    } catch (error) {
+      console.error('Failed to add project:', error)
+      toast.error(t('projects:FailedAddProject'))
+    }
   }
 
   useEffect(() => {
-    setProjectsList(window.electronAPI.getProjects())
-
     const handleProjectAdded = (event) => {
-      const { project } = event.detail
-      setProjectsList((prevProjects) => [...prevProjects, project])
+      const { updatedProjects } = event.detail
+      setProjectsList(updatedProjects)
     }
 
     window.addEventListener('project-added', handleProjectAdded)

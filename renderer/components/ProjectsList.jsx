@@ -47,15 +47,22 @@ function ProjectsList({ projectsList, setProjectsList }) {
   const [isConfirmDelete, setIsConfirmDelete] = useState(false)
 
   useEffect(() => {
-    setProjectsList(window.electronAPI.getProjects())
+    const loadProjects = () => {
+      const projects = window.electronAPI.getProjects()
+      setProjectsList(projects || [])
+    }
+
+    loadProjects()
 
     const handleProjectsUpdated = (updatedProjects) => {
-      setProjectsList(updatedProjects)
+      setProjectsList(updatedProjects || [])
     }
 
     const unsubscribe = window.ipc.on('projects-updated', handleProjectsUpdated)
 
-    return unsubscribe
+    return () => {
+      unsubscribe()
+    }
   }, [])
 
   useEffect(() => {
