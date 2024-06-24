@@ -37,6 +37,7 @@
   "ProjectBooks": "Книги проекта",
   "ProjectCode": "Код проекта",
   "ProjectDelete": "Удаление проекта",
+  "ProjectDeleted": "Проект удалён",
   "ProjectEditing": "Редактирование проекта",
   "Projects": "Проекты",
   "ProjectSettings": "Настройки проекта",
@@ -57,6 +58,7 @@
   "toc3_placeholder": "3Jn",
   "Translator": "переводчика",
   "Translators": "Переводчики",
+  "UpdatedProjectSettings": "Обновлены настройки проекта",
   "V-CANAProjects": "Проекты V-CANA",
   "Verse": "Стих",
   "VerseMerge": "Объединение Стихов"

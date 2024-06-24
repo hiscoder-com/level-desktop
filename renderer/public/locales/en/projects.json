@@ -37,6 +37,7 @@
   "ProjectBooks": "Project books",
   "ProjectCode": "Project сode",
   "ProjectDelete": "Deleting a project",
+  "ProjectDeleted": "Project deleted",
   "ProjectEditing": "Editing the project",
   "Projects": "Projects",
   "ProjectSettings": "Project Settings",
@@ -57,6 +58,7 @@
   "toc3_placeholder": "3Jn",
   "Translator": "translator",
   "Translators": "Translators",
+  "UpdatedProjectSettings": "Updated project settings",
   "V-CANAProjects": "V-CANA projects",
   "Verse": "Verse",
   "VerseMerge": "Verse merge"

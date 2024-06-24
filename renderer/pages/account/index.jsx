@@ -101,6 +101,7 @@ export default function Account() {
               className="btn-primary text-base mt-3 mr-3"
               type="submit"
               value={t('Import')}
+              disabled={!fileUrl}
             />
           </div>
         </form>
