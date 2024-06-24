@@ -1,6 +1,7 @@
-import React, { useRef, useState } from 'react'
-import { useTranslation } from '@/next-i18next'
+import { useRef, useState } from 'react'
 
+import { useTranslation } from '@/next-i18next'
+import toast from 'react-hot-toast'
 import JSZip from 'jszip'
 
 import { convertToUsfm } from '../helpers/usfm'
@@ -45,31 +46,62 @@ export default function ChaptersMerger({ book }) {
       console.log(error.message)
     }
   }
+
   const handleFiles = async (files) => {
     const jsonPromises = []
+
     for (let file of files) {
+      if (!file.name.toLowerCase().endsWith('.zip')) {
+        toast.error(t('projects:FileTypeIncorrect'))
+        continue
+      }
+
       const zip = new JSZip()
-      const zipContents = await zip.loadAsync(file)
-      for (let filename in zipContents.files) {
-        const existingFile = checkEqualFiles(filename)
-        if (filename.endsWith('.json') && !existingFile) {
-          const filePromise = zipContents.files[filename]
-            .async('text')
-            .then((fileData) => {
-              const data = JSON.parse(fileData)
-              return { filename, content: data }
-            })
-          jsonPromises.push(filePromise)
-        } else if (filename.endsWith('.json') && existingFile) {
+      try {
+        const zipContents = await zip.loadAsync(file)
+        let hasJsonFile = false
+
+        for (let filename in zipContents.files) {
+          if (filename.toLowerCase().endsWith('.json')) {
+            hasJsonFile = true
+            const existingFile = checkEqualFiles(filename)
+            if (!existingFile) {
+              const filePromise = zipContents.files[filename]
+                .async('text')
+                .then((fileData) => {
+                  try {
+                    const data = JSON.parse(fileData)
+                    return { filename, content: data }
+                  } catch (parseError) {
+                    toast.error(t('projects:ErrorParsing'))
+                    console.error(`Error parsing JSON in file ${filename}:`, parseError)
+
+                    return null
+                  }
+                })
+              jsonPromises.push(filePromise)
+            } else {
+              console.log(`File ${filename} already exists and will be skipped`)
+            }
+          }
         }
+        if (!hasJsonFile) {
+          toast.error(t('projects:NoJsonFiles'))
+          console.error(`ZIP archive ${file.name} does not contain JSON files`)
+        }
+      } catch (error) {
+        toast.error(t('projects:ErrorDownloadingZip'))
+        console.error('Error downloading ZIP file:', error)
       }
     }
 
     try {
       const jsonObjects = await Promise.all(jsonPromises)
-      setJsonDataArray((prevData) => [...prevData, ...jsonObjects])
+      const validJsonObjects = jsonObjects.filter((obj) => obj !== null)
+      setJsonDataArray((prevData) => [...prevData, ...validJsonObjects])
     } catch (error) {
-      console.error('Ошибка валидации', error)
+      toast.error(t('projects:ErrorProcessingFiles'))
+      console.error('File processing error', error)
     }
   }
 
@@ -176,6 +208,7 @@ export default function ChaptersMerger({ book }) {
         ref={fileInputRef}
         type="file"
         multiple
+        accept=".zip"
         onChange={(e) => handleFiles(e.target.files)}
         style={{ display: 'none' }}
       />
