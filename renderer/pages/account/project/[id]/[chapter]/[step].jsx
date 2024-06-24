@@ -60,14 +60,13 @@ function StepPage() {
         push(`/project/${id}`)
       } else {
         setProject(_project)
+        setActiveTabIndexes({})
       }
     }
-  }, [id])
+  }, [id, step])
 
   const nextStepHandle = () => {
     const nextStep = window.electronAPI.goToStep(id, chapter, parseInt(step) + 1)
-
-    setActiveTabIndexes({})
 
     if (nextStep !== parseInt(step)) {
       push(`/account/project/${id}/${chapter}/${nextStep}`)
