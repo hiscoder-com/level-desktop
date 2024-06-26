@@ -839,7 +839,13 @@ ipcMain.on('add-project', async (event, url) => {
 
       config.showIntro = true
 
-      fs.writeFileSync(configPath, JSON.stringify(config, null, 2))
+      const configPath = path.join(finalDir, 'config.json')
+      try {
+        await fs.promises.writeFile(configPath, JSON.stringify(config, null, 2))
+      } catch (error) {
+        console.error('Error writing config file:', error)
+        throw new Error('Failed to write config file')
+      }
 
       project.book = { ...config.book }
       project.name = config.project

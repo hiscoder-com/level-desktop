@@ -96,9 +96,7 @@ function ChapterList({ id, chapters, steps, mutate }) {
                 </a>
               </Link>
             </td>
-            <td className="p-4 pl-8 cursor-default">
-              {steps[step].title} | {steps[step].intro}
-            </td>
+            <td className="p-4 pl-8 cursor-default">{steps[step].title}</td>
             <td className="p-4 pl-8">
               {step > 0 && (
                 <div
