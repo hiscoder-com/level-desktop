@@ -33,6 +33,7 @@ let projectUrl = path.join(app.getPath('userData'), 'projects')
 async function handleFileOpen() {
   const { canceled, filePaths } = await dialog.showOpenDialog({
     buttonLabel: 'Создать проект',
+    filters: [{ name: 'Zip Archives', extensions: ['zip'] }],
   })
   if (!canceled) {
     return filePaths[0]
@@ -766,7 +767,8 @@ ipcMain.on('get-project', async (event, id) => {
   event.sender.send('notify', 'Project Loaded')
 })
 
-ipcMain.on('add-project', (event, url) => {
+ipcMain.on('add-project', async (event, url) => {
+  let tempDir = null
   const defaultProperties = {
     h: '',
     toc1: '',
@@ -776,26 +778,63 @@ ipcMain.on('add-project', (event, url) => {
     chapter_label: '',
   }
 
-  const createPropertiesFile = (projectId, properties) => {
+  const createPropertiesFile = async (projectId, properties) => {
     const projectPath = path.join(projectUrl, projectId)
     const propertiesPath = path.join(projectPath, 'properties.json')
 
-    fs.writeFileSync(propertiesPath, JSON.stringify(properties, null, 2))
+    await fs.promises.writeFile(propertiesPath, JSON.stringify(properties, null, 2))
+  }
+
+  const validateProjectStructure = (projectPath) => {
+    const requiredFolders = ['chapters', 'dictionary', 'personal-notes', 'team-notes']
+    const configFile = 'config.json'
+
+    for (const folder of requiredFolders) {
+      if (!fs.existsSync(path.join(projectPath, folder))) {
+        throw new Error(`Missing required folder!`)
+      }
+    }
+
+    if (!fs.existsSync(path.join(projectPath, configFile))) {
+      throw new Error(`Missing required file!`)
+    }
+
+    const configContent = fs.readFileSync(path.join(projectPath, configFile), 'utf-8')
+    const config = JSON.parse(configContent)
+    if (
+      !config.book ||
+      typeof config.book !== 'object' ||
+      !config.book.code ||
+      !config.book.name
+    ) {
+      throw new Error('Invalid book structure in config.json')
+    }
+    if (!config.project || typeof config.project !== 'string') {
+      throw new Error('Invalid project in config.json')
+    }
+    if (!config.method || typeof config.method !== 'string') {
+      throw new Error('Invalid method in config.json')
+    }
   }
 
   if (url) {
-    const projects = storeProjects.get('projects') || []
-    const id = uuid()
-    const createdAt = Date.now()
-    const project = { id, createdAt }
-    const decompress = require('decompress')
-    decompress(url, path.join(projectUrl, id)).then(() => {
-      const configPath = path.join(projectUrl, id, 'config.json')
+    try {
+      const projects = storeProjects.get('projects') || []
+      const id = uuid()
+      const createdAt = Date.now()
+      const project = { id, createdAt }
+      const decompress = require('decompress')
+
+      tempDir = path.join(projectUrl, 'temp_' + id)
+      await decompress(url, tempDir)
+
+      validateProjectStructure(tempDir)
+
+      const finalDir = path.join(projectUrl, id)
+      await fs.promises.rename(tempDir, finalDir)
 
       const config = JSON.parse(
-        fs.readFileSync(configPath, {
-          encoding: 'utf-8',
-        })
+        await fs.promises.readFile(path.join(finalDir, 'config.json'), 'utf-8')
       )
 
       config.showIntro = true
@@ -806,15 +845,23 @@ ipcMain.on('add-project', (event, url) => {
       project.name = config.project
       project.method = config.method
 
-      createPropertiesFile(id, defaultProperties)
+      await createPropertiesFile(id, defaultProperties)
 
       projects.push(project)
       storeProjects.set('projects', projects)
       event.sender.send('notify', 'Created')
-      event.returnValue = projects
 
-      event.sender.send('project-added', id, project)
-    })
+      const updatedProjects = storeProjects.get('projects') || []
+      event.sender.send('project-added', id, project, updatedProjects)
+    } catch (error) {
+      console.error('Error adding project:', error)
+      event.sender.send('notify', `Error: ${error.message}`)
+
+      if (tempDir && fs.existsSync(tempDir)) {
+        await fs.promises.rm(tempDir, { recursive: true })
+      }
+      event.sender.send('project-add-error', error.message)
+    }
   } else {
     event.sender.send('notify', 'Url not set')
   }

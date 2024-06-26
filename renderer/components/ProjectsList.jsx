@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 
 import { useTranslation } from '@/next-i18next'
+import toast from 'react-hot-toast'
 import jszip from 'jszip'
 
 import { JsonToPdf } from '@texttree/obs-format-convert-rcl'
@@ -47,15 +48,22 @@ function ProjectsList({ projectsList, setProjectsList }) {
   const [showIntro, setShowIntro] = useState(true)
 
   useEffect(() => {
-    setProjectsList(window.electronAPI.getProjects())
+    const loadProjects = () => {
+      const projects = window.electronAPI.getProjects()
+      setProjectsList(projects || [])
+    }
+
+    loadProjects()
 
     const handleProjectsUpdated = (updatedProjects) => {
-      setProjectsList(updatedProjects)
+      setProjectsList(updatedProjects || [])
     }
 
     const unsubscribe = window.ipc.on('projects-updated', handleProjectsUpdated)
 
-    return unsubscribe
+    return () => {
+      unsubscribe()
+    }
   }, [])
 
   useEffect(() => {
@@ -210,6 +218,7 @@ function ProjectsList({ projectsList, setProjectsList }) {
 
   const saveProperties = () => {
     setProperties(editedProperties)
+    toast.success(t('projects:UpdatedProjectSettings'))
     window.electronAPI.updateProperties(currentProject.id, editedProperties)
     if (editedProperties.h) {
       window.electronAPI.updateProjectName(currentProject.id, editedProperties.h)
@@ -348,6 +357,7 @@ function ProjectsList({ projectsList, setProjectsList }) {
                   projectRemove(currentProject.id)
                   setIsOpenSettingsModal(false)
                   setIsConfirmDelete(false)
+                  toast.success(t('projects:ProjectDeleted'))
                 }}
               >
                 {t('Yes')}
