@@ -34,6 +34,13 @@ process.once('loaded', () => {
     getBook: (projectid) => ipcRenderer.sendSync('get-book', projectid),
     updateChapter: (projectid, chapter, data) =>
       ipcRenderer.sendSync('update-chapter', projectid, chapter, data),
+    onUpdateChapter: (callback) => {
+      ipcRenderer.on('notify', callback)
+      return () => ipcRenderer.removeListener('notify', callback)
+    },
+    removeUpdateChapterListener: (callback) => {
+      ipcRenderer.removeListener('notify', callback)
+    },
     divideVerse: (projectid, chapter, verse, enabled) =>
       ipcRenderer.send('divide-verse', projectid, chapter, verse, enabled),
     updateVerse: (projectid, chapter, verse, text) =>
@@ -85,12 +92,26 @@ process.once('loaded', () => {
     getTWL: (id, resource, mainResource, chapter = false) =>
       ipcRenderer.sendSync('get-twl', id, resource, mainResource, chapter),
     addProject: (fileUrl) => {
-      ipcRenderer.once('project-added', (event, projectId, project) => {
-        window.dispatchEvent(
-          new CustomEvent('project-added', { detail: { projectId, project } })
+      return new Promise((resolve, reject) => {
+        ipcRenderer.removeAllListeners('project-added')
+        ipcRenderer.removeAllListeners('project-add-error')
+
+        ipcRenderer.once(
+          'project-added',
+          (event, projectId, project, updatedProjects) => {
+            window.dispatchEvent(
+              new CustomEvent('project-added', {
+                detail: { projectId, project, updatedProjects },
+              })
+            )
+            resolve({ projectId, project, updatedProjects })
+          }
         )
+        ipcRenderer.once('project-add-error', (event, error) => {
+          reject(error)
+        })
+        ipcRenderer.send('add-project', fileUrl)
       })
-      ipcRenderer.send('add-project', fileUrl)
     },
     deleteProject: (projectId) => ipcRenderer.send('delete-project', projectId),
   })

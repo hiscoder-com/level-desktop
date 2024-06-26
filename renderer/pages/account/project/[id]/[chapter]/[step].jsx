@@ -51,6 +51,8 @@ function StepPage() {
 
   const [project, setProject] = useState(false)
   const [checked, setChecked] = useState(false)
+  const [activeTabIndexes, setActiveTabIndexes] = useState({})
+
   useEffect(() => {
     if (id) {
       const _project = window.electronAPI.getProject(id)
@@ -58,9 +60,10 @@ function StepPage() {
         push(`/project/${id}`)
       } else {
         setProject(_project)
+        setActiveTabIndexes({})
       }
     }
-  }, [id])
+  }, [id, step])
 
   const nextStepHandle = () => {
     const nextStep = window.electronAPI.goToStep(id, chapter, parseInt(step) + 1)
@@ -104,12 +107,12 @@ function StepPage() {
       />
       <div className="layout-step">
         {project?.steps?.[step] &&
-          project.steps[step].cards.map((el, index) => (
+          project.steps[step].cards.map((el, columnIndex) => (
             <div
-              key={index}
-              className={`layout-step-col ${index === 0 && inactive ? 'inactive' : ''} ${
-                sizes[el.size]
-              }`}
+              key={columnIndex}
+              className={`layout-step-col ${
+                columnIndex === 0 && inactive ? 'inactive' : ''
+              } ${sizes[el.size]}`}
             >
               <Panel
                 t={t}
@@ -119,6 +122,9 @@ function StepPage() {
                 chapter={chapter}
                 toolNames={project.resources}
                 stepConfig={project.steps[step]}
+                columnIndex={columnIndex}
+                activeTabIndexes={activeTabIndexes}
+                setActiveTabIndexes={setActiveTabIndexes}
               />
             </div>
           ))}
@@ -143,6 +149,7 @@ function StepPage() {
                 cursor:
                   'fill-th-secondary-10 text-th-secondary-10 stroke-th-secondary-10',
               }}
+              id="goToNextStepCheckBox"
               label={t('Done')}
             />
             <button
@@ -163,17 +170,55 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-function Panel({ tools, mainResource, id, chapter, toolNames, stepConfig, t }) {
+function Panel({
+  tools,
+  mainResource,
+  id,
+  chapter,
+  toolNames,
+  stepConfig,
+  t,
+  columnIndex,
+  activeTabIndexes,
+  setActiveTabIndexes,
+}) {
+  const [isSingleTab, setIsSingleTab] = useState(false)
+
+  useEffect(() => {
+    handleTabsCount()
+  }, [tools])
+
+  const handleTabsCount = () => {
+    if (tools.length === 1) {
+      setIsSingleTab(true)
+    } else {
+      setIsSingleTab(false)
+    }
+  }
+
   return (
-    <Tab.Group>
-      <Tab.List className="space-x-3 text-xs px-3 -mb-2 lg:-mb-7 flex overflow-auto">
+    <Tab.Group
+      selectedIndex={activeTabIndexes[columnIndex] || 0}
+      onChange={(index) =>
+        setActiveTabIndexes((prev) => ({
+          ...prev,
+          [columnIndex]: index,
+        }))
+      }
+    >
+      <Tab.List
+        className={`flex overflow-auto text-xs -mb-2 lg:-mb-7
+      ${!isSingleTab ? 'px-3 space-x-3' : ''}
+      `}
+      >
         {tools?.map((tool, idx) => (
           <Tab
             key={tool.name + idx}
             className={({ selected }) =>
               classNames(
-                'text-xs p-1 flex-1 lg:pb-3 md:p-2 md:text-sm lg:text-base text-ellipsis overflow-hidden whitespace-nowrap',
-                selected ? 'tab-active' : 'tab-inactive'
+                'text-xs p-1 lg:pb-3 md:p-2 md:text-sm lg:text-base text-ellipsis overflow-hidden whitespace-nowrap',
+                isSingleTab ? 'flex' : 'flex-1',
+                selected ? (isSingleTab ? 'tab-single' : 'tab-active') : 'tab-inactive'
               )
             }
           >
@@ -185,14 +230,27 @@ function Panel({ tools, mainResource, id, chapter, toolNames, stepConfig, t }) {
               'personalNotes',
               'retelling',
               'dictionary',
+              'merger',
               'info',
             ].includes(tool.name) ? (
               <span title={t(tool.name)}>
-                {icons[tool.name]}
-                <span className="hidden ml-2 sm:inline">{t(tool.name)}</span>
+                {icons[tool.name] ? (
+                  <div className={`${!isSingleTab ? 'truncate' : 'px-5 sm:px-10'}`}>
+                    {icons[tool.name]}
+                    <span className="hidden ml-2 sm:inline">{t(tool.name)}</span>
+                  </div>
+                ) : (
+                  <span
+                    className={`${!isSingleTab ? 'hidden sm:inline' : 'px-10 sm:px-20'}`}
+                  >
+                    {t(tool.name)}
+                  </span>
+                )}
               </span>
             ) : (
-              toolNames[tool.config.resource]
+              <p className={`${!isSingleTab ? 'truncate' : 'px-10 sm:px-20'} `}>
+                {toolNames[tool.config.resource]}
+              </p>
             )}
           </Tab>
         ))}
@@ -201,7 +259,7 @@ function Panel({ tools, mainResource, id, chapter, toolNames, stepConfig, t }) {
         {tools?.map((tool, index) => {
           return (
             <Tab.Panel key={index}>
-              <div className="flex flex-col bg-white rounded-lg h-full">
+              <div className="flex flex-col bg-white rounded-xl h-full">
                 <Tool
                   config={{
                     mainResource,
@@ -211,6 +269,7 @@ function Panel({ tools, mainResource, id, chapter, toolNames, stepConfig, t }) {
                     wholeChapter: stepConfig.whole_chapter,
                   }}
                   toolName={tool.name}
+                  isSingleTab={isSingleTab}
                 />
               </div>
             </Tab.Panel>
