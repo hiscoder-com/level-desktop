@@ -136,8 +136,9 @@ function StepPage() {
             </div>
           ))}
       </div>
-      <div className="relative flex flex-col justify-center items-center px-4 mx-auto w-full md:flex-row-reverse lg:px-0 mt-2 h-16">
-        <div className="pb-3 md:pb-0">
+      <div className="flex flex-col md:flex-row justify-between items-center md:px-4 lg:px-2 mx-auto w-full mt-4 md:mt-2 md:h-16">
+        <div className="hidden lg:block lg:w-1/3" />
+        <div className="w-full lg:w-1/3 flex justify-center md:justify-start lg:justify-center">
           {project && !project.steps[step].isTech && (
             <ProgressBar
               amountSteps={getTotalTranslationSteps(project.steps)}
@@ -145,7 +146,7 @@ function StepPage() {
             />
           )}
         </div>
-        <div className="absolute right-2 flex items-center h-12 md:h-16">
+        <div className="w-full lg:w-1/3 flex justify-end items-center my-4 md:my-0">
           <div className="flex flex-row items-center space-x-6">
             <CheckBox
               onChange={() => setChecked((prev) => !prev)}
