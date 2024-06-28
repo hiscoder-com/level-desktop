@@ -9,7 +9,7 @@ import MarkdownExtended from '@/components/MarkdownExtended'
 import Breadcrumbs from '@/components/Breadcrumbs'
 
 export default function IntroPage() {
-  const { t } = useTranslation()
+  const { t } = useTranslation(['common', 'projects'])
   const { query, push } = useRouter()
   const { id, chapter, step } = query
   const [introMd, setIntroMd] = useState('')
@@ -61,6 +61,10 @@ export default function IntroPage() {
           {title.subtitle && <h3 className="mb-4 text-xl">{title.subtitle}</h3>}
 
           <MarkdownExtended className="markdown-body">{introMd}</MarkdownExtended>
+
+          <p className="mt-10 opacity-40 cursor-default">
+            * {t('projects:DisableIntroClue')}
+          </p>
         </div>
 
         <div className="flex items-center justify-end h-12 md:h-16 flex-row space-x-6">
@@ -72,7 +76,7 @@ export default function IntroPage() {
                 'bg-th-secondary-10 checked:bg-th-secondary-400 checked:border-th-secondary-400 checked:before:bg-th-secondary-400 border-th-secondary',
               cursor: 'fill-th-secondary-10 text-th-secondary-10 stroke-th-secondary-10',
             }}
-            label={t('Done')}
+            label={t('Ok')}
           />
           <button
             className="relative btn-quaternary w-28 text-center"

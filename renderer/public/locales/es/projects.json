@@ -17,6 +17,7 @@
   "Coordinators": "Coordinadores",
   "Delete": "Delete",
   "DisableIntro": "Deshabilitar la introducción en los pasos",
+  "DisableIntroClue": "Puede desactivar la Introducción en la configuración del proyecto",
   "EnableIntro": "Habilitar introducción a los pasos",
   "ErrorDownloadingZip": "Error al descargar el archivo ZIP",
   "ErrorParsing": "Error de análisis JSON",

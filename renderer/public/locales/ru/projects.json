@@ -17,6 +17,7 @@
   "Coordinators": "Координаторы",
   "Delete": "Удалить",
   "DisableIntro": "Отключить Интро на Шагах",
+  "DisableIntroClue": "Вы можете отключить Интро в настройках проекта",
   "EnableIntro": "Включить Интро на Шагах",
   "ErrorDownloadingZip": "Ошибка загрузки ZIP-файла",
   "ErrorParsing": "Ошибка парсинга JSON",

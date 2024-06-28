@@ -145,7 +145,7 @@ function StepPage() {
             />
           )}
         </div>
-        <div className="absolute right-0 flex items-center h-12 md:h-16">
+        <div className="absolute right-2 flex items-center h-12 md:h-16">
           <div className="flex flex-row items-center space-x-6">
             <CheckBox
               onChange={() => setChecked((prev) => !prev)}
