@@ -247,9 +247,10 @@ function ProjectsList({ projectsList, setProjectsList }) {
   }
 
   const handleShowIntroChange = () => {
-    const newShowIntro = !showIntro
-    setShowIntro(newShowIntro)
-    window.electronAPI.updateProjectConfig(currentProject.id, { showIntro: newShowIntro })
+    setShowIntro((prev) => {
+      window.electronAPI.updateProjectConfig(currentProject.id, { showIntro: !prev })
+      return !prev
+    })
   }
 
   return (

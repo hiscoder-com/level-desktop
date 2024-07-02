@@ -837,7 +837,7 @@ ipcMain.on('add-project', async (event, url) => {
         await fs.promises.readFile(path.join(finalDir, 'config.json'), 'utf-8')
       )
 
-      config.showIntro = true
+      config.showIntro = config.showIntro ?? true
 
       const configPath = path.join(finalDir, 'config.json')
       try {

@@ -87,8 +87,8 @@ function ChapterList({ id, chapters, steps, mutate }) {
             >
               <td className="p-2 sm:p-4 sm:pl-8">
                 <Link
-                  href={`/account/project/${id}/${chapter}/${showIntro ? 'intro' : step}${
-                    showIntro ? `?step=${step}` : ''
+                  href={`/account/project/${id}/${chapter}/${
+                    showIntro ? `intro?step=${step}` : step
                   }`}
                   legacyBehavior
                 >

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 
 import Head from 'next/head'
 import { useRouter } from 'next/router'
+
 import { useTranslation } from '@/next-i18next'
 
 import CheckBox from '@/components/CheckBox'
@@ -14,7 +15,6 @@ export default function IntroPage() {
   const { id, chapter, step } = query
   const [introMd, setIntroMd] = useState('')
   const [checked, setChecked] = useState(false)
-
   const [title, setTitle] = useState({})
   const [project, setProject] = useState(false)
 
