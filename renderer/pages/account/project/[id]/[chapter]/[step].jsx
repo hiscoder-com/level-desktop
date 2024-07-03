@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 
 import { useRecoilValue } from 'recoil'
-import { useTranslation } from '@/next-i18next'
 import { Tab } from '@headlessui/react'
 
 import Tool from '@/components/Tool'
@@ -11,6 +10,7 @@ import CheckBox from '@/components/CheckBox'
 import Breadcrumbs from '@/components/Breadcrumbs'
 import ProgressBar from '@/components/ProgressBar'
 
+import { useTranslation } from '@/next-i18next'
 import { inactiveState } from '@/helpers/atoms'
 
 import Dict from 'public/icons/dictionary.svg'

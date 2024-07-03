@@ -2,9 +2,9 @@ import { useEffect, useRef, useState } from 'react'
 
 import { useRouter } from 'next/router'
 
-import { useTranslation } from '@/next-i18next'
-
 import CheckBox from '@/components/CheckBox'
+
+import { useTranslation } from '@/next-i18next'
 
 export default function UserAgreement() {
   const endOfTextRef = useRef(null)

@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
 
 import { useRouter } from 'next/router'
-import { useTranslation } from '@/next-i18next'
 import { useSetRecoilState } from 'recoil'
 
 import Recorder from './Recorder'
 
+import { useTranslation } from '@/next-i18next'
 import { inactiveState } from '@/helpers/atoms'
 
 import Back from 'public/icons/left.svg'

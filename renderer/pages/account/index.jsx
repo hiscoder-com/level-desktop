@@ -3,11 +3,12 @@ import { useEffect, useState } from 'react'
 import Head from 'next/head'
 import Link from 'next/link'
 
-import { useTranslation } from '@/next-i18next'
 import toast from 'react-hot-toast'
 
 import ProjectsList from '@/components/ProjectsList'
 import Modal from '@/components/Modal'
+
+import { useTranslation } from '@/next-i18next'
 
 import VcanaLogo from 'public/icons/vcana-logo-color.svg'
 

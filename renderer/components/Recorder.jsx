@@ -1,10 +1,10 @@
 import { useRef, useEffect, useState } from 'react'
 
 import { useSetRecoilState } from 'recoil'
-import { useTranslation } from '@/next-i18next'
 
 import Modal from './Modal'
 
+import { useTranslation } from '@/next-i18next'
 import { inactiveState } from '@/helpers/atoms'
 
 import RecorderCrossedButton from 'public/icons/error-outline.svg'

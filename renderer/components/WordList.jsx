@@ -1,8 +1,8 @@
 import dynamic from 'next/dynamic'
 
-import { useTranslation } from '@/next-i18next'
-
 import Modal from './Modal'
+
+import { useTranslation } from '@/next-i18next'
 
 import Trash from 'public/icons/trash.svg'
 import Back from 'public/icons/left.svg'

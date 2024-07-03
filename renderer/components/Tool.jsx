@@ -1,7 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-import { useTranslation } from '@/next-i18next'
-
 import Retelling from './Retelling'
 import Bible from './Bible'
 import BlindEditor from './BlindEditor'
@@ -15,6 +13,8 @@ import TWL from './TWL'
 import Divider from './Divider'
 import TeamNotes from './TeamNotes'
 import Merger from './Merger'
+
+import { useTranslation } from '@/next-i18next'
 
 function Tool({ config, toolName, isSingleTab }) {
   const { t } = useTranslation()

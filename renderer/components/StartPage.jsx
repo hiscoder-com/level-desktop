@@ -1,9 +1,9 @@
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 
-import { useTranslation } from '@/next-i18next'
-
 import LanguageSwitcher from './LanguageSwitcher'
+
+import { useTranslation } from '@/next-i18next'
 
 import VcanaLogo from 'public/icons/vcana-logo-color.svg'
 import Gear from 'public/icons/gear.svg'

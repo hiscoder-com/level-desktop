@@ -1,9 +1,9 @@
 import { useRef, useState } from 'react'
 
-import { useTranslation } from '@/next-i18next'
 import toast from 'react-hot-toast'
 import JSZip from 'jszip'
 
+import { useTranslation } from '@/next-i18next'
 import { convertToUsfm } from '@/helpers/usfm'
 
 import Close from 'public/icons/close.svg'

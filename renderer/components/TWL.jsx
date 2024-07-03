@@ -2,13 +2,13 @@ import { useEffect, useState } from 'react'
 
 import dynamic from 'next/dynamic'
 
-import { useTranslation } from '@/next-i18next'
 import localforage from 'localforage'
 import jszip from 'jszip'
 import { useRecoilState } from 'recoil'
 
 import { Placeholder } from './Placeholder'
 
+import { useTranslation } from '@/next-i18next'
 import { useGetTwlResource } from '@/hooks/useGetTwlResource'
 import { currentVerse } from '@/helpers/atoms'
 import { checkLSVal } from '@/helpers/checkls'

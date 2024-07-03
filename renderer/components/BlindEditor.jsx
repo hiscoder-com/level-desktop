@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 
-import { useTranslation } from '@/next-i18next'
 import { useSetRecoilState } from 'recoil'
 
 import Modal from './Modal'
 import { obsCheckAdditionalVerses } from './Bible'
 
+import { useTranslation } from '@/next-i18next'
 import { checkedVersesBibleState } from '@/helpers/atoms'
 
 import Pencil from 'public/icons/pencil.svg'

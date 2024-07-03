@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
 
 import { Disclosure } from '@headlessui/react'
-import { useTranslation } from '@/next-i18next'
 
 import SearchAndAddWords from './SearchAndAddWords'
 import Alphabet from './Alphabet'
 import WordList from './WordList'
 
+import { useTranslation } from '@/next-i18next'
 import { useGetDictionary } from '@/hooks/useGetDictionary'
 import { generateUniqueId } from '@/helpers/noteEditor'
 
