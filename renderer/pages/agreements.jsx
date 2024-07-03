@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 
 import { useTranslation } from '@/next-i18next'
 
-import Check from '@/public/icons/check.svg'
+import Check from 'public/icons/check.svg'
 
 export default function Agreements() {
   const { t } = useTranslation(['users', 'common', 'user-agreement'])

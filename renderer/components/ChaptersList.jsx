@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { JsonToPdf } from '@texttree/obs-format-convert-rcl'
 import { useTranslation } from '@/next-i18next'
 
-import DownloadPDF from '../public/icons/download-pdf.svg'
+import DownloadPDF from 'public/icons/download-pdf.svg'
 
 const styles = {
   currentPage: {

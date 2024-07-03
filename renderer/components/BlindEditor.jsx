@@ -1,15 +1,15 @@
 import { useEffect, useRef, useState } from 'react'
 
-import { useTranslation } from '@/next-i18next'
 import { useSetRecoilState } from 'recoil'
 
 import Modal from './Modal'
 import { obsCheckAdditionalVerses } from './Bible'
 
-import { checkedVersesBibleState } from '../helpers/atoms'
+import { useTranslation } from '@/next-i18next'
+import { checkedVersesBibleState } from '@/helpers/atoms'
 
-import Pencil from '../public/icons/pencil.svg'
-import Check from '../public/icons/check.svg'
+import Pencil from 'public/icons/pencil.svg'
+import Check from 'public/icons/check.svg'
 
 function BlindEditor({ config: { id, mainResource, chapter = false }, toolName }) {
   const { t } = useTranslation()

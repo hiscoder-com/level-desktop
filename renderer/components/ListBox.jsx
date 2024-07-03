@@ -1,5 +1,6 @@
-import { Listbox } from "@headlessui/react";
-import Down from "../public/icons/arrow-down.svg";
+import { Listbox } from '@headlessui/react'
+
+import Down from 'public/icons/arrow-down.svg'
 
 function ListBox({ options, selectedOption, setSelectedOption }) {
   return (
@@ -9,14 +10,11 @@ function ListBox({ options, selectedOption, setSelectedOption }) {
           <div className="relative text-th-text-primary">
             <Listbox.Button className="relative flex justify-between px-5 py-3 w-full bg-th-secondary-10 rounded-lg">
               <span>
-                {
-                  options?.find((option) => option.value === selectedOption)
-                    ?.label
-                }
+                {options?.find((option) => option.value === selectedOption)?.label}
               </span>
               <Down className="w-6 h-6 min-w-[1.5rem] stroke-th-text-primary" />
             </Listbox.Button>
-            <div className={`-mt-2 pt-5 ${open ? "bg-th-secondary-10" : ""}`}>
+            <div className={`-mt-2 pt-5 ${open ? 'bg-th-secondary-10' : ''}`}>
               <Listbox.Options className="absolute w-full max-h-[40vh] bg-th-secondary-10 rounded-b-lg overflow-y-auto z-10">
                 {options.map((el) => (
                   <Listbox.Option
@@ -33,7 +31,7 @@ function ListBox({ options, selectedOption, setSelectedOption }) {
         </>
       )}
     </Listbox>
-  );
+  )
 }
 
-export default ListBox;
+export default ListBox

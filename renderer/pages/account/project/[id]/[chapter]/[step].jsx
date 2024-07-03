@@ -2,23 +2,23 @@ import React, { useEffect, useState } from 'react'
 
 import { useRouter } from 'next/router'
 
-import { useTranslation } from '@/next-i18next'
+import { useRecoilValue } from 'recoil'
 import { Tab } from '@headlessui/react'
+
 import Tool from '@/components/Tool'
 import CheckBox from '@/components/CheckBox'
 import Breadcrumbs from '@/components/Breadcrumbs'
 import ProgressBar from '@/components/ProgressBar'
 
-import { useRecoilValue } from 'recoil'
-
+import { useTranslation } from '@/next-i18next'
 import { inactiveState } from '@/helpers/atoms'
 
-import Dict from '@/public/icons/dictionary.svg'
-import Notepad from '@/public/icons/notepad.svg'
-import Audio from '@/public/icons/audio.svg'
-import Pencil from '@/public/icons/editor-pencil.svg'
-import Info from '@/public/icons/info.svg'
-import TeamNote from '@/public/icons/team-note.svg'
+import Dict from 'public/icons/dictionary.svg'
+import Notepad from 'public/icons/notepad.svg'
+import Audio from 'public/icons/audio.svg'
+import Pencil from 'public/icons/editor-pencil.svg'
+import Info from 'public/icons/info.svg'
+import TeamNote from 'public/icons/team-note.svg'
 
 const sizes = {
   1: 'lg:w-1/6',

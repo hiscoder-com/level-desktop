@@ -1,17 +1,15 @@
-import { Placeholder } from './Placeholder';
-import MarkdownExtended from './MarkdownExtended';
-import { useGetInfoResource } from '../hooks/useGetInfoResource';
+import { Placeholder } from './Placeholder'
+import MarkdownExtended from './MarkdownExtended'
 
-function Info({
-  config: { resource, id, mainResource, chapter = false },
-  toolName,
-}) {
+import { useGetInfoResource } from '@/hooks/useGetInfoResource'
+
+function Info({ config: { resource, id, mainResource, chapter = false }, toolName }) {
   const { isLoading, data: intro } = useGetInfoResource({
     id,
     resource,
     mainResource,
     chapter,
-  });
+  })
 
   return (
     <>
@@ -25,7 +23,7 @@ function Info({
         </div>
       )}
     </>
-  );
+  )
 }
 
-export default Info;
+export default Info

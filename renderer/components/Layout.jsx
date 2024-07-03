@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 import { Transition } from '@headlessui/react'
 import { Toaster } from 'react-hot-toast'
 
-import Progress from '../public/icons/progress.svg'
+import Progress from 'public/icons/progress.svg'
 
 function Layout({ children }) {
   const [loadingPage, setLoadingPage] = useState(false)

@@ -1,9 +1,10 @@
-import React, { useEffect } from 'react'
-
-import '../styles/globals.css'
+import { useEffect } from 'react'
 
 import { RecoilRoot } from 'recoil'
-import Layout from '../components/Layout'
+
+import Layout from '@/components/Layout'
+
+import '@/styles/globals.css'
 
 function MyApp({ Component, pageProps }) {
   useEffect(() => {

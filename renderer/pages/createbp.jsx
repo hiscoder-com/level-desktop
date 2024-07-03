@@ -1,8 +1,9 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import Head from 'next/head'
 import Link from 'next/link'
+
 import { useTranslation } from '@/next-i18next'
-import { books } from '../helpers/books'
+import { books } from '@/helpers/books'
 
 function Create() {
   const { t } = useTranslation()
