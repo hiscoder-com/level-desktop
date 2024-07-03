@@ -2,17 +2,17 @@ import { useRef, useEffect, useState } from 'react'
 
 import { useSetRecoilState } from 'recoil'
 
-import { useTranslation } from '@/next-i18next'
-
-import { inactiveState } from '../helpers/atoms'
 import Modal from './Modal'
 
-import RecorderButton from '../public/icons/recorder.svg'
-import StopButton from '../public/icons/stop.svg'
-import RecorderCrossedButton from '../public/icons/error-outline.svg'
-import TrashButton from '../public/icons/trash.svg'
-import PlayButton from '../public/icons/play.svg'
-import PauseButton from '../public/icons/pause.svg'
+import { useTranslation } from '@/next-i18next'
+import { inactiveState } from '@/helpers/atoms'
+
+import RecorderCrossedButton from 'public/icons/error-outline.svg'
+import RecorderButton from 'public/icons/recorder.svg'
+import TrashButton from 'public/icons/trash.svg'
+import StopButton from 'public/icons/stop.svg'
+import PlayButton from 'public/icons/play.svg'
+import PauseButton from 'public/icons/pause.svg'
 
 export default function Recorder({ setIsRecording, voice, setVoice }) {
   const { t } = useTranslation()

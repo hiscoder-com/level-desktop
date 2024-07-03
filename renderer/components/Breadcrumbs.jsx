@@ -1,7 +1,7 @@
-import React, { Fragment } from 'react'
+import { Fragment } from 'react'
 import Link from 'next/link'
 
-import VcanaLogo from '../public/icons/vcana-logo.svg'
+import VcanaLogo from 'public/icons/vcana-logo.svg'
 
 export default function Breadcrumbs({ links = [], currentTitle }) {
   return (

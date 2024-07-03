@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react'
 
 import ReactMarkdown from 'react-markdown'
 
-import { useScroll } from '../hooks/useScroll'
-import { useGetUsfmResource } from '../hooks/useGetUsfmResource'
 import { Placeholder } from './Placeholder'
 import CheckBox from './CheckBox'
+
+import { useScroll } from '@/hooks/useScroll'
+import { useGetUsfmResource } from '@/hooks/useGetUsfmResource'
 
 export const obsCheckAdditionalVerses = (numVerse) => {
   if (['0', '200'].includes(String(numVerse))) {
