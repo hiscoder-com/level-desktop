@@ -711,10 +711,6 @@ ipcMain.on('update-project-config', (event, id, updatedConfig) => {
     const currentConfig = JSON.parse(fs.readFileSync(configPath, { encoding: 'utf-8' }))
     const mergedConfig = { ...currentConfig, ...updatedConfig }
 
-    if (updatedConfig.hasOwnProperty('showIntro')) {
-      mergedConfig.showIntro = updatedConfig.showIntro
-    }
-
     fs.writeFileSync(configPath, JSON.stringify(mergedConfig, null, 2), {
       encoding: 'utf-8',
     })
@@ -837,7 +833,7 @@ ipcMain.on('add-project', async (event, url) => {
         await fs.promises.readFile(path.join(finalDir, 'config.json'), 'utf-8')
       )
 
-      config.showIntro = config.showIntro ?? true
+      config.showIntro ??= true
 
       const configPath = path.join(finalDir, 'config.json')
       try {
