@@ -9,7 +9,7 @@ import toast from 'react-hot-toast'
 import ProjectsList from '@/components/ProjectsList'
 import Modal from '@/components/Modal'
 
-import VcanaLogo from '@/public/icons/vcana-logo-color.svg'
+import VcanaLogo from 'public/icons/vcana-logo-color.svg'
 
 export default function Account() {
   const { t } = useTranslation(['common', 'projects'])

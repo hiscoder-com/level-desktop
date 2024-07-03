@@ -1,18 +1,19 @@
 import { useEffect, useState } from 'react'
 
-import { useTranslation } from '@/next-i18next'
+import dynamic from 'next/dynamic'
 
+import { useTranslation } from '@/next-i18next'
 import localforage from 'localforage'
 import jszip from 'jszip'
-import { useGetTwlResource } from '../hooks/useGetTwlResource'
-import Back from '../public/icons/left.svg'
+import { useRecoilState } from 'recoil'
 
 import { Placeholder } from './Placeholder'
 
-import { checkLSVal } from '../helpers/checkls'
-import dynamic from 'next/dynamic'
-import { useRecoilState } from 'recoil'
-import { currentVerse } from '../helpers/atoms'
+import { useGetTwlResource } from '@/hooks/useGetTwlResource'
+import { currentVerse } from '@/helpers/atoms'
+import { checkLSVal } from '@/helpers/checkls'
+
+import Back from 'public/icons/left.svg'
 
 const TWords = dynamic(() => import('@texttree/v-cana-rcl').then((mod) => mod.TWords), {
   ssr: false,

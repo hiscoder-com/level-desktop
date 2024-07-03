@@ -4,9 +4,9 @@ import { useRouter } from 'next/router'
 
 import { useTranslation } from '@/next-i18next'
 
-import CheckBox from '/components/CheckBox'
+import CheckBox from '@/components/CheckBox'
 
-import LeftArrow from '/public/icons/arrow-left.svg'
+import LeftArrow from 'public/icons/arrow-left.svg'
 
 export default function ConfessionSteps() {
   const { t } = useTranslation(['confession-steps', 'common', 'users'])

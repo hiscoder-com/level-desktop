@@ -1,11 +1,10 @@
 import { useRef, useState, useEffect } from 'react'
 
 import { useTranslation } from '@/next-i18next'
-
 import JSZip from 'jszip'
 import toast from 'react-hot-toast'
 
-import Close from '../public/icons/close.svg'
+import Close from 'public/icons/close.svg'
 
 function Merger({ config }) {
   const { t } = useTranslation(['common', 'projects'])

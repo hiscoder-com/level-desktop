@@ -2,10 +2,10 @@ import dynamic from 'next/dynamic'
 
 import { useTranslation } from '@/next-i18next'
 
-import Close from '../public/icons/close.svg'
-import Plus from '../public/icons/plus.svg'
-import Export from '../public/icons/export.svg'
-import Import from '../public/icons/import.svg'
+import Close from 'public/icons/close.svg'
+import Plus from 'public/icons/plus.svg'
+import Export from 'public/icons/export.svg'
+import Import from 'public/icons/import.svg'
 
 const MenuButtons = dynamic(
   () => import('@texttree/v-cana-rcl').then((mod) => mod.MenuButtons),

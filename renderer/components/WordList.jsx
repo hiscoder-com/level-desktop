@@ -1,13 +1,11 @@
-import React from 'react'
-
 import dynamic from 'next/dynamic'
 
 import { useTranslation } from '@/next-i18next'
 
 import Modal from './Modal'
 
-import Trash from '../public/icons/trash.svg'
-import Back from '../public/icons/left.svg'
+import Trash from 'public/icons/trash.svg'
+import Back from 'public/icons/left.svg'
 
 const Redactor = dynamic(
   () => import('@texttree/notepad-rcl').then((mod) => mod.Redactor),

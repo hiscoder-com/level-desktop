@@ -6,12 +6,13 @@ import { useTranslation } from '@/next-i18next'
 import SearchAndAddWords from './SearchAndAddWords'
 import Alphabet from './Alphabet'
 import WordList from './WordList'
-import { useGetDictionary } from '../hooks/useGetDictionary'
-import { generateUniqueId } from '../helpers/noteEditor'
 
-import RightArrow from '../public/icons/right-arrow.svg'
-import LeftArrow from '../public/icons/left-arrow.svg'
-import Down from '../public/icons/arrow-down.svg'
+import { useGetDictionary } from '@/hooks/useGetDictionary'
+import { generateUniqueId } from '@/helpers/noteEditor'
+
+import RightArrow from 'public/icons/right-arrow.svg'
+import LeftArrow from 'public/icons/left-arrow.svg'
+import Down from 'public/icons/arrow-down.svg'
 
 const countWordsOnPage = 10
 

@@ -5,16 +5,16 @@ import Link from 'next/link'
 import { useTranslation } from '@/next-i18next'
 import toast from 'react-hot-toast'
 import jszip from 'jszip'
-
 import { JsonToPdf } from '@texttree/obs-format-convert-rcl'
 
 import ListBox from './ListBox'
 import Modal from './Modal'
 import Property from './Property'
-import { convertToUsfm, convertBookChapters } from '../helpers/usfm'
 
-import DownloadIcon from '../public/icons/download.svg'
-import Gear from '../public/icons/gear.svg'
+import { convertToUsfm, convertBookChapters } from '@/helpers/usfm'
+
+import DownloadIcon from 'public/icons/download.svg'
+import Gear from 'public/icons/gear.svg'
 
 const styles = {
   currentPage: {

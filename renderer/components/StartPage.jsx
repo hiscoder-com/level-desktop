@@ -5,8 +5,8 @@ import { useTranslation } from '@/next-i18next'
 
 import LanguageSwitcher from './LanguageSwitcher'
 
-import VcanaLogo from '../public/icons/vcana-logo-color.svg'
-import Gear from '../public/icons/gear.svg'
+import VcanaLogo from 'public/icons/vcana-logo-color.svg'
+import Gear from 'public/icons/gear.svg'
 
 export default function StartPage() {
   const router = useRouter()

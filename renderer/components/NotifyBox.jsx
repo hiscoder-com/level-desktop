@@ -1,19 +1,19 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from 'react'
 
 function NotifyBox() {
-  const [notify, setNotify] = useState(false);
+  const [notify, setNotify] = useState(false)
   useEffect(() => {
     window.electronAPI.notify((data) => {
-      setNotify(data);
+      setNotify(data)
       setTimeout(() => {
-        setNotify(false);
-      }, 2000);
-    });
+        setNotify(false)
+      }, 2000)
+    })
 
     return () => {
-      window.electronAPI.removeNotify();
-    };
-  }, []);
+      window.electronAPI.removeNotify()
+    }
+  }, [])
 
   return (
     <>
@@ -23,7 +23,7 @@ function NotifyBox() {
         </div>
       )}
     </>
-  );
+  )
 }
 
-export default NotifyBox;
+export default NotifyBox

@@ -6,10 +6,10 @@ import { useSetRecoilState } from 'recoil'
 import Modal from './Modal'
 import { obsCheckAdditionalVerses } from './Bible'
 
-import { checkedVersesBibleState } from '../helpers/atoms'
+import { checkedVersesBibleState } from '@/helpers/atoms'
 
-import Pencil from '../public/icons/pencil.svg'
-import Check from '../public/icons/check.svg'
+import Pencil from 'public/icons/pencil.svg'
+import Check from 'public/icons/check.svg'
 
 function BlindEditor({ config: { id, mainResource, chapter = false }, toolName }) {
   const { t } = useTranslation()

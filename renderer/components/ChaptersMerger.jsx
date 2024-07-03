@@ -4,9 +4,9 @@ import { useTranslation } from '@/next-i18next'
 import toast from 'react-hot-toast'
 import JSZip from 'jszip'
 
-import { convertToUsfm } from '../helpers/usfm'
+import { convertToUsfm } from '@/helpers/usfm'
 
-import Close from '../public/icons/close.svg'
+import Close from 'public/icons/close.svg'
 
 export default function ChaptersMerger({ book }) {
   const { t } = useTranslation(['common', 'projects'])

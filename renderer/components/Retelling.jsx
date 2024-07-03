@@ -4,10 +4,11 @@ import { useRouter } from 'next/router'
 import { useTranslation } from '@/next-i18next'
 import { useSetRecoilState } from 'recoil'
 
-import { inactiveState } from '../helpers/atoms'
 import Recorder from './Recorder'
 
-import Back from '../public/icons/left.svg'
+import { inactiveState } from '@/helpers/atoms'
+
+import Back from 'public/icons/left.svg'
 
 export default function Retelling() {
   const { t } = useTranslation()
