@@ -371,12 +371,38 @@ ipcMain.on('get-note', (event, projectid, noteid, type) => {
 
 ipcMain.on('remove-note', (event, projectid, noteid, type) => {
   const notesLS = getNotesWithType(type)
+  let notes = notesLS.store
 
-  notesLS.delete(noteid)
-  fs.rmSync(path.join(projectUrl, projectid, type, noteid + '.json'), {
-    force: true,
+  if (!notes[noteid]) {
+    event.returnValue = {}
+    event.sender.send('notify', 'Note not found')
+    return
+  }
+
+  const notesToDelete = [noteid]
+  const findNestedNotes = (parentId) => {
+    for (const [id, note] of Object.entries(notes)) {
+      if (note.parent_id === parentId) {
+        notesToDelete.push(id)
+        if (note.is_folder) {
+          findNestedNotes(id)
+        }
+      }
+    }
+  }
+
+  if (notes[noteid].is_folder) {
+    findNestedNotes(noteid)
+  }
+
+  notesToDelete.forEach((id) => {
+    notesLS.delete(id)
+    fs.rmSync(path.join(projectUrl, projectid, type, id + '.json'), {
+      force: true,
+    })
   })
-  event.returnValue = noteid
+
+  event.returnValue = notesToDelete
   event.sender.send('notify', 'Removed')
 })
 
