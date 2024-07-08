@@ -54,7 +54,6 @@ function ChapterList({ id, chapters, steps, mutate }) {
       combineVerses: false,
       showChapterTitlePage: false,
       showVerseNumber: true,
-      bookPropertiesObs: {},
       showPageFooters: false,
     })
       .then(() => console.log('PDF creation completed'))

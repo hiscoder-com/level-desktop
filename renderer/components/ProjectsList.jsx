@@ -125,13 +125,13 @@ function ProjectsList({ projectsList, setProjectsList }) {
     }
     JsonToPdf({
       data: book,
+      styles,
+      fileName,
       showImages: false,
       combineVerses: false,
       showChapterTitlePage: false,
       showVerseNumber: true,
       showPageFooters: false,
-      fileName,
-      styles,
     })
       .then(() => console.log('PDF creation completed'))
       .catch((error) => console.error('PDF creation failed:', error))
