@@ -371,7 +371,7 @@ ipcMain.on('get-note', (event, projectid, noteid, type) => {
 
 ipcMain.on('remove-note', (event, projectid, noteid, type) => {
   const notesLS = getNotesWithType(type)
-  let notes = notesLS.store
+  let notes = { ...notesLS.store }
 
   if (!notes[noteid]) {
     event.returnValue = {}
@@ -395,12 +395,29 @@ ipcMain.on('remove-note', (event, projectid, noteid, type) => {
     findNestedNotes(noteid)
   }
 
+  const parentId = notes[noteid].parent_id
+  const oldSorting = notes[noteid].sorting
+
   notesToDelete.forEach((id) => {
-    notesLS.delete(id)
+    delete notes[id]
+
     fs.rmSync(path.join(projectUrl, projectid, type, id + '.json'), {
       force: true,
     })
   })
+
+  const siblings = Object.values(notes).filter((note) => note.parent_id === parentId)
+
+  siblings.sort((a, b) => a.sorting - b.sorting)
+
+  siblings.forEach((note, index) => {
+    if (note.sorting > oldSorting) {
+      note.sorting = index
+      notes[note.id].sorting = index
+    }
+  })
+
+  notesLS.store = notes
 
   event.returnValue = notesToDelete
   event.sender.send('notify', 'Removed')
