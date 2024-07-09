@@ -81,7 +81,6 @@ export default function PersonalNotes({ config: { id }, config, toolName }) {
   const notes = Object.values(notesObject)
   const [dataForTreeView, setDataForTreeView] = useState(convertNotesToTree(notes))
   const [term, setTerm] = useState('')
-  // const isRtl = config?.isRtl || false;
   const isRtl = false
   const saveNote = () => {
     window.electronAPI.updateNote(id, activeNote, 'personal-notes')
@@ -500,7 +499,6 @@ export default function PersonalNotes({ config: { id }, config, toolName }) {
     setContextMenuEvent({ event })
   }
 
-  const handleBack = () => {}
   const dropMenuItems = {
     dots: menuItems.menu,
     plus: menuItems.contextMenu.filter((menuItem) =>
@@ -626,11 +624,9 @@ export default function PersonalNotes({ config: { id }, config, toolName }) {
           <div className="text-center text-2xl">
             {t('AreYouSureDelete') +
               ' ' +
-              t(
-                currentNodeProps
-                  ? currentNodeProps.node.data.name
-                  : t('AllNotes').toLowerCase()
-              ) +
+              (currentNodeProps
+                ? currentNodeProps.node.data.name
+                : t('AllNotes').toLowerCase()) +
               '?'}
           </div>
           <div className="flex gap-7 w-1/2 text-th-text-primary">
