@@ -1093,6 +1093,18 @@
   resolved "https://registry.yarnpkg.com/@editorjs/editorjs/-/editorjs-2.29.1.tgz#d7c644c5c3fc1ea1022373cbf2c8c3ac9f990b7b"
   integrity sha512-WRT2pCfikMsvySQJqpCU21LfTZaPuxUWsDO8aFGrPx4MKzOR9D+Ur4mNb3jq0FXx2EMqvIWfTyFixJxtjGHTyQ==
 
+"@editorjs/editorjs@^2.29.1":
+  version "2.30.1"
+  resolved "https://registry.yarnpkg.com/@editorjs/editorjs/-/editorjs-2.30.1.tgz#a16d862a70f03b708ef51cc08d3eb7f5adee3940"
+  integrity sha512-OB/xADM+j1wV0AY/PqadKr2cAGNLj5S6/QvLoD0nWZn6Yo6r78r+yyD8MzJ+IU8nvB2zIbSUNcE3kYCRtYrb0A==
+
+"@editorjs/paragraph@^2.11.6":
+  version "2.11.6"
+  resolved "https://registry.yarnpkg.com/@editorjs/paragraph/-/paragraph-2.11.6.tgz#011444187a74dc603201dce37d2fc6d054022407"
+  integrity sha512-i9B50Ylvh+0ZzUGWIba09PfUXsA00Y//zFZMwqsyaXXKxMluSIJ6ADFJbbK0zaV9Ijx49Xocrlg+CEPRqATk9w==
+  dependencies:
+    "@codexteam/icons" "^0.0.4"
+
 "@editorjs/paragraph@^2.9.0":
   version "2.11.4"
   resolved "https://registry.yarnpkg.com/@editorjs/paragraph/-/paragraph-2.11.4.tgz#ee91fc2d97f0aa9790860854fd804ef5d83d988e"
@@ -1545,6 +1557,18 @@
   dependencies:
     "@editorjs/editorjs" "^2.27.2"
     "@editorjs/paragraph" "^2.9.0"
+    editorjs-blocks-react-renderer "^1.3.0"
+    localforage "^1.10.0"
+    react-arborist "^3.2.0"
+    react-editor-js "^2.1.0"
+
+"@texttree/notepad-rcl@^2.5.0":
+  version "2.5.0"
+  resolved "https://registry.yarnpkg.com/@texttree/notepad-rcl/-/notepad-rcl-2.5.0.tgz#54b7f879582a597acc0bab1b681a813a7733602e"
+  integrity sha512-F+cmpg2qzMkp5STtEFjsrOOFmicghwbxY9sjhZP9MM1jbd1cEMKCjmbaQtEpe+4xy8W0rF0VrJjBwXwFoS96UQ==
+  dependencies:
+    "@editorjs/editorjs" "^2.29.1"
+    "@editorjs/paragraph" "^2.11.6"
     editorjs-blocks-react-renderer "^1.3.0"
     localforage "^1.10.0"
     react-arborist "^3.2.0"
