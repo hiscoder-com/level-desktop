@@ -1,29 +1,7 @@
 import { useEffect, useState } from 'react'
-import { atom, useRecoilState } from 'recoil'
+import { useRecoilState } from 'recoil'
 import { checkLSVal } from '@/helpers/checkls'
-
-const localStorageEffect =
-  (key) =>
-  ({ setSelf, onSet }) => {
-    if (typeof window !== 'undefined') {
-      const savedValue = window.electronAPI.getItem(key)
-      if (savedValue != null) {
-        setSelf(JSON.parse(savedValue))
-      }
-
-      onSet((newValue, _, isReset) => {
-        isReset
-          ? window.electronAPI.removeItem(key)
-          : window.electronAPI.setItem(key, JSON.stringify(newValue))
-      })
-    }
-  }
-
-export const currentVerse = atom({
-  key: 'currentVerse',
-  default: '1',
-  effects: [localStorageEffect('currentScrollVerse')],
-})
+import { currentVerse } from '@/helpers/atoms'
 
 export function useScroll({ toolName, isLoading, idPrefix }) {
   const [currentScrollVerse, setCurrentScrollVerse] = useRecoilState(currentVerse)
