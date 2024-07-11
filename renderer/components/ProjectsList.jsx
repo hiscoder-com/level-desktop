@@ -128,7 +128,6 @@ function ProjectsList({ projectsList, setProjectsList }) {
       styles,
       fileName,
       showImages: false,
-      combineVerses: false,
       showChapterTitlePage: false,
       showVerseNumber: true,
       showPageFooters: false,
