@@ -467,23 +467,34 @@ ipcMain.on('get-chapter', (event, projectid, chapter) => {
 })
 
 ipcMain.on('update-chapter', (event, projectid, chapter, data) => {
-  const chapterData = JSON.parse(
+  const localChapterData = JSON.parse(
     fs.readFileSync(path.join(projectUrl, projectid, 'chapters', chapter + '.json'), {
       encoding: 'utf-8',
     })
   )
-  for (const verse in data) {
-    if (Object.hasOwnProperty.call(data, verse)) {
-      chapterData[verse].text = data[verse].text
+  const compareEqualArrays = (arr1, arr2) => {
+    if (arr1.length !== arr2.length) {
+      return false
     }
+    return arr1.every((item, index) => item === arr2[index])
   }
-  fs.writeFileSync(
-    path.join(projectUrl, projectid, 'chapters', chapter + '.json'),
-    JSON.stringify(chapterData, null, 2),
-    { encoding: 'utf-8' }
-  )
-  event.returnValue = chapter
-  event.sender.send('notify', 'Updated')
+  if (!compareEqualArrays(Object.keys(localChapterData), Object.keys(data))) {
+    event.returnValue = false
+    event.sender.send('notify', 'Error updating chapter')
+  } else {
+    for (const verse in data) {
+      if (Object.hasOwnProperty.call(data, verse) && !localChapterData[verse].enabled) {
+        localChapterData[verse].text = data[verse].text
+      }
+    }
+    fs.writeFileSync(
+      path.join(projectUrl, projectid, 'chapters', chapter + '.json'),
+      JSON.stringify(localChapterData, null, 2),
+      { encoding: 'utf-8' }
+    )
+    event.returnValue = true
+    event.sender.send('notify', 'Updated')
+  }
 })
 
 ipcMain.on('update-verse', (event, projectid, chapter, verse, text) => {

@@ -16,6 +16,7 @@ function Merger({ config }) {
   useEffect(() => {
     const handleUpdate = () => {
       setImportedChapter(null)
+      fileInputRef.current.value = ''
     }
 
     window.electronAPI.onUpdateChapter(handleUpdate)
@@ -72,12 +73,19 @@ function Merger({ config }) {
   }
 
   const merge = () => {
-    window.electronAPI.updateChapter(
+    if (!importedChapter || !importedChapter[config.chapter]) {
+      return toast.error(t('WrongImportedData'))
+    }
+    const isUpdated = window.electronAPI.updateChapter(
       config.id,
       config.chapter,
       Object.values(importedChapter)[0]
     )
-    toast.success(t('ChapterUpdated'))
+    if (isUpdated) {
+      toast.success(t('ChapterUpdated'))
+    } else {
+      toast.error(t('WrongImportedData'))
+    }
   }
 
   return (
@@ -93,11 +101,7 @@ function Merger({ config }) {
         >
           {t('ImportArchive')}
         </button>
-        <button
-          onClick={() => merge()}
-          className="btn-strong w-fit"
-          disabled={!importedChapter}
-        >
+        <button onClick={merge} className="btn-strong w-fit" disabled={!importedChapter}>
           {t('MergeVerses')}
         </button>
       </div>

@@ -75,6 +75,7 @@
   "USFM": "USFM",
   "V-CANA": "V-CANA",
   "WordExist": "Такое слово уже существует:",
+  "WrongImportedData": "Неверные данные импорта",
   "WrongResource": "Ошибка загрузки ресурса",
   "Yes": "Да",
   "YourselfRetelling": "Пересказ себе"
