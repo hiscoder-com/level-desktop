@@ -1,20 +1,13 @@
-import React, { Fragment } from 'react'
+import { Fragment } from 'react'
 import Link from 'next/link'
-import { useTranslation } from 'react-i18next'
 
-import VcanaLogo from '../public/icons/vcana-logo.svg'
+import VcanaLogo from 'public/icons/vcana-logo.svg'
 
 export default function Breadcrumbs({ links = [], currentTitle }) {
-  const {
-    i18n: { language: locale },
-  } = useTranslation()
-
-  const homeUrl = `/${locale}/account`
-
   return (
-    <div className="bg-gray-200 dark:bg-slate-550 mb-4">
+    <div className="absolute top-0 left-0 w-full bg-gray-200 dark:bg-slate-550 mb-4">
       <div className="flex items-center px-6 py-4 mx-auto overflow-x-auto whitespace-nowrap">
-        <Link href={homeUrl} legacyBehavior>
+        <Link href={`${currentTitle ? '/account' : '/home'}`} legacyBehavior>
           <a className="text-gray-600 dark:text-gray-200">
             <VcanaLogo className="w-32" />
           </a>

@@ -1,16 +1,15 @@
-import Document, { Head, Html, Main, NextScript } from "next/document";
-import i18next from "../../next-i18next.config.js";
+import Document, { Head, Html, Main, NextScript } from 'next/document'
 
 export default class MyDocument extends Document {
   render() {
     return (
-      <Html lang={i18next.i18n.defaultLocale}>
+      <Html>
         <Head />
         <body>
           <Main />
           <NextScript />
         </body>
       </Html>
-    );
+    )
   }
 }

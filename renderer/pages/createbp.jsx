@@ -1,15 +1,12 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import Head from 'next/head'
 import Link from 'next/link'
-import { useTranslation } from 'react-i18next'
-import { books } from '../helpers/books'
-import { makeStaticProperties, getStaticPaths } from '../../lib/get-static'
+
+import { useTranslation } from '@/next-i18next'
+import { books } from '@/helpers/books'
 
 function Create() {
-  const {
-    i18n: { language: locale },
-    t,
-  } = useTranslation()
+  const { t } = useTranslation()
   const [fileUrl, setFileUrl] = useState('')
   const [resources, setResources] = useState([])
 
@@ -32,7 +29,7 @@ function Create() {
         <title>{t('V-CANA')}</title>
       </Head>
       <div className="text-lg w-full p-4">
-        <Link href={`${locale}/home`} legacyBehavior>
+        <Link href={`home`} legacyBehavior>
           <a className="border py-2 px-3 rounded-md bg-slate-300">{t('Back')}</a>
         </Link>
         <br />
@@ -83,7 +80,3 @@ function Create() {
 }
 
 export default Create
-
-export const getStaticProps = makeStaticProperties(['common'])
-
-export { getStaticPaths }

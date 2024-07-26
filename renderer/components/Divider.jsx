@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react'
 
 import ReactMarkdown from 'react-markdown'
 
-import { useScroll } from '../hooks/useScroll'
-import { useGetUsfmResource } from '../hooks/useGetUsfmResource'
 import { Placeholder } from './Placeholder'
 import CheckBox from './CheckBox'
+
+import { useScroll } from '@/hooks/useScroll'
+import { useGetUsfmResource } from '@/hooks/useGetUsfmResource'
 
 export const obsCheckAdditionalVerses = (numVerse) => {
   if (['0', '200'].includes(String(numVerse))) {
@@ -47,9 +48,10 @@ function Divider({ config: { resource, id, chapter = false }, toolName, wholeCha
 
 export default Divider
 
-function Verses({ verseObjects, handleSaveScroll, currentScrollVerse = 1, id, chapter }) {
+function Verses({ verseObjects, id, chapter, currentScrollVerse = 1 }) {
   const t = () => {}
   const [versesDivide, setVersesDivide] = useState({})
+
   useEffect(() => {
     const verses = window.electronAPI.getChapter(id, chapter)
     const versesEnabled = Object.keys(verses).reduce((acc, key) => {
@@ -68,6 +70,7 @@ function Verses({ verseObjects, handleSaveScroll, currentScrollVerse = 1, id, ch
       [verseNum]: enabled,
     }))
   }
+
   return (
     <>
       {verseObjects?.map((verseObject) => (
@@ -92,6 +95,7 @@ function Verses({ verseObjects, handleSaveScroll, currentScrollVerse = 1, id, ch
                 'bg-th-secondary-10 checked:bg-th-primary-100 checked:border-th-secondary-400 checked:before:bg-th-secondary-400 border-th-secondary',
               cursor: 'fill-th-secondary-10 text-th-secondary-10 stroke-th-secondary-10',
             }}
+            id={`checkBox-${verseObject.verse}`}
             label={t('Done')}
           />
           <ReactMarkdown>

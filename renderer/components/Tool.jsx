@@ -1,4 +1,4 @@
-import { useTranslation } from 'react-i18next'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import Retelling from './Retelling'
 import Bible from './Bible'
@@ -14,7 +14,9 @@ import Divider from './Divider'
 import TeamNotes from './TeamNotes'
 import Merger from './Merger'
 
-function Tool({ config, toolName }) {
+import { useTranslation } from '@/next-i18next'
+
+function Tool({ config, toolName, isSingleTab }) {
   const { t } = useTranslation()
   let CurrentTool
   let title = toolName
@@ -33,24 +35,6 @@ function Tool({ config, toolName }) {
       CurrentTool = Merger
       break
 
-    // case 'OBS Translation Questions':
-    // case 'TSV OBS Translation Questions':
-    //   CurrentTool = TQ;
-
-    //   config.resource.bookPath = config.resource.manifest.projects[0]?.path;
-
-    //   url = '/api/git/obs-tq';
-    //   break;
-
-    // case 'OBS Translation Notes':
-    // case 'TSV OBS Translation Notes':
-    //   CurrentTool = OBSTN;
-
-    //   config.resource.bookPath = config.resource.manifest.projects[0]?.path;
-
-    //   url = '/api/git/obs-tn';
-    //   break;
-
     case 'twl':
       CurrentTool = TWL
       break
@@ -62,14 +46,6 @@ function Tool({ config, toolName }) {
     case 'tq':
       CurrentTool = TQ
       break
-
-    // case 'Open Bible Stories':
-    //   CurrentTool = Bible;
-
-    //   config.resource.bookPath = config.resource.manifest.projects[0]?.path;
-
-    //   url = '/api/git/obs';
-    //   break;
 
     case 'editor':
       CurrentTool = Editor
@@ -109,25 +85,64 @@ function Tool({ config, toolName }) {
     default:
       return <div>{t('WrongResource')}</div>
   }
+  const contentRef = useRef(null)
+  const [hasVerticalScroll, setHasVerticalScroll] = useState(false)
+
+  const checkVerticalScroll = useCallback(() => {
+    const contentElement = contentRef.current
+    if (contentElement) {
+      const hasScroll = contentElement.scrollHeight > contentElement.clientHeight
+      setHasVerticalScroll(hasScroll)
+    }
+  }, [])
+
+  useEffect(() => {
+    const handleResize = () => {
+      checkVerticalScroll()
+    }
+
+    window.addEventListener('resize', handleResize)
+    checkVerticalScroll()
+
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [checkVerticalScroll])
+
+  useEffect(() => {
+    checkVerticalScroll()
+  }, [toolName, checkVerticalScroll])
+
+  useEffect(() => {
+    const contentElement = contentRef.current
+    if (contentElement) {
+      const observer = new MutationObserver(checkVerticalScroll)
+      observer.observe(contentElement, { subtree: true, childList: true })
+
+      return () => {
+        observer.disconnect()
+      }
+    }
+  }, [checkVerticalScroll])
+
   return (
     <>
-      <div className="pt-2.5 px-4 h-10 font-bold bg-th-primary-200 text-th-text-secondary-100 rounded-t-lg truncate">
-        {/* {![
-          "translate",
-          "commandTranslate",
-          "draftTranslate",
-          "teamNotes",
-          "personalNotes",
-          "retelling",
-          "dictionary",
-        ].includes(toolName) &&
-          `${t(`books:${config?.reference?.book}`)} ${
-            config?.reference?.chapter
-          }, `} */}
-        {title}
+      <div
+        className={`h-10 bg-th-primary-200 ${
+          isSingleTab
+            ? 'rounded-tr-xl'
+            : 'pt-2.5 px-4 font-bold truncate text-th-text-secondary-100 rounded-t-xl'
+        }`}
+      >
+        {!isSingleTab && title}
       </div>
       <div className="adaptive-card border border-b-th-secondary-300 border-l-th-secondary-300 border-r-th-secondary-300 rounded-b-lg box-border">
-        <div className="h-full p-4 overflow-x-hidden overflow-y-auto">
+        <div
+          className={`h-full overflow-x-hidden overflow-y-auto py-4 pl-4 ${
+            hasVerticalScroll ? 'pr-1' : 'pr-5'
+          }`}
+          ref={contentRef}
+        >
           <CurrentTool config={config} toolName={toolName} />
         </div>
       </div>

@@ -258,10 +258,15 @@
 }
 
 .tab {
-  @apply py-2 px-2 text-base border-x border-t rounded-t-2xl;
+  @apply py-2 px-2 text-base border-x border-t rounded-t-xl;
 }
 .tab-active {
   @apply tab text-th-text-secondary-100 bg-th-primary-400 border-th-primary-400
+  cursor-default focus:outline-none shadow;
+}
+
+.tab-single {
+  @apply tab text-th-text-secondary-100 bg-th-primary-200 border-th-primary-400
   cursor-default focus:outline-none shadow;
 }
 
@@ -289,6 +294,10 @@
   disabled:text-th-text-secondary-100 disabled:cursor-default;
 }
 
+.btn-strong {
+  @apply rounded-md py-2.5 px-4 text-center cursor-pointer text-sm md:text-base text-th-text-secondary-100 bg-th-primary-200 hover:opacity-70 disabled:opacity-50 disabled:cursor-auto;
+}
+
 .btn-secondary {
   @apply btn-base text-th-text-primary bg-th-secondary-10 hover:opacity-70;
 }
@@ -302,7 +311,7 @@
 }
 
 .btn-red {
-  @apply btn-base text-th-invalid border-th-invalid border  hover:bg-th-invalid hover:text-th-text-secondary-100;
+  @apply btn-base text-th-invalid border-th-invalid border hover:bg-th-invalid hover:text-th-text-secondary-100;
 }
 
 .step-link {
@@ -365,7 +374,7 @@
 
 .green-two-layers {
   position: relative;
-  background: linear-gradient(45deg, #24585b 50%, transparent 50%);
+  background: linear-gradient(310deg, #24585b 47%, transparent 47%);
 }
 
 .green-two-layers::after {
@@ -375,7 +384,7 @@
   right: 0;
   bottom: 0;
   left: 0;
-  background: linear-gradient(340deg, #113e41 40%, transparent 40%);
+  background: linear-gradient(310deg, #113e41 32%, transparent 32%);
   z-index: -1;
 }
 

@@ -3,12 +3,24 @@ import { Fragment, useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 
 import { Transition } from '@headlessui/react'
+import { Toaster } from 'react-hot-toast'
 
-import Progress from '../public/icons/progress.svg'
+import Progress from 'public/icons/progress.svg'
 
 function Layout({ children }) {
   const [loadingPage, setLoadingPage] = useState(false)
   const router = useRouter()
+
+  const homePath = '/home'
+
+  const getMainClassName = () => {
+    if (router.pathname === homePath) {
+      return 'mx-auto min-h-screen'
+    } else {
+      return 'mx-auto h-[calc(100vh-5rem)] mt-20'
+    }
+  }
+
   useEffect(() => {
     const handleStart = (url, { shallow }) => {
       if (!shallow) {
@@ -22,7 +34,7 @@ function Layout({ children }) {
   }, [router])
   return (
     <>
-      <div className="mx-auto min-h-screen">
+      <div className={getMainClassName()}>
         <Transition
           as={Fragment}
           appear={true}
@@ -38,6 +50,8 @@ function Layout({ children }) {
         </Transition>
         <main>{children}</main>
       </div>
+
+      <Toaster />
     </>
   )
 }

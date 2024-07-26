@@ -1,6 +1,11 @@
 const { contextBridge, ipcRenderer } = require('electron')
 
 process.once('loaded', () => {
+  ipcRenderer.on('update-project-config-reply', (event, success) => {
+    if (!success) {
+      console.error('Failed to update project config')
+    }
+  })
   contextBridge.exposeInMainWorld('electronAPI', {
     openFile: () => ipcRenderer.invoke('dialog:openFile'),
     openConfig: () => ipcRenderer.invoke('dialog:openConfig'),
@@ -9,8 +14,26 @@ process.once('loaded', () => {
         handler(data)
       }),
     removeNotify: () => ipcRenderer.removeAllListeners('notify'),
+    localeChanged: (handler) =>
+      ipcRenderer.on('localeChanged', (event, data) => {
+        handler(data)
+      }),
+    removeLocaleChanged: () => ipcRenderer.removeAllListeners('localeChanged'),
     getProjects: () => ipcRenderer.sendSync('get-projects'),
     getProject: (id) => ipcRenderer.sendSync('get-project', id),
+    getProperties: (projectId) => ipcRenderer.sendSync('get-properties', projectId),
+    updateProperties: (projectId, properties) =>
+      ipcRenderer.sendSync('update-properties', projectId, properties),
+    updateProjectName: (projectId, newName) => {
+      ipcRenderer.send('update-project-name', projectId, newName),
+        ipcRenderer.on('project-name-updated', (event, projectId, newName) => {
+          window.dispatchEvent(
+            new CustomEvent('project-name-updated', { detail: { projectId, newName } })
+          )
+        })
+    },
+    updateProjectConfig: (id, updatedConfig) =>
+      ipcRenderer.send('update-project-config', id, updatedConfig),
     goToStep: (id, chapter, step) =>
       ipcRenderer.sendSync('go-to-step', id, chapter, step),
     getChapter: (projectid, chapter) =>
@@ -18,6 +41,13 @@ process.once('loaded', () => {
     getBook: (projectid) => ipcRenderer.sendSync('get-book', projectid),
     updateChapter: (projectid, chapter, data) =>
       ipcRenderer.sendSync('update-chapter', projectid, chapter, data),
+    onUpdateChapter: (callback) => {
+      ipcRenderer.on('notify', callback)
+      return () => ipcRenderer.removeListener('notify', callback)
+    },
+    removeUpdateChapterListener: (callback) => {
+      ipcRenderer.removeListener('notify', callback)
+    },
     divideVerse: (projectid, chapter, verse, enabled) =>
       ipcRenderer.send('divide-verse', projectid, chapter, verse, enabled),
     updateVerse: (projectid, chapter, verse, text) =>
@@ -29,6 +59,8 @@ process.once('loaded', () => {
     addWord: (projectid, wordid) => ipcRenderer.sendSync('add-word', projectid, wordid),
     updateWord: (projectid, word) => ipcRenderer.sendSync('update-word', projectid, word),
     getWord: (projectid, wordid) => ipcRenderer.sendSync('get-word', projectid, wordid),
+    getI18n: (ns) => ipcRenderer.sendSync('get-i18n', ns),
+    getLang: () => ipcRenderer.sendSync('get-lang'),
     getWordsWithData: (projectid, wordids) =>
       ipcRenderer.sendSync('get-words-with-data', projectid, wordids),
     importWord: (projectid, note) => ipcRenderer.sendSync('import-word', projectid, note),
@@ -66,7 +98,29 @@ process.once('loaded', () => {
       ipcRenderer.sendSync('get-tq', id, resource, mainResource, chapter),
     getTWL: (id, resource, mainResource, chapter = false) =>
       ipcRenderer.sendSync('get-twl', id, resource, mainResource, chapter),
-    addProject: (fileUrl) => ipcRenderer.send('add-project', fileUrl),
+    addProject: (fileUrl) => {
+      return new Promise((resolve, reject) => {
+        ipcRenderer.removeAllListeners('project-added')
+        ipcRenderer.removeAllListeners('project-add-error')
+
+        ipcRenderer.once(
+          'project-added',
+          (event, projectId, project, updatedProjects) => {
+            window.dispatchEvent(
+              new CustomEvent('project-added', {
+                detail: { projectId, project, updatedProjects },
+              })
+            )
+            resolve({ projectId, project, updatedProjects })
+          }
+        )
+        ipcRenderer.once('project-add-error', (event, error) => {
+          reject(error)
+        })
+        ipcRenderer.send('add-project', fileUrl)
+      })
+    },
+    deleteProject: (projectId) => ipcRenderer.send('delete-project', projectId),
   })
 
   const handler = {

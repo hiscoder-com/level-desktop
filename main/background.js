@@ -33,6 +33,7 @@ let projectUrl = path.join(app.getPath('userData'), 'projects')
 async function handleFileOpen() {
   const { canceled, filePaths } = await dialog.showOpenDialog({
     buttonLabel: 'Создать проект',
+    filters: [{ name: 'Zip Archives', extensions: ['zip'] }],
   })
   if (!canceled) {
     return filePaths[0]
@@ -66,14 +67,11 @@ async function handleConfigOpen() {
     },
   })
 
-  const locale = localeStore.get('locale', i18next.i18n.defaultLocale)
-
   if (isProd) {
-    await mainWindow.loadURL(`app://./${locale}/home`)
+    await mainWindow.loadURL(`app://./home`)
   } else {
     const port = process.argv[2]
-    await mainWindow.loadURL(`http://localhost:${port}/${locale}/home`)
-    // mainWindow.webContents.openDevTools();
+    await mainWindow.loadURL(`http://localhost:${port}/home`)
   }
 })()
 
@@ -215,6 +213,38 @@ ipcMain.on('update-word', (event, projectid, word) => {
   event.sender.send('notify', 'Updated')
 })
 
+ipcMain.on('get-lang', (event) => {
+  event.returnValue = localeStore.get('locale', i18next.i18n.defaultLocale)
+})
+
+ipcMain.on('get-i18n', (event, ns = 'common') => {
+  const lang = localeStore.get('locale', i18next.i18n.defaultLocale)
+  let res = {}
+  let fileDest
+  if (isProd) {
+    fileDest = path.join(__dirname, 'locales/')
+  } else {
+    fileDest = path.resolve('./renderer/public/locales/')
+  }
+
+  if (Array.isArray(ns)) {
+    ns.forEach((n) => {
+      res[n] = JSON.parse(
+        fs.readFileSync(path.join(fileDest, lang, n + '.json'), {
+          encoding: 'utf-8',
+        })
+      )
+    })
+  } else {
+    res[ns] = JSON.parse(
+      fs.readFileSync(path.join(fileDest, lang, ns + '.json'), {
+        encoding: 'utf-8',
+      })
+    )
+  }
+  event.returnValue = res
+})
+
 ipcMain.on('get-word', (event, projectid, wordid) => {
   const data = fs.readFileSync(
     path.join(projectUrl, projectid, 'dictionary', wordid + '.json'),
@@ -341,12 +371,55 @@ ipcMain.on('get-note', (event, projectid, noteid, type) => {
 
 ipcMain.on('remove-note', (event, projectid, noteid, type) => {
   const notesLS = getNotesWithType(type)
+  let notes = { ...notesLS.store }
 
-  notesLS.delete(noteid)
-  fs.rmSync(path.join(projectUrl, projectid, type, noteid + '.json'), {
-    force: true,
+  if (!notes[noteid]) {
+    event.returnValue = {}
+    event.sender.send('notify', 'Note not found')
+    return
+  }
+
+  const notesToDelete = [noteid]
+  const findNestedNotes = (parentId) => {
+    for (const [id, note] of Object.entries(notes)) {
+      if (note.parent_id === parentId) {
+        notesToDelete.push(id)
+        if (note.is_folder) {
+          findNestedNotes(id)
+        }
+      }
+    }
+  }
+
+  if (notes[noteid].is_folder) {
+    findNestedNotes(noteid)
+  }
+
+  const parentId = notes[noteid].parent_id
+  const oldSorting = notes[noteid].sorting
+
+  notesToDelete.forEach((id) => {
+    delete notes[id]
+
+    fs.rmSync(path.join(projectUrl, projectid, type, id + '.json'), {
+      force: true,
+    })
   })
-  event.returnValue = noteid
+
+  const siblings = Object.values(notes).filter((note) => note.parent_id === parentId)
+
+  siblings.sort((a, b) => a.sorting - b.sorting)
+
+  siblings.forEach((note, index) => {
+    if (note.sorting > oldSorting) {
+      note.sorting = index
+      notes[note.id].sorting = index
+    }
+  })
+
+  notesLS.store = notes
+
+  event.returnValue = notesToDelete
   event.sender.send('notify', 'Removed')
 })
 
@@ -394,23 +467,34 @@ ipcMain.on('get-chapter', (event, projectid, chapter) => {
 })
 
 ipcMain.on('update-chapter', (event, projectid, chapter, data) => {
-  const chapterData = JSON.parse(
+  const localChapterData = JSON.parse(
     fs.readFileSync(path.join(projectUrl, projectid, 'chapters', chapter + '.json'), {
       encoding: 'utf-8',
     })
   )
-  for (const verse in data) {
-    if (Object.hasOwnProperty.call(data, verse)) {
-      chapterData[verse].text = data[verse].text
+  const compareEqualArrays = (arr1, arr2) => {
+    if (arr1.length !== arr2.length) {
+      return false
     }
+    return arr1.every((item, index) => item === arr2[index])
   }
-  fs.writeFileSync(
-    path.join(projectUrl, projectid, 'chapters', chapter + '.json'),
-    JSON.stringify(chapterData, null, 2),
-    { encoding: 'utf-8' }
-  )
-  event.returnValue = chapter
-  event.sender.send('notify', 'Updated')
+  if (!compareEqualArrays(Object.keys(localChapterData), Object.keys(data))) {
+    event.returnValue = false
+    event.sender.send('notify', 'Error updating chapter')
+  } else {
+    for (const verse in data) {
+      if (Object.hasOwnProperty.call(data, verse) && !localChapterData[verse].enabled) {
+        localChapterData[verse].text = data[verse].text
+      }
+    }
+    fs.writeFileSync(
+      path.join(projectUrl, projectid, 'chapters', chapter + '.json'),
+      JSON.stringify(localChapterData, null, 2),
+      { encoding: 'utf-8' }
+    )
+    event.returnValue = true
+    event.sender.send('notify', 'Updated')
+  }
 })
 
 ipcMain.on('update-verse', (event, projectid, chapter, verse, text) => {
@@ -674,6 +758,24 @@ const restoreStepData = (projectid, chapter, step) => {
   )
 }
 
+ipcMain.on('update-project-config', (event, id, updatedConfig) => {
+  const configPath = path.join(projectUrl, id, 'config.json')
+
+  try {
+    const currentConfig = JSON.parse(fs.readFileSync(configPath, { encoding: 'utf-8' }))
+    const mergedConfig = { ...currentConfig, ...updatedConfig }
+
+    fs.writeFileSync(configPath, JSON.stringify(mergedConfig, null, 2), {
+      encoding: 'utf-8',
+    })
+
+    event.sender.send('update-project-config-reply', true)
+  } catch (error) {
+    console.error(`Error updating project config: ${error}`)
+    event.sender.send('update-project-config-reply', false)
+  }
+})
+
 ipcMain.on('go-to-step', async (event, id, chapter, step) => {
   const config = JSON.parse(
     fs.readFileSync(path.join(projectUrl, id, 'config.json'), {
@@ -715,30 +817,173 @@ ipcMain.on('get-project', async (event, id) => {
   event.sender.send('notify', 'Project Loaded')
 })
 
-ipcMain.on('add-project', (event, url) => {
+ipcMain.on('add-project', async (event, url) => {
+  let tempDir = null
+  const defaultProperties = {
+    h: '',
+    toc1: '',
+    toc2: '',
+    toc3: '',
+    mt: '',
+    chapter_label: '',
+  }
+
+  const createPropertiesFile = async (projectId, properties) => {
+    const projectPath = path.join(projectUrl, projectId)
+    const propertiesPath = path.join(projectPath, 'properties.json')
+
+    await fs.promises.writeFile(propertiesPath, JSON.stringify(properties, null, 2))
+  }
+
+  const validateProjectStructure = (projectPath) => {
+    const requiredFolders = ['chapters', 'dictionary', 'personal-notes', 'team-notes']
+    const configFile = 'config.json'
+
+    for (const folder of requiredFolders) {
+      if (!fs.existsSync(path.join(projectPath, folder))) {
+        throw new Error(`Missing required folder!`)
+      }
+    }
+
+    if (!fs.existsSync(path.join(projectPath, configFile))) {
+      throw new Error(`Missing required file!`)
+    }
+
+    const configContent = fs.readFileSync(path.join(projectPath, configFile), 'utf-8')
+    const config = JSON.parse(configContent)
+    if (
+      !config.book ||
+      typeof config.book !== 'object' ||
+      !config.book.code ||
+      !config.book.name
+    ) {
+      throw new Error('Invalid book structure in config.json')
+    }
+    if (!config.project || typeof config.project !== 'string') {
+      throw new Error('Invalid project in config.json')
+    }
+    if (!config.method || typeof config.method !== 'string') {
+      throw new Error('Invalid method in config.json')
+    }
+  }
+
   if (url) {
-    const projects = storeProjects.get('projects') || []
-    const id = uuid()
-    const createdAt = Date.now()
-    const project = { id, createdAt }
-    const decompress = require('decompress')
-    decompress(url, path.join(projectUrl, id)).then(() => {
+    try {
+      const projects = storeProjects.get('projects') || []
+      const id = uuid()
+      const createdAt = Date.now()
+      const project = { id, createdAt }
+      const decompress = require('decompress')
+
+      tempDir = path.join(projectUrl, 'temp_' + id)
+      await decompress(url, tempDir)
+
+      validateProjectStructure(tempDir)
+
+      const finalDir = path.join(projectUrl, id)
+      await fs.promises.rename(tempDir, finalDir)
+
       const config = JSON.parse(
-        fs.readFileSync(path.join(projectUrl, id, 'config.json'), {
-          encoding: 'utf-8',
-        })
+        await fs.promises.readFile(path.join(finalDir, 'config.json'), 'utf-8')
       )
+
+      config.showIntro ??= true
+
+      const configPath = path.join(finalDir, 'config.json')
+      try {
+        await fs.promises.writeFile(configPath, JSON.stringify(config, null, 2))
+      } catch (error) {
+        console.error('Error writing config file:', error)
+        throw new Error('Failed to write config file')
+      }
+
       project.book = { ...config.book }
       project.name = config.project
       project.method = config.method
+
+      await createPropertiesFile(id, defaultProperties)
+
       projects.push(project)
       storeProjects.set('projects', projects)
       event.sender.send('notify', 'Created')
-      event.returnValue = projects
-    })
+
+      const updatedProjects = storeProjects.get('projects') || []
+      event.sender.send('project-added', id, project, updatedProjects)
+    } catch (error) {
+      console.error('Error adding project:', error)
+      event.sender.send('notify', `Error: ${error.message}`)
+
+      if (tempDir && fs.existsSync(tempDir)) {
+        await fs.promises.rm(tempDir, { recursive: true })
+      }
+      event.sender.send('project-add-error', error.message)
+    }
   } else {
     event.sender.send('notify', 'Url not set')
   }
+})
+
+ipcMain.on('get-properties', (event, projectId) => {
+  const propertiesPath = path.join(projectUrl, projectId, 'properties.json')
+  try {
+    const propertiesData = fs.readFileSync(propertiesPath, 'utf8')
+    event.returnValue = JSON.parse(propertiesData)
+  } catch (err) {
+    console.error(`Error reading properties file for project ${projectId}:`, err)
+    event.returnValue = {}
+  }
+})
+
+ipcMain.on('update-properties', (event, projectId, properties) => {
+  const propertiesPath = path.join(projectUrl, projectId, 'properties.json')
+  try {
+    fs.writeFileSync(propertiesPath, JSON.stringify(properties, null, 2))
+    event.returnValue = true
+  } catch (err) {
+    console.error(`Error writing properties file for project ${projectId}:`, err)
+    event.returnValue = false
+  }
+})
+
+ipcMain.on('update-project-name', (event, projectId, newName) => {
+  const projects = storeProjects.get('projects') || []
+  const updatedProjects = projects.map((project) => {
+    if (project.id === projectId) {
+      return {
+        ...project,
+        book: {
+          ...project.book,
+          name: newName,
+        },
+      }
+    }
+    return project
+  })
+  storeProjects.set('projects', updatedProjects)
+  event.sender.send('project-name-updated', projectId, newName)
+})
+
+ipcMain.on('delete-project', (event, projectId) => {
+  const projectsFilePath = path.join(app.getPath('userData'), 'projects.json')
+  const projectsData = JSON.parse(fs.readFileSync(projectsFilePath, 'utf8'))
+
+  projectsData.projects = projectsData.projects.filter(
+    (project) => project.id !== projectId
+  )
+
+  fs.writeFileSync(projectsFilePath, JSON.stringify(projectsData, null, 2))
+
+  const projectDirPath = path.join(projectUrl, projectId)
+  fs.rm(projectDirPath, { recursive: true }, (err) => {
+    if (err) {
+      console.error(`Error when deleting project folder: ${err}`)
+      event.sender.send('notify', 'Error deleting project')
+      return
+    }
+    event.sender.send('notify', 'Project deleted')
+
+    event.sender.send('projects-updated', projectsData.projects)
+  })
 })
 
 ipcMain.handle('dialog:openFile', handleFileOpen)

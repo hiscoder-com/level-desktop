@@ -1,13 +1,13 @@
 import { useMemo } from 'react'
 
 import ReactMarkdown from 'react-markdown'
-
 import { useRecoilValue } from 'recoil'
 
-import { useScroll } from '../hooks/useScroll'
-import { useGetUsfmResource } from '../hooks/useGetUsfmResource'
 import { Placeholder } from './Placeholder'
-import { checkedVersesBibleState } from '../helpers/atoms'
+
+import { useScroll } from '@/hooks/useScroll'
+import { useGetUsfmResource } from '@/hooks/useGetUsfmResource'
+import { checkedVersesBibleState } from '@/helpers/atoms'
 
 export const obsCheckAdditionalVerses = (numVerse) => {
   if (['0', '200'].includes(String(numVerse))) {
@@ -83,6 +83,7 @@ function VersesExtended({ verseObjects, handleSaveScroll, currentScrollVerse = 1
     <>
       {verseObjects?.map((verseObject) => {
         const checkedCurrent = checkedVersesBible.includes(verseObject.verse)
+
         return (
           <div
             key={verseObject.verse}

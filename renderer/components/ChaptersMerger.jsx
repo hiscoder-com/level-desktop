@@ -1,11 +1,12 @@
-import React, { useRef, useState } from 'react'
-import { useTranslation } from 'react-i18next'
+import { useRef, useState } from 'react'
 
+import toast from 'react-hot-toast'
 import JSZip from 'jszip'
 
-import { convertToUsfm } from '../helpers/usfm'
+import { useTranslation } from '@/next-i18next'
+import { convertToUsfm } from '@/helpers/usfm'
 
-import Close from '../public/icons/close.svg'
+import Close from 'public/icons/close.svg'
 
 export default function ChaptersMerger({ book }) {
   const { t } = useTranslation(['common', 'projects'])
@@ -45,31 +46,62 @@ export default function ChaptersMerger({ book }) {
       console.log(error.message)
     }
   }
+
   const handleFiles = async (files) => {
     const jsonPromises = []
+
     for (let file of files) {
+      if (!file.name.toLowerCase().endsWith('.zip')) {
+        toast.error(t('projects:FileTypeIncorrect'))
+        continue
+      }
+
       const zip = new JSZip()
-      const zipContents = await zip.loadAsync(file)
-      for (let filename in zipContents.files) {
-        const existingFile = checkEqualFiles(filename)
-        if (filename.endsWith('.json') && !existingFile) {
-          const filePromise = zipContents.files[filename]
-            .async('text')
-            .then((fileData) => {
-              const data = JSON.parse(fileData)
-              return { filename, content: data }
-            })
-          jsonPromises.push(filePromise)
-        } else if (filename.endsWith('.json') && existingFile) {
+      try {
+        const zipContents = await zip.loadAsync(file)
+        let hasJsonFile = false
+
+        for (let filename in zipContents.files) {
+          if (filename.toLowerCase().endsWith('.json')) {
+            hasJsonFile = true
+            const existingFile = checkEqualFiles(filename)
+            if (!existingFile) {
+              const filePromise = zipContents.files[filename]
+                .async('text')
+                .then((fileData) => {
+                  try {
+                    const data = JSON.parse(fileData)
+                    return { filename, content: data }
+                  } catch (parseError) {
+                    toast.error(t('projects:ErrorParsing'))
+                    console.error(`Error parsing JSON in file ${filename}:`, parseError)
+
+                    return null
+                  }
+                })
+              jsonPromises.push(filePromise)
+            } else {
+              console.log(`File ${filename} already exists and will be skipped`)
+            }
+          }
         }
+        if (!hasJsonFile) {
+          toast.error(t('projects:NoJsonFiles'))
+          console.error(`ZIP archive ${file.name} does not contain JSON files`)
+        }
+      } catch (error) {
+        toast.error(t('projects:ErrorDownloadingZip'))
+        console.error('Error downloading ZIP file:', error)
       }
     }
 
     try {
       const jsonObjects = await Promise.all(jsonPromises)
-      setJsonDataArray((prevData) => [...prevData, ...jsonObjects])
+      const validJsonObjects = jsonObjects.filter((obj) => obj !== null)
+      setJsonDataArray((prevData) => [...prevData, ...validJsonObjects])
     } catch (error) {
-      console.error('Ошибка валидации', error)
+      toast.error(t('projects:ErrorProcessingFiles'))
+      console.error('File processing error', error)
     }
   }
 
@@ -170,36 +202,50 @@ export default function ChaptersMerger({ book }) {
   }
 
   return (
-    <div className="layout-appbar">
+    <div className="flex flex-col gap-4 self-start">
+      <h2 className="my-6 text-4xl">{t('projects:VerseMerge')}</h2>
       <input
         ref={fileInputRef}
         type="file"
         multiple
+        accept=".zip"
         onChange={(e) => handleFiles(e.target.files)}
+        style={{ display: 'none' }}
       />
-      <div>
-        <p>{t('UploadedFiles')}</p>
-        {jsonDataArray.map((json, index) => (
-          <div className="flex gap-2 items-center" key={index}>
-            <h1 key={index}>{json.filename}</h1>
-            <Close
-              className="w-5 h-5 cursor-pointer"
-              onClick={() => {
-                setJsonDataArray(jsonDataArray.filter((_, i) => i !== index))
-                setConflicts(null)
-                if (fileInputRef.current) {
-                  fileInputRef.current.value = ''
-                }
-                setMergedContent(null)
-              }}
-            />
-          </div>
-          // <pre key={index}>{JSON.stringify(json, null, 2)}</pre>
-        ))}
+      <div className="flex gap-4 items-center">
+        <button className="w-fit btn-strong" onClick={() => fileInputRef.current.click()}>
+          {t('projects:SelectFiles')}
+        </button>
       </div>
       {jsonDataArray.length > 0 && (
+        <div className="py-5 border-y">
+          <p>{t('UploadedFiles')}</p>
+          <div className="flex gap-2.5 pt-4">
+            {jsonDataArray.map((json, index) => (
+              <div
+                className="flex items-center gap-2.5 py-4 px-5 border w-fit rounded-full border-th-text-primary"
+                key={index}
+              >
+                <p>{json.filename}</p>
+                <Close
+                  className="w-5 h-5 cursor-pointer stroke-2"
+                  onClick={() => {
+                    setJsonDataArray(jsonDataArray.filter((_, i) => i !== index))
+                    setConflicts(null)
+                    if (fileInputRef.current) {
+                      fileInputRef.current.value = ''
+                    }
+                    setMergedContent(null)
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      {jsonDataArray.length > 0 && (
         <button
-          className="btn-primary"
+          className="w-fit btn-strong"
           disabled={jsonDataArray.length < 2}
           onClick={() => mergeChapters()}
         >
@@ -207,10 +253,10 @@ export default function ChaptersMerger({ book }) {
         </button>
       )}
       {conflicts ? (
-        <div>
-          <p className="font-bold mb-2">{t('ConflictTitle')}</p>
+        <>
+          <p className="font-bold">{t('ConflictTitle')}</p>
           {conflicts.map((conflict, index) => (
-            <div key={index}>
+            <div key={index} className="py-5 border-y">
               <p>
                 {t('projects:Chapter')} {conflict.chapter}, {t('projects:Verse')}
                 {conflict.verse}
@@ -223,24 +269,27 @@ export default function ChaptersMerger({ book }) {
               </p>
             </div>
           ))}
-        </div>
+        </>
       ) : (
         mergedContent && (
-          <div>
+          <>
             <p>{t('projects:NoConflicts')}</p>
-            <div className="flex gap-2 items-center justify-center">
-              <button className="btn-primary" onClick={() => downloadUsfm(mergedContent)}>
-                USFM
+            <div className="flex gap-2.5 pt-5 border-t">
+              <button
+                className="w-fit btn-strong"
+                onClick={() => downloadUsfm(mergedContent)}
+              >
+                {t('USFM')}
               </button>
 
               <button
-                className="btn-primary"
+                className="w-fit btn-strong"
                 onClick={() => exportToZip(mergedContent, 'merged')}
               >
-                Архив для переводчиков
+                {t('ArchiveTranslators')}
               </button>
             </div>
-          </div>
+          </>
         )
       )}
     </div>
