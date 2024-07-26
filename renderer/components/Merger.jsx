@@ -76,12 +76,12 @@ function Merger({ config }) {
     if (!importedChapter || !importedChapter[config.chapter]) {
       return toast.error(t('WrongImportedData'))
     }
-    const chapter = window.electronAPI.updateChapter(
+    const isUpdated = window.electronAPI.updateChapter(
       config.id,
       config.chapter,
       Object.values(importedChapter)[0]
     )
-    if (chapter) {
+    if (isUpdated) {
       toast.success(t('ChapterUpdated'))
     } else {
       toast.error(t('WrongImportedData'))

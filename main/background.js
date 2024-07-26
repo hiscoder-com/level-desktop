@@ -479,7 +479,7 @@ ipcMain.on('update-chapter', (event, projectid, chapter, data) => {
     return arr1.every((item, index) => item === arr2[index])
   }
   if (!compareEqualArrays(Object.keys(localChapterData), Object.keys(data))) {
-    event.returnValue = null
+    event.returnValue = false
     event.sender.send('notify', 'Error updating chapter')
   } else {
     for (const verse in data) {
@@ -492,7 +492,7 @@ ipcMain.on('update-chapter', (event, projectid, chapter, data) => {
       JSON.stringify(localChapterData, null, 2),
       { encoding: 'utf-8' }
     )
-    event.returnValue = chapter
+    event.returnValue = true
     event.sender.send('notify', 'Updated')
   }
 })
