@@ -6,7 +6,8 @@ import { v4 as uuid } from 'uuid'
 import path from 'path'
 import { toJSON } from 'usfm-js'
 import { markRepeatedWords } from '@texttree/translation-words-helpers'
-const fs = require('fs')
+const fs = require('fs-extra')
+
 import i18next from '../next-i18next.config.js'
 import { localeStore } from './helpers/user-store'
 
@@ -110,7 +111,9 @@ const getNotesWithType = (type) => {
 let dictionaryLS
 
 ipcMain.on('set-project-folder', (event, id) => {
-  personalNotesLS = new Store({ name: 'personal-notes', cwd: `projects/${id}` })
+  const appDataPath = app.getPath('userData')
+
+  personalNotesLS = new Store({ name: 'personal-notes', cwd: appDataPath })
   dictionaryLS = new Store({ name: 'dictionary', cwd: `projects/${id}` })
   teamNotesLS = new Store({ name: 'team-notes', cwd: `projects/${id}` })
 })
@@ -193,11 +196,13 @@ ipcMain.on('import-note', (event, projectid, note, type) => {
     is_folder,
     parent_id,
   }
-  fs.writeFileSync(
-    path.join(projectUrl, projectid, type, id + '.json'),
-    JSON.stringify(data, null, 2),
-    { encoding: 'utf-8' }
-  )
+
+  const noteTypePath = path.join(app.getPath('userData'), type)
+  fs.mkdirSync(noteTypePath, { recursive: true })
+
+  fs.writeFileSync(path.join(noteTypePath, id + '.json'), JSON.stringify(data, null, 2), {
+    encoding: 'utf-8',
+  })
   event.returnValue = id
   event.sender.send('notify', 'Updated')
 })
@@ -285,14 +290,15 @@ ipcMain.on('get-notes', (event, type) => {
 ipcMain.on('get-notes-with-data', (event, projectid, type) => {
   let notes = []
   const notesLS = getNotesWithType(type)
+  const noteTypePath = path.join(app.getPath('userData'), type)
+  fs.mkdirSync(noteTypePath, { recursive: true })
 
   for (const noteId in notesLS.store) {
     if (Object.hasOwnProperty.call(notesLS.store, noteId)) {
       const note = notesLS.store[noteId]
-      const newNote = fs.readFileSync(
-        path.join(projectUrl, projectid, type, note.id + '.json'),
-        { encoding: 'utf-8' }
-      )
+      const newNote = fs.readFileSync(path.join(noteTypePath, note.id + '.json'), {
+        encoding: 'utf-8',
+      })
       const { data } = JSON.parse(newNote)
       notes.push({ ...note, data })
     }
@@ -322,47 +328,55 @@ ipcMain.on('add-note', (event, projectid, noteid, isfolder, sorting, type) => {
       version: '2.29.1',
     },
   }
-  fs.writeFileSync(
-    path.join(projectUrl, projectid, type, noteid + '.json'),
-    JSON.stringify(data, null, 2),
-    { encoding: 'utf-8' }
-  )
+
+  const noteTypePath = path.join(app.getPath('userData'), type)
+  fs.mkdirSync(noteTypePath, { recursive: true })
+  const filePath = path.join(noteTypePath, noteid + '.json')
+
+  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), { encoding: 'utf-8' })
+
   event.returnValue = noteid
   event.sender.send('notify', 'Updated')
 })
 
 ipcMain.on('update-note', (event, projectid, note, type) => {
+  const noteTypePath = path.join(app.getPath('userData'), type)
+  fs.mkdirSync(noteTypePath, { recursive: true })
+  const filePath = path.join(noteTypePath, note.id + '.json')
+
   const notesLS = getNotesWithType(type)
   notesLS.set(`${note.id}.title`, note.title)
-  fs.writeFileSync(
-    path.join(projectUrl, projectid, type, note.id + '.json'),
-    JSON.stringify(note, null, 2),
-    { encoding: 'utf-8' }
-  )
+  fs.writeFileSync(filePath, JSON.stringify(note, null, 2), { encoding: 'utf-8' })
   event.returnValue = note.id
   event.sender.send('notify', 'Updated')
 })
 
 ipcMain.on('rename-note', (event, projectid, title, noteid, type) => {
+  const noteTypePath = path.join(app.getPath('userData'), type)
+  fs.mkdirSync(noteTypePath, { recursive: true })
+  const filePath = path.join(noteTypePath, noteid + '.json')
+
   const notesLS = getNotesWithType(type)
 
   notesLS.set(`${noteid}.title`, title)
-  const data = fs.readFileSync(path.join(projectUrl, projectid, type, noteid + '.json'), {
+  const data = fs.readFileSync(filePath, {
     encoding: 'utf-8',
   })
   const newNote = JSON.parse(data)
 
-  fs.writeFileSync(
-    path.join(projectUrl, projectid, type, noteid + '.json'),
-    JSON.stringify({ ...newNote, title }, null, 2),
-    { encoding: 'utf-8' }
-  )
+  fs.writeFileSync(filePath, JSON.stringify({ ...newNote, title }, null, 2), {
+    encoding: 'utf-8',
+  })
   event.returnValue = noteid
   event.sender.send('notify', 'Updated')
 })
 
 ipcMain.on('get-note', (event, projectid, noteid, type) => {
-  const data = fs.readFileSync(path.join(projectUrl, projectid, type, noteid + '.json'), {
+  const noteTypePath = path.join(app.getPath('userData'), type)
+  fs.mkdirSync(noteTypePath, { recursive: true })
+  const filePath = path.join(noteTypePath, noteid + '.json')
+
+  const data = fs.readFileSync(filePath, {
     encoding: 'utf-8',
   })
   event.returnValue = data
@@ -370,6 +384,9 @@ ipcMain.on('get-note', (event, projectid, noteid, type) => {
 })
 
 ipcMain.on('remove-note', (event, projectid, noteid, type) => {
+  const noteTypePath = path.join(app.getPath('userData'), type)
+  fs.mkdirSync(noteTypePath, { recursive: true })
+
   const notesLS = getNotesWithType(type)
   let notes = { ...notesLS.store }
 
@@ -401,7 +418,7 @@ ipcMain.on('remove-note', (event, projectid, noteid, type) => {
   notesToDelete.forEach((id) => {
     delete notes[id]
 
-    fs.rmSync(path.join(projectUrl, projectid, type, id + '.json'), {
+    fs.rmSync(path.join(noteTypePath, id + '.json'), {
       force: true,
     })
   })
@@ -856,6 +873,21 @@ ipcMain.on('add-project', async (event, url) => {
     }
   }
 
+  const movePersonalNotesToCentralStorage = async (sourcePath, projectId) => {
+    const centralNotesPath = path.join(app.getPath('userData'), 'personal-notes')
+    fs.mkdirSync(centralNotesPath, { recursive: true })
+
+    const files = await fs.promises.readdir(sourcePath)
+
+    console.log({ files })
+
+    for (const file of files) {
+      const sourceFilePath = path.join(sourcePath, file)
+      const destFilePath = path.join(centralNotesPath, `${projectId}_${file}`)
+      await fs.promises.move(sourceFilePath, destFilePath, { overwrite: true })
+    }
+  }
+
   if (url) {
     try {
       const projects = storeProjects.get('projects') || []
@@ -868,6 +900,12 @@ ipcMain.on('add-project', async (event, url) => {
       await decompress(url, tempDir)
 
       validateProjectStructure(tempDir)
+
+      const personalNotesPath = path.join(tempDir, 'personal-notes')
+      if (fs.existsSync(personalNotesPath)) {
+        await movePersonalNotesToCentralStorage(personalNotesPath, id)
+        await fs.remove(personalNotesPath)
+      }
 
       const finalDir = path.join(projectUrl, id)
       await fs.promises.rename(tempDir, finalDir)
@@ -952,7 +990,7 @@ ipcMain.on('update-project-name', (event, projectId, newName) => {
   event.sender.send('project-name-updated', projectId, newName)
 })
 
-ipcMain.on('delete-project', (event, projectId) => {
+ipcMain.on('delete-project', async (event, projectId) => {
   const projectsFilePath = path.join(app.getPath('userData'), 'projects.json')
   const projectsData = JSON.parse(fs.readFileSync(projectsFilePath, 'utf8'))
 
@@ -963,16 +1001,11 @@ ipcMain.on('delete-project', (event, projectId) => {
   fs.writeFileSync(projectsFilePath, JSON.stringify(projectsData, null, 2))
 
   const projectDirPath = path.join(projectUrl, projectId)
-  fs.rm(projectDirPath, { recursive: true }, (err) => {
-    if (err) {
-      console.error(`Error when deleting project folder: ${err}`)
-      event.sender.send('notify', 'Error deleting project')
-      return
-    }
-    event.sender.send('notify', 'Project deleted')
+  await fs.promises.rm(projectDirPath, { recursive: true })
 
-    event.sender.send('projects-updated', projectsData.projects)
-  })
+  event.sender.send('notify', 'Project deleted')
+
+  event.sender.send('projects-updated', projectsData.projects)
 })
 
 ipcMain.handle('dialog:openFile', handleFileOpen)
