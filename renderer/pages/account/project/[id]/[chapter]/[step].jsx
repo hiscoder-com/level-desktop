@@ -194,16 +194,8 @@ function Panel({
   const [isSingleTab, setIsSingleTab] = useState(false)
 
   useEffect(() => {
-    handleTabsCount()
+    setIsSingleTab(tools.length === 1)
   }, [tools])
-
-  const handleTabsCount = () => {
-    if (tools.length === 1) {
-      setIsSingleTab(true)
-    } else {
-      setIsSingleTab(false)
-    }
-  }
 
   return (
     <Tab.Group
