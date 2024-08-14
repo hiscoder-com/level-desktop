@@ -92,17 +92,17 @@ function Merger({ config }) {
     <div className="flex flex-col gap-4">
       <div className="flex gap-2.5 pb-4 border-b">
         <button onClick={() => exportChapterToZip()} className="w-fit btn-strong">
-          {t('ExportArchive')}
+          {t('Export')}
         </button>
         <button
           className="w-fit btn-strong"
           onClick={() => fileInputRef.current.click()}
           disabled={importedChapter}
         >
-          {t('ImportArchive')}
+          {t('Import')}
         </button>
         <button onClick={merge} className="btn-strong w-fit" disabled={!importedChapter}>
-          {t('MergeVerses')}
+          {t('Merge')}
         </button>
       </div>
 
