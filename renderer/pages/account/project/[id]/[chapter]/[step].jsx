@@ -86,7 +86,6 @@ function StepPage() {
   const getTotalTranslationSteps = (steps) => {
     return (steps || []).filter((step) => !step.isTech).length || 0
   }
-
   const getCurrentTranslationStepIndex = (steps, currentStep) => {
     let currentTranslationStep = 0
     let translationStepIndex = 0
@@ -132,6 +131,7 @@ function StepPage() {
                 columnIndex={columnIndex}
                 activeTabIndexes={activeTabIndexes}
                 setActiveTabIndexes={setActiveTabIndexes}
+                book={project.book}
               />
             </div>
           ))}
@@ -189,6 +189,7 @@ function Panel({
   columnIndex,
   activeTabIndexes,
   setActiveTabIndexes,
+  book,
 }) {
   const [isSingleTab, setIsSingleTab] = useState(false)
 
@@ -257,7 +258,7 @@ function Panel({
               </span>
             ) : (
               <p className={`${!isSingleTab ? 'truncate' : 'px-10 sm:px-20'} `}>
-                {toolNames[tool.config.resource]}
+                {toolNames[tool.config.resource].name}
               </p>
             )}
           </Tab>
@@ -275,8 +276,10 @@ function Panel({
                     chapter,
                     ...tool.config,
                     wholeChapter: stepConfig.whole_chapter,
+                    book,
                   }}
                   toolName={tool.name}
+                  resourceTitle={toolNames[tool.config.resource]?.title || ''}
                   isSingleTab={isSingleTab}
                 />
               </div>

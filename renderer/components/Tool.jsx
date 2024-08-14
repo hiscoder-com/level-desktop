@@ -16,8 +16,8 @@ import Merger from './Merger'
 
 import { useTranslation } from '@/next-i18next'
 
-function Tool({ config, toolName, isSingleTab }) {
-  const { t } = useTranslation()
+function Tool({ config, toolName, isSingleTab, resourceTitle }) {
+  const { t } = useTranslation(['common', 'books'])
   let CurrentTool
   let title = toolName
 
@@ -125,6 +125,21 @@ function Tool({ config, toolName, isSingleTab }) {
     }
   }, [checkVerticalScroll])
 
+  const isSpecialTool = [
+    'translate',
+    'commandTranslate',
+    'draftTranslate',
+    'teamNotes',
+    'personalNotes',
+    'retelling',
+    'dictionary',
+  ].includes(toolName)
+
+  const displayBookChapter =
+    !isSpecialTool && config.book?.code
+      ? `${t('books:' + config.book?.code)} ${config.chapter}, `
+      : ''
+
   return (
     <>
       <div
@@ -134,7 +149,8 @@ function Tool({ config, toolName, isSingleTab }) {
             : 'pt-2.5 px-4 font-bold truncate text-th-text-secondary-100 rounded-t-xl'
         }`}
       >
-        {!isSingleTab && title}
+        {displayBookChapter}
+        {!isSingleTab && resourceTitle ? resourceTitle : title}
       </div>
       <div className="adaptive-card border border-b-th-secondary-300 border-l-th-secondary-300 border-r-th-secondary-300 rounded-b-lg box-border">
         <div
@@ -143,7 +159,11 @@ function Tool({ config, toolName, isSingleTab }) {
           }`}
           ref={contentRef}
         >
-          <CurrentTool config={config} toolName={toolName} />
+          <CurrentTool
+            config={config}
+            toolName={toolName}
+            resourceTitle={resourceTitle}
+          />
         </div>
       </div>
     </>
