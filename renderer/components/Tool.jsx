@@ -149,8 +149,12 @@ function Tool({ config, toolName, isSingleTab, resourceTitle }) {
             : 'pt-2.5 px-4 font-bold truncate text-th-text-secondary-100 rounded-t-xl'
         }`}
       >
-        {displayBookChapter}
-        {!isSingleTab && resourceTitle ? resourceTitle : title}
+        {!isSingleTab && (
+          <>
+            <span>{displayBookChapter}</span>
+            <span>{resourceTitle ? resourceTitle : title}</span>
+          </>
+        )}
       </div>
       <div className="adaptive-card border border-b-th-secondary-300 border-l-th-secondary-300 border-r-th-secondary-300 rounded-b-lg box-border">
         <div
