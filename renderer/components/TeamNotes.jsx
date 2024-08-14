@@ -95,11 +95,10 @@ export default function TeamNotes({ config: { id }, config, toolName }) {
 
   function parseNotesWithTopFolder(notes, maxsorting = 0) {
     const exportFolderId = generateUniqueId(notes.map(({ id }) => id))
-    const exportFolderDateTime = new Date().toISOString().replace(/[:.]/g, '-')
 
     const exportFolder = {
       id: exportFolderId,
-      title: `export-${exportFolderDateTime}`,
+      title: 'Team notes',
       data: null,
       created_at: new Date().toISOString(),
       changed_at: new Date().toISOString(),
@@ -280,7 +279,7 @@ export default function TeamNotes({ config: { id }, config, toolName }) {
       const currentDate = new Date()
       const formattedDate = currentDate.toISOString().split('T')[0]
 
-      const fileName = `personal_notes_${formattedDate}.json`
+      const fileName = `team_notes_${formattedDate}.json`
 
       const url = URL.createObjectURL(blob)
 
