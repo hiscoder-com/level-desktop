@@ -6,7 +6,11 @@ import Modal from './Modal'
 
 import { useTranslation } from '@/next-i18next'
 import { useGetPersonalNotes } from '@/hooks/useGetPersonalNotes'
-import { convertNotesToTree, generateUniqueId } from '@/helpers/noteEditor'
+import {
+  convertNotesToTree,
+  generateFolderName,
+  generateUniqueId,
+} from '@/helpers/noteEditor'
 
 import Back from 'public/icons/left.svg'
 import Trash from 'public/icons/trash.svg'
@@ -21,6 +25,8 @@ import Rename from 'public/icons/rename.svg'
 import Close from 'public/icons/close.svg'
 import Plus from 'public/icons/plus.svg'
 import Progress from 'public/icons/progress.svg'
+import toast from 'react-hot-toast'
+import LoadingPage from './LoadingPage'
 
 const t = (str) => str
 
@@ -95,7 +101,7 @@ export default function PersonalNotes({ config: { id }, config, toolName }) {
 
     const exportFolder = {
       id: exportFolderId,
-      title: 'My notes',
+      title: generateFolderName('My notes'),
       data: null,
       created_at: new Date().toISOString(),
       changed_at: new Date().toISOString(),
@@ -168,6 +174,7 @@ export default function PersonalNotes({ config: { id }, config, toolName }) {
 
     fileInput.addEventListener('change', async (event) => {
       try {
+        setIsLoading(true)
         const file = event.target.files[0]
         if (!file) {
           throw new Error(t('NoFileSelected'))
@@ -192,8 +199,12 @@ export default function PersonalNotes({ config: { id }, config, toolName }) {
           window.electronAPI.importNote(id, newNote, 'personal-notes')
         }
         mutate()
+        toast.success(t('projects:ImportSuccess'))
       } catch (error) {
         console.log(error.message)
+        toast.error(t('projects:ImportError'))
+      } finally {
+        setIsLoading(false)
       }
     })
 
@@ -511,6 +522,7 @@ export default function PersonalNotes({ config: { id }, config, toolName }) {
 
   return (
     <>
+      <LoadingPage loadingPage={isLoading} />
       <div className="flex gap-2.5 w-full items-center">
         <div className="relative flex items-center w-full">
           <input
@@ -542,7 +554,7 @@ export default function PersonalNotes({ config: { id }, config, toolName }) {
       <div className="relative mt-6">
         {!activeNote || !Object.keys(activeNote)?.length ? (
           <>
-            {!isLoading || notes?.length ? (
+            {notes?.length ? (
               <>
                 <TreeView
                   term={term}
