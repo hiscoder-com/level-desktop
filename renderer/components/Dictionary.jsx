@@ -2,9 +2,12 @@ import { useEffect, useMemo, useState } from 'react'
 
 import { Disclosure } from '@headlessui/react'
 
+import toast from 'react-hot-toast'
+
 import SearchAndAddWords from './SearchAndAddWords'
 import Alphabet from './Alphabet'
 import WordList from './WordList'
+import LoadingPage from './LoadingPage'
 
 import { useTranslation } from '@/next-i18next'
 import { useGetDictionary } from '@/hooks/useGetDictionary'
@@ -17,7 +20,8 @@ import Down from 'public/icons/arrow-down.svg'
 const countWordsOnPage = 10
 
 function Dictionary({ config: { id } }) {
-  const { t } = useTranslation()
+  const { t } = useTranslation(['common', 'projects'])
+  const [isLoading, setIsLoading] = useState(false)
   const [currentPage, setCurrentPage] = useState(0)
   const [isOpenModal, setIsOpenModal] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -115,6 +119,7 @@ function Dictionary({ config: { id } }) {
     fileInput.accept = '.json'
     fileInput.addEventListener('change', async (event) => {
       try {
+        setIsLoading(true)
         const file = event.target.files[0]
         if (!file) {
           throw new Error(t('NoFileSelected'))
@@ -141,8 +146,14 @@ function Dictionary({ config: { id } }) {
         }
         getAll()
         mutate()
+        toast.success(t('projects:ImportSuccess'))
       } catch (error) {
         console.log(error.message)
+        toast.error(t('projects:ImportError'))
+      } finally {
+        setTimeout(() => {
+          setIsLoading(false)
+        }, 1000)
       }
     })
 
@@ -203,70 +214,73 @@ function Dictionary({ config: { id } }) {
   }
 
   return (
-    <div className="relative">
-      <SearchAndAddWords
-        {...sharedProps}
-        importWords={importWords}
-        exportWords={exportWords}
-      />
-      {alphabet.length ? (
-        <Card t={t}>
-          <div className="mt-4">
-            <Alphabet
-              alphabet={alphabet}
-              getAll={getAll}
-              setSearchQuery={setSearchQuery}
-              setCurrentPage={setCurrentPage}
-              disabled={activeWord}
-            />
-          </div>
-        </Card>
-      ) : (
-        <p className="py-8 opacity-40 cursor-default">{t('EmptyAlphabet')}</p>
-      )}
-
+    <>
+      <LoadingPage loadingPage={isLoading} />
       <div className="relative">
-        <WordList
+        <SearchAndAddWords
           {...sharedProps}
-          words={words}
-          setWordId={setWordId}
-          isOpenModal={isOpenModal}
-          setActiveWord={setActiveWord}
-          setIsOpenModal={setIsOpenModal}
-          wordToDel={wordToDel}
-          saveWord={saveWord}
-          setWordToDel={setWordToDel}
+          importWords={importWords}
+          exportWords={exportWords}
         />
-      </div>
-      {totalPageCount > 1 && !activeWord && (
-        <div className="w-full flex justify-center gap-10">
-          <button
-            className="px-5 py-5 rounded-full duration-300 hover:bg-white active:bg-gray-100 disabled:opacity-50 disabled:hover:bg-transparent"
-            disabled={currentPage === 0}
-            onClick={() =>
-              setCurrentPage((prev) => {
-                getWords(searchQuery, prev - 1)
-                return prev - 1
-              })
-            }
-          >
-            <LeftArrow className="w-6 h-6" />
-          </button>
-          <button
-            className="px-5 py-5 rounded-full duration-300 hover:bg-white active:bg-gray-100 disabled:opacity-50 disabled:hover:bg-transparent"
-            disabled={currentPage >= totalPageCount - 1}
-            onClick={() => {
-              setCurrentPage((prev) => {
-                getWords(searchQuery, prev + 1)
-                return prev + 1
-              })
-            }}
-          >
-            <RightArrow className="w-6 h-6" />
-          </button>
+        {alphabet.length ? (
+          <Card t={t}>
+            <div className="mt-4">
+              <Alphabet
+                alphabet={alphabet}
+                getAll={getAll}
+                setSearchQuery={setSearchQuery}
+                setCurrentPage={setCurrentPage}
+                disabled={activeWord}
+              />
+            </div>
+          </Card>
+        ) : (
+          <p className="py-8 opacity-40 cursor-default">{t('EmptyAlphabet')}</p>
+        )}
+
+        <div className="relative">
+          <WordList
+            {...sharedProps}
+            words={words}
+            setWordId={setWordId}
+            isOpenModal={isOpenModal}
+            setActiveWord={setActiveWord}
+            setIsOpenModal={setIsOpenModal}
+            wordToDel={wordToDel}
+            saveWord={saveWord}
+            setWordToDel={setWordToDel}
+          />
         </div>
-      )}
-    </div>
+        {totalPageCount > 1 && !activeWord && (
+          <div className="w-full flex justify-center gap-10">
+            <button
+              className="px-5 py-5 rounded-full duration-300 hover:bg-white active:bg-gray-100 disabled:opacity-50 disabled:hover:bg-transparent"
+              disabled={currentPage === 0}
+              onClick={() =>
+                setCurrentPage((prev) => {
+                  getWords(searchQuery, prev - 1)
+                  return prev - 1
+                })
+              }
+            >
+              <LeftArrow className="w-6 h-6" />
+            </button>
+            <button
+              className="px-5 py-5 rounded-full duration-300 hover:bg-white active:bg-gray-100 disabled:opacity-50 disabled:hover:bg-transparent"
+              disabled={currentPage >= totalPageCount - 1}
+              onClick={() => {
+                setCurrentPage((prev) => {
+                  getWords(searchQuery, prev + 1)
+                  return prev + 1
+                })
+              }}
+            >
+              <RightArrow className="w-6 h-6" />
+            </button>
+          </div>
+        )}
+      </div>
+    </>
   )
 }
 
