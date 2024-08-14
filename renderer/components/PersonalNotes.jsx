@@ -92,11 +92,10 @@ export default function PersonalNotes({ config: { id }, config, toolName }) {
 
   function parseNotesWithTopFolder(notes, maxsorting = 0) {
     const exportFolderId = generateUniqueId(notes.map(({ id }) => id))
-    const exportFolderDateTime = new Date().toISOString().replace(/[:.]/g, '-')
 
     const exportFolder = {
       id: exportFolderId,
-      title: `export-${exportFolderDateTime}`,
+      title: 'My notes',
       data: null,
       created_at: new Date().toISOString(),
       changed_at: new Date().toISOString(),

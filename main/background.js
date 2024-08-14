@@ -859,7 +859,7 @@ ipcMain.on('add-project', async (event, url) => {
     ) {
       throw new Error('Invalid book structure in config.json')
     }
-    if (!config.project || typeof config.project !== 'string') {
+    if (!config.project || typeof config.project.code !== 'string') {
       throw new Error('Invalid project in config.json')
     }
     if (!config.method || typeof config.method !== 'string') {
@@ -898,7 +898,7 @@ ipcMain.on('add-project', async (event, url) => {
       }
 
       project.book = { ...config.book }
-      project.name = config.project
+      project.name = config.project.title
       project.method = config.method
 
       await createPropertiesFile(id, defaultProperties)

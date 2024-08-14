@@ -259,8 +259,6 @@ function ProjectsList({ projectsList, setProjectsList }) {
           <tr className="text-left text-th-secondary-300 border-b border-th-secondary-200 cursor-default">
             <th className="font-medium pt-0 pr-4 pb-3 pl-8">{t('Book')}</th>
             <th className="font-medium pt-0 pr-4 pb-3 pl-8">{t('projects:Project')}</th>
-            <th className="font-medium pt-0 pr-4 pb-3 pl-8">{t('projects:Method')}</th>
-            <th className="font-medium pt-0 pr-4 pb-3 pl-8">{t('ID')}</th>
             <th className="font-medium pt-0 pr-4 pb-3 pl-8">{t('CreatedAt')}</th>
             <th className="font-medium pt-0 pr-4 pb-3 pl-8"></th>
           </tr>
@@ -273,14 +271,10 @@ function ProjectsList({ projectsList, setProjectsList }) {
             >
               <td className="p-4 pl-8">
                 <Link href={`/account/project/${project.id}`} legacyBehavior>
-                  <a className="font-bold hover:opacity-70">
-                    {project.book.name} ({project.book.code})
-                  </a>
+                  <a className="font-bold hover:opacity-70">{project.book.name}</a>
                 </Link>
               </td>
               <td className="p-4 pl-8">{project.name}</td>
-              <td className="p-4 pl-8">{project.method}</td>
-              <td className="p-4 pl-8">{project.id}</td>
               <td className="p-4 pl-8">
                 {new Date(project.createdAt).toLocaleDateString()}
               </td>
