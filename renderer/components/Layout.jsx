@@ -1,16 +1,14 @@
-import { Fragment, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { useRouter } from 'next/router'
 
-import { Transition } from '@headlessui/react'
 import { Toaster } from 'react-hot-toast'
 
-import Progress from 'public/icons/progress.svg'
+import LoadingPage from './LoadingPage'
 
 function Layout({ children }) {
   const [loadingPage, setLoadingPage] = useState(false)
   const router = useRouter()
-
   const homePath = '/home'
 
   const getMainClassName = () => {
@@ -35,19 +33,7 @@ function Layout({ children }) {
   return (
     <>
       <div className={getMainClassName()}>
-        <Transition
-          as={Fragment}
-          appear={true}
-          show={loadingPage}
-          enter="transition-opacity duration-200"
-          leave="transition-opacity duration-200"
-        >
-          <div className="absolute flex justify-center items-center inset-0 backdrop-brightness-90 backdrop-blur z-20 overflow-y-hidden">
-            {loadingPage && (
-              <Progress className="progress-custom-colors w-14 animate-spin stroke-th-primary-100" />
-            )}
-          </div>
-        </Transition>
+        <LoadingPage loadingPage={loadingPage} />
         <main>{children}</main>
       </div>
 

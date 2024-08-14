@@ -2,11 +2,18 @@ import { useEffect, useState } from 'react'
 
 import dynamic from 'next/dynamic'
 
+import toast from 'react-hot-toast'
+
 import Modal from './Modal'
+import LoadingPage from './LoadingPage'
 
 import { useTranslation } from '@/next-i18next'
 import { useGetTeamNotes } from '@/hooks/useGetTeamNotes'
-import { convertNotesToTree, generateUniqueId } from '@/helpers/noteEditor'
+import {
+  convertNotesToTree,
+  generateFolderName,
+  generateUniqueId,
+} from '@/helpers/noteEditor'
 
 import Back from 'public/icons/left.svg'
 import Trash from 'public/icons/trash.svg'
@@ -98,7 +105,7 @@ export default function TeamNotes({ config: { id }, config, toolName }) {
 
     const exportFolder = {
       id: exportFolderId,
-      title: 'Team notes',
+      title: generateFolderName('Team notes'),
       data: null,
       created_at: new Date().toISOString(),
       changed_at: new Date().toISOString(),
@@ -171,6 +178,7 @@ export default function TeamNotes({ config: { id }, config, toolName }) {
 
     fileInput.addEventListener('change', async (event) => {
       try {
+        setIsLoading(true)
         const file = event.target.files[0]
         if (!file) {
           throw new Error(t('NoFileSelected'))
@@ -182,7 +190,7 @@ export default function TeamNotes({ config: { id }, config, toolName }) {
         }
 
         const importedData = JSON.parse(fileContents)
-        if (importedData.type !== 'personal_notes') {
+        if (importedData.type !== 'team_notes') {
           throw new Error(t('ContentError'))
         }
         const maxSorting = getMaxSortingNullParent(notes)
@@ -195,8 +203,14 @@ export default function TeamNotes({ config: { id }, config, toolName }) {
           window.electronAPI.importNote(id, newNote, 'team-notes')
         }
         mutate()
+        toast.success(t('projects:ImportSuccess'))
       } catch (error) {
         console.log(error.message)
+        toast.error(t('projects:ImportError'))
+      } finally {
+        setTimeout(() => {
+          setIsLoading(false)
+        }, 1000)
       }
     })
 
@@ -268,7 +282,7 @@ export default function TeamNotes({ config: { id }, config, toolName }) {
       const transformedData = formationJSONToTree(notesWithData)
 
       const jsonContent = JSON.stringify(
-        { type: 'personal_notes', data: transformedData },
+        { type: 'team_notes', data: transformedData },
         null,
         2
       )
@@ -503,7 +517,6 @@ export default function TeamNotes({ config: { id }, config, toolName }) {
     setContextMenuEvent({ event })
   }
 
-  const handleBack = () => {}
   const dropMenuItems = {
     dots: menuItems.menu,
     plus: menuItems.contextMenu.filter((menuItem) =>
@@ -517,6 +530,7 @@ export default function TeamNotes({ config: { id }, config, toolName }) {
 
   return (
     <>
+      <LoadingPage loadingPage={isLoading} />
       <div className="flex gap-2.5 w-full items-center">
         <div className="relative flex items-center w-full">
           <input
@@ -548,7 +562,7 @@ export default function TeamNotes({ config: { id }, config, toolName }) {
       <div className="relative mt-6">
         {!activeNote || !Object.keys(activeNote)?.length ? (
           <>
-            {!isLoading || notes?.length ? (
+            {notes?.length ? (
               <>
                 <TreeView
                   term={term}
