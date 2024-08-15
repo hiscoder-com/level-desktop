@@ -1,4 +1,5 @@
 {
+  "AboutStep": "Acerca del paso",
   "AddWord": "Añada palabra",
   "AllNotes": "Todas las notas",
   "ArchiveTranslators": "Archivo para traductores",
@@ -31,6 +32,7 @@
   "ES": "ES",
   "Export": "Exportación",
   "Finish": "Finalizar",
+  "Goal": "About the step",
   "Hide": "Ocultar",
   "ID": "ID",
   "Import": "Importación",
