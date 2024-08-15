@@ -2,16 +2,16 @@ import { useEffect, useState } from 'react'
 
 import { useRouter } from 'next/router'
 
-import { useRecoilValue } from 'recoil'
+import { useRecoilValue, useSetRecoilState } from 'recoil'
 import { Tab } from '@headlessui/react'
 
 import Tool from '@/components/Tool'
 import CheckBox from '@/components/CheckBox'
-import Breadcrumbs from '@/components/Breadcrumbs'
+import AppBar from '@/components/AppBar'
 import ProgressBar from '@/components/ProgressBar'
 
 import { useTranslation } from '@/next-i18next'
-import { inactiveState } from '@/helpers/atoms'
+import { inactiveState, stepConfigState } from '@/helpers/atoms'
 
 import Dict from 'public/icons/dictionary.svg'
 import Notepad from 'public/icons/notepad.svg'
@@ -48,6 +48,7 @@ function StepPage() {
     push,
   } = useRouter()
   const inactive = useRecoilValue(inactiveState)
+  const setStepConfig = useSetRecoilState(stepConfigState)
 
   const [project, setProject] = useState(false)
   const [checked, setChecked] = useState(false)
@@ -56,6 +57,7 @@ function StepPage() {
   useEffect(() => {
     if (id) {
       const _project = window.electronAPI.getProject(id)
+      setStepConfig(_project?.steps?.[parseInt(step)])
       if (_project && _project?.steps?.length <= parseInt(step)) {
         push(`/project/${id}`)
       } else {
@@ -102,16 +104,8 @@ function StepPage() {
 
   return (
     <div className="w-full">
-      <Breadcrumbs
-        links={[
-          {
-            href: `/account/project/${id}`,
-            title: `${project?.book?.name} ${chapter}`,
-          },
-        ]}
-        currentTitle={project?.steps?.[step]?.title}
-      />
-      <div className="layout-step">
+      <AppBar />
+      <div className="layout-step mt-32 md:mt-0">
         {project?.steps?.[step] &&
           project.steps[step].cards.map((el, columnIndex) => (
             <div
