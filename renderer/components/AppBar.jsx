@@ -12,7 +12,7 @@ export default function AppBar() {
       <div className="appbar">
         <div className="relative md:static flex items-center h-10 md:justify-start md:gap-7">
           <div className={`flex justify-center w-full md:ml-0 `}>
-            <Link href={'/home'}>
+            <Link href={'/account'}>
               <VcanaLogo className="h-6 fill-th-text-secondary-100" />
             </Link>
           </div>
