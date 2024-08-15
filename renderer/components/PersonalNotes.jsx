@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 
 import dynamic from 'next/dynamic'
+import toast from 'react-hot-toast'
 
 import Modal from './Modal'
+import LoadingPage from './LoadingPage'
 
 import { useTranslation } from '@/next-i18next'
 import { useGetPersonalNotes } from '@/hooks/useGetPersonalNotes'
@@ -25,8 +27,6 @@ import Rename from 'public/icons/rename.svg'
 import Close from 'public/icons/close.svg'
 import Plus from 'public/icons/plus.svg'
 import Progress from 'public/icons/progress.svg'
-import toast from 'react-hot-toast'
-import LoadingPage from './LoadingPage'
 
 const t = (str) => str
 
@@ -554,7 +554,7 @@ export default function PersonalNotes({ config: { id }, config, toolName }) {
       <div className="relative mt-6">
         {!activeNote || !Object.keys(activeNote)?.length ? (
           <>
-            {notes?.length ? (
+            {!isLoading ? (
               <>
                 <TreeView
                   term={term}

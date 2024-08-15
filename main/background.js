@@ -635,7 +635,7 @@ ipcMain.on('get-tn', (event, id, resource, mainResource, chapter) => {
       verses: [selectedTn.verse],
     })
 
-    const result = target[selectedTn.verse].verseObjects.map((el) =>
+    const result = target[selectedTn.verse[0]]?.verseObjects.map((el) =>
       parseVerseObjects(el, selections, {
         chapter: chapter,
         verse: selectedTn.verse,
