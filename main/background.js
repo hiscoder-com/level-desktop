@@ -945,6 +945,29 @@ ipcMain.on('update-properties', (event, projectId, properties) => {
   }
 })
 
+ipcMain.on('change-time-step', (event, projectId, step, time) => {
+  const propertiesPath = path.join(projectUrl, projectId, 'config.json')
+
+  try {
+    const fileContent = fs.readFileSync(propertiesPath, 'utf8')
+    const properties = JSON.parse(fileContent)
+
+    if (properties.steps && properties.steps[step]) {
+      properties.steps[step].time = time
+
+      fs.writeFileSync(propertiesPath, JSON.stringify(properties, null, 2))
+
+      event.returnValue = true
+    } else {
+      console.error(`Step ${step} not found in project ${projectId}`)
+      event.returnValue = false
+    }
+  } catch (err) {
+    console.error(`Error writing properties file for project ${projectId}:`, err)
+    event.returnValue = false
+  }
+})
+
 ipcMain.on('update-project-name', (event, projectId, newName) => {
   const projects = storeProjects.get('projects') || []
   const updatedProjects = projects.map((project) => {
