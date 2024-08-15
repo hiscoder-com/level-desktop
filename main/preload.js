@@ -121,6 +121,8 @@ process.once('loaded', () => {
       })
     },
     deleteProject: (projectId) => ipcRenderer.send('delete-project', projectId),
+    changeTimeStep: (id, step, time) =>
+      ipcRenderer.send('change-time-step', id, step, time),
   })
 
   const handler = {
