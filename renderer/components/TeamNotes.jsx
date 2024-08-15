@@ -75,7 +75,7 @@ const icons = {
   ),
 }
 
-export default function TeamNotes({ config: { id }, config, toolName }) {
+export default function TeamNotes({ config: { id } }) {
   const { t } = useTranslation(['common', 'projects'])
 
   const [noteId, setNoteId] = useState('')
@@ -562,7 +562,7 @@ export default function TeamNotes({ config: { id }, config, toolName }) {
       <div className="relative mt-6">
         {!activeNote || !Object.keys(activeNote)?.length ? (
           <>
-            {notes?.length ? (
+            {isLoading ? (
               <>
                 <TreeView
                   term={term}
