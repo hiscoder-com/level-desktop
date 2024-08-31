@@ -13,9 +13,9 @@ function Layout({ children }) {
 
   const getMainClassName = () => {
     if (router.pathname === homePath) {
-      return 'mx-auto min-h-screen'
+      return 'min-h-screen'
     } else {
-      return 'mx-auto h-[calc(100vh-5rem)] mt-20'
+      return 'mx-4 h-[calc(100vh-5rem)] mt-20'
     }
   }
 
