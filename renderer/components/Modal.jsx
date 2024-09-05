@@ -1,6 +1,8 @@
 import { Fragment } from 'react'
 
-import { Transition, Dialog } from '@headlessui/react'
+import { Transition, Dialog, DialogPanel, DialogTitle } from '@headlessui/react'
+
+import Close from 'public/icons/close-round.svg'
 
 function Modal({
   title,
@@ -10,6 +12,7 @@ function Modal({
   buttons,
   className: propsClassNames = {},
   handleCloseDisabled = false,
+  isCloseButton = false,
 }) {
   const classNames = {
     ...{
@@ -27,7 +30,7 @@ function Modal({
   }
 
   return (
-    <Transition appear show={isOpen} as={Fragment}>
+    <Transition as={Fragment} appear show={isOpen}>
       <Dialog
         as="div"
         className={classNames.main}
@@ -46,6 +49,9 @@ function Modal({
         </Transition.Child>
         <div className={classNames.backdrop}>
           <div className={classNames.content}>
+            {isCloseButton && (
+              <Close className="absolute cursor-pointer top-0 translate-y-[6rem] translate-x-[16rem] z-20" />
+            )}
             <Transition.Child
               as={Fragment}
               leaveFrom="opacity-100 scale-100"
@@ -55,13 +61,13 @@ function Modal({
               leaveTo="opacity-0 scale-95"
               leave="ease-in duration-100"
             >
-              <Dialog.Panel className={classNames.dialogPanel}>
-                <Dialog.Title as="h3" className={classNames.dialogTitle}>
+              <DialogPanel className={classNames.dialogPanel}>
+                <DialogTitle as="h3" className={classNames.dialogTitle}>
                   {title}
-                </Dialog.Title>
+                </DialogTitle>
                 <div className={classNames.contentBody}>{children}</div>
                 <div className={classNames.buttonsContainer}>{buttons}</div>
-              </Dialog.Panel>
+              </DialogPanel>
             </Transition.Child>
           </div>
         </div>

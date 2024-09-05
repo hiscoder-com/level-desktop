@@ -1,20 +1,18 @@
 import { useState, useEffect } from 'react'
 
-import Link from 'next/link'
-
 import toast from 'react-hot-toast'
 import jszip from 'jszip'
 import { JsonToPdf } from '@texttree/obs-format-convert-rcl'
 
-import ListBox from './ListBox'
 import Modal from './Modal'
 import Property from './Property'
 
 import { useTranslation } from '@/next-i18next'
 import { convertToUsfm, convertBookChapters } from '@/helpers/usfm'
 
-import DownloadIcon from 'public/icons/download.svg'
 import Gear from 'public/icons/gear.svg'
+import { useRouter } from 'next/router'
+import { Switch, Label, Field } from '@headlessui/react'
 
 const styles = {
   currentPage: {
@@ -31,6 +29,7 @@ const styles = {
 
 function ProjectsList({ projectsList, setProjectsList }) {
   const { t } = useTranslation(['common', 'projects'])
+  const router = useRouter()
 
   const options = [
     { label: t('projects:ExportToPDF'), value: 'pdf' },
@@ -40,7 +39,6 @@ function ProjectsList({ projectsList, setProjectsList }) {
 
   const [selectedOption, setSelectedOption] = useState(options[0].value)
   const [currentProject, setCurrentProject] = useState(null)
-  const [isOpenModal, setIsOpenModal] = useState(false)
   const [isOpenSettingsModal, setIsOpenSettingsModal] = useState(false)
   const [properties, setProperties] = useState(null)
   const [editedProperties, setEditedProperties] = useState({})
@@ -206,6 +204,7 @@ function ProjectsList({ projectsList, setProjectsList }) {
     } else {
       exportToZip(chapters, project)
     }
+    setSelectedOption(null)
   }
 
   const updateEditedProperty = (text, property) => {
@@ -245,7 +244,7 @@ function ProjectsList({ projectsList, setProjectsList }) {
     window.electronAPI.deleteProject(id)
   }
 
-  const handleShowIntroChange = () => {
+  const handleShowIntroChange = (e) => {
     setShowIntro((prev) => {
       window.electronAPI.updateProjectConfig(currentProject.id, { showIntro: !prev })
       return !prev
@@ -254,83 +253,94 @@ function ProjectsList({ projectsList, setProjectsList }) {
 
   return (
     <>
+      <div className="h-7 bg-th-primary-100 rounded-t-lg"></div>
+      <div className="pl-8 h-16 bg-th-secondary-10 border-b border-th-secondary-200 flex items-center font-bold text-lg">
+        {t('common:Projects')}
+      </div>
       <table className="border-collapse table-auto w-full text-sm">
         <thead>
-          <tr className="text-left text-th-secondary-300 border-b border-th-secondary-200 cursor-default">
-            <th className="font-medium pt-0 pr-4 pb-3 pl-8">{t('Book')}</th>
-            <th className="font-medium pt-0 pr-4 pb-3 pl-8">{t('projects:Project')}</th>
-            <th className="font-medium pt-0 pr-4 pb-3 pl-8">{t('CreatedAt')}</th>
-            <th className="font-medium pt-0 pr-4 pb-3 pl-8"></th>
+          <tr className="text-left font-bold text-th-primary border-b border-th-secondary-200 bg-th-secondary-10 cursor-default">
+            <th className="py-4 pl-8">{t('Book')}</th>
+            <th className="py-4 pl-8">{t('projects:Project')}</th>
+            <th className="py-4 pl-8">{t('CreatedAt')}</th>
+            <th className="py-4 pl-8">{t('Settings')}</th>
+            <th className="py-4 px-8 flex justify-end">
+              <span>{t('common:Download')}</span>
+            </th>
           </tr>
         </thead>
         <tbody className="bg-th-secondary-10">
           {projectsList.map((project) => (
             <tr
               key={project.id}
-              className="border-b border-th-secondary-200 text-th-primary-100"
+              className="border-b border-th-secondary-200 text-th-primary-100 hover:bg-th-secondary-20
+               cursor-pointer"
+              onClick={() => router.push(`/account/project/${project.id}`)}
             >
-              <td className="p-4 pl-8">
-                <Link href={`/account/project/${project.id}`} legacyBehavior>
-                  <a className="font-bold hover:opacity-70">{project.book.name}</a>
-                </Link>
+              <td className="py-4 pl-8">
+                <span className="px-3 py-2 bg-th-secondary-100 rounded">
+                  {project.book.name}
+                </span>
               </td>
-              <td className="p-4 pl-8">{project.name}</td>
-              <td className="p-4 pl-8">
-                {new Date(project.createdAt).toLocaleDateString()}
+              <td className="py-4 pl-8">
+                <span className="px-3 py-2 bg-th-secondary-100 rounded">
+                  {project.name}
+                </span>
               </td>
-              <td className="p-4 pl-8">
-                <div className="flex justify-center gap-5 cursor-pointer">
-                  <DownloadIcon
-                    className="w-8 hover:opacity-70"
-                    onClick={() => {
-                      setCurrentProject(project)
-                      setIsOpenModal(true)
+              <td className="py-4 pl-8">
+                <span className="px-3 py-2 bg-th-secondary-100 rounded">
+                  {new Date(project.createdAt).toLocaleDateString()}
+                </span>
+              </td>
+              <td className="py-4 pl-8">
+                <Gear
+                  className="w-5 hover:opacity-70"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setCurrentProject(project)
+                    setIsOpenSettingsModal(true)
+                  }}
+                />
+              </td>
+              <td className="py-4 px-8">
+                <div className="flex justify-end gap-5 cursor-pointer">
+                  <button
+                    className="bg-th-primary-100 text-th-secondary-10 p-1 rounded-md hover:opacity-70"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setSelectedOption('usfm')
+                      download(project)
                     }}
-                  />
-                  <Gear
-                    className="w-8 hover:opacity-70"
-                    onClick={() => {
-                      setCurrentProject(project)
-                      setIsOpenSettingsModal(true)
+                  >
+                    USFM
+                  </button>
+                  <button
+                    className="bg-th-primary-100 text-th-secondary-10 p-1 rounded-md hover:opacity-70"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setSelectedOption('pdf')
+                      download(project)
                     }}
-                  />
+                  >
+                    PDF
+                  </button>
+                  <button
+                    className="bg-th-primary-100 text-th-secondary-10 p-1 rounded-md hover:opacity-70"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setSelectedOption('zip')
+                      download(project)
+                    }}
+                  >
+                    ZIP
+                  </button>
                 </div>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-      <Modal
-        title={t('Download')}
-        closeHandle={() => setIsOpenModal(false)}
-        className={{
-          dialogPanel:
-            'w-full max-w-md align-middle px-6 bg-th-primary-100 text-th-text-secondary-100 overflow-y-visible rounded-3xl',
-        }}
-        isOpen={isOpenModal}
-        buttons={
-          <div className="flex justify-center self-center w-2/3 gap-7">
-            <button
-              className="btn-secondary flex-1"
-              onClick={() => download(currentProject)}
-            >
-              {t('Download')}
-            </button>
-            <button
-              className="btn-secondary flex-1"
-              onClick={() => setIsOpenModal(false)}
-            >
-              {t('Close')}
-            </button>
-          </div>
-        }
-      >
-        <ListBox
-          selectedOption={selectedOption}
-          setSelectedOption={setSelectedOption}
-          options={options}
-        />
-      </Modal>
+
       <Modal
         title={
           isConfirmDelete ? t('projects:ProjectDelete') : t('projects:ProjectSettings')
@@ -342,6 +352,7 @@ function ProjectsList({ projectsList, setProjectsList }) {
         className={{
           contentBody: 'max-h-[70vh] overflow-y-auto px-6',
         }}
+        isCloseButton
         buttons={
           isConfirmDelete ? (
             <div className="flex justify-center self-center gap-7 w-2/3 pt-6">
@@ -365,14 +376,11 @@ function ProjectsList({ projectsList, setProjectsList }) {
             </div>
           ) : (
             <div className="flex justify-center self-center gap-7 w-2/3">
+              <button className="btn-red flex-1" onClick={() => setIsConfirmDelete(true)}>
+                {t('Delete')}
+              </button>
               <button className="btn-secondary flex-1" onClick={saveProperties}>
                 {t('Save')}
-              </button>
-              <button
-                className="btn-secondary flex-1"
-                onClick={() => setIsOpenSettingsModal(false)}
-              >
-                {t('Close')}
               </button>
             </div>
           )
@@ -387,12 +395,25 @@ function ProjectsList({ projectsList, setProjectsList }) {
         ) : (
           <div className="flex flex-col gap-4">
             {renderProperties}
-            <button className="btn-secondary mt-2.5" onClick={handleShowIntroChange}>
-              {showIntro ? t('projects:DisableIntro') : t('projects:EnableIntro')}
-            </button>
-            <button className="btn-red my-2.5" onClick={() => setIsConfirmDelete(true)}>
-              {t('projects:RemoveProject')}
-            </button>
+            <Field className="flex items-center gap-4 font-bold">
+              <Switch
+                checked={showIntro}
+                onChange={handleShowIntroChange}
+                className={`group relative flex h-7 w-14 cursor-pointer rounded-full p-1 transition-colors duration-200 ease-in-out focus:outline-none data-[focus]:outline-1 data-[focus]:outline-white ${
+                  !showIntro ? 'bg-th-secondary-400' : 'bg-th-secondary-200'
+                }`}
+              >
+                <span
+                  aria-hidden="true"
+                  className={`pointer-events-none inline-block size-5 rounded-full bg-white ring-0 shadow-lg transition duration-200 ease-in-out ${
+                    showIntro ? 'translate-x-0' : 'translate-x-7'
+                  }`}
+                />
+              </Switch>
+              <Label>
+                {showIntro ? t('projects:DisableIntro') : t('projects:EnableIntro')}
+              </Label>
+            </Field>
           </div>
         )}
       </Modal>

@@ -7,7 +7,6 @@ import { useTranslation } from '@/next-i18next'
 
 import CheckBox from '@/components/CheckBox'
 import MarkdownExtended from '@/components/MarkdownExtended'
-import Breadcrumbs from '@/components/Breadcrumbs'
 
 export default function IntroPage() {
   const { t } = useTranslation(['common', 'projects'])
@@ -50,9 +49,7 @@ export default function IntroPage() {
         <title>{t('V-CANA')}</title>
       </Head>
 
-      <div className="f-screen-appbar mb-4 w-full max-w-3xl">
-        <Breadcrumbs currentTitle={project?.book?.name} />
-
+      <div className="f-screen-appbar mb-4 w-full max-w-3xl pt-4">
         <div
           style={{ height: 'calc(100vh - 11rem)' }}
           className="mb-4 mx-auto py-6 px-6 lg:px-8 bg-th-secondary-10 overflow-auto rounded-lg"
@@ -66,7 +63,6 @@ export default function IntroPage() {
             * {t('projects:DisableIntroClue')}
           </p>
         </div>
-
         <div className="flex items-center justify-end h-12 md:h-16 flex-row space-x-6">
           <CheckBox
             onChange={() => setChecked((prev) => !prev)}

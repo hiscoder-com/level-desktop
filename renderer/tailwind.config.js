@@ -1,4 +1,4 @@
-const colors = require('tailwindcss/colors');
+const colors = require('tailwindcss/colors')
 
 module.exports = {
   content: [
@@ -14,6 +14,7 @@ module.exports = {
         'th-primary-400': 'var(--primary-400)',
         'th-primary-500': 'var(--primary-500)',
         'th-secondary-10': 'var(--secondary-10)',
+        'th-secondary-20': 'var(--secondary-20)',
         'th-secondary-100': 'var(--secondary-100)',
         'th-secondary-200': 'var(--secondary-200)',
         'th-secondary-300': 'var(--secondary-300)',
@@ -54,4 +55,4 @@ module.exports = {
     },
   },
   plugins: [],
-};
+}
