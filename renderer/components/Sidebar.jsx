@@ -27,13 +27,23 @@ export default function Sidebar() {
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <div className="flex flex-col justify-between h-full ml-4 text-sm">
-        <div className="flex flex-col gap-6">
+      <div className="flex flex-col justify-between h-full text-sm">
+        <div className="flex flex-col">
           <div
-            className="flex items-center cursor-pointer"
+            className={`flex items-center cursor-pointer ${
+              router.pathname === '/account' ? 'bg-th-secondary-200' : ''
+            } hover:bg-th-secondary-200 py-3`}
             onClick={() => router.push('/account')}
           >
-            <Folder />
+            <Folder
+              className={`ml-4 ${
+                router.pathname === '/account'
+                  ? 'text-th-primary-100'
+                  : isHovered
+                  ? 'text-th-text-primary'
+                  : 'text-th-secondary-300'
+              }`}
+            />
             <div
               className={`ml-2 ${
                 isHovered && !isOpenAbout ? 'opacity-100' : 'opacity-0'
@@ -43,10 +53,20 @@ export default function Sidebar() {
             </div>
           </div>
           <div
-            className="flex items-center cursor-pointer"
+            className={`flex items-center cursor-pointer ${
+              router.pathname === '/account/project/import' ? 'bg-th-secondary-200' : ''
+            } hover:bg-th-secondary-200 py-3`}
             onClick={() => router.push('/account/project/import')}
           >
-            <Upload />
+            <Upload
+              className={`ml-4 ${
+                router.pathname === '/account/project/import'
+                  ? 'text-th-primary-100'
+                  : isHovered
+                  ? 'text-th-text-primary'
+                  : 'text-th-secondary-300'
+              }`}
+            />
             <div
               className={`ml-2 ${
                 isHovered && !isOpenAbout ? 'opacity-100' : 'opacity-0'
@@ -56,10 +76,20 @@ export default function Sidebar() {
             </div>
           </div>
           <div
-            className="flex items-center cursor-pointer"
+            className={`flex items-center cursor-pointer ${
+              router.pathname === '/account/merger' ? 'bg-th-secondary-200' : ''
+            } hover:bg-th-secondary-200 py-3`}
             onClick={() => router.push('/account/merger')}
           >
-            <Merger />
+            <Merger
+              className={`ml-4 ${
+                router.pathname === '/account/merger'
+                  ? 'text-th-primary-100'
+                  : isHovered
+                  ? 'text-th-text-primary'
+                  : 'text-th-secondary-300'
+              }`}
+            />
             <div
               className={`ml-2 ${
                 isHovered && !isOpenAbout ? 'opacity-100' : 'opacity-0'
@@ -71,7 +101,11 @@ export default function Sidebar() {
         </div>
         <div className="flex flex-col gap-6">
           <div className="flex items-center">
-            <Localization />
+            <Localization
+              className={`${
+                isHovered ? 'text-th-text-primary' : 'text-th-secondary-300'
+              } ml-4`}
+            />
             <div
               className={`ml-2 ${
                 isHovered && !isOpenAbout ? 'opacity-100' : 'opacity-0'
@@ -90,7 +124,11 @@ export default function Sidebar() {
               setIsHovered(false)
             }}
           >
-            <AboutIcon />
+            <AboutIcon
+              className={`${
+                isHovered ? 'fill-th-text-primary' : 'text-th-secondary-300'
+              } ml-4`}
+            />
             <div
               className={`ml-2 ${
                 isHovered && !isOpenAbout ? 'opacity-100' : 'opacity-0'

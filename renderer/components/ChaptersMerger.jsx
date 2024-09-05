@@ -238,7 +238,7 @@ export default function ChaptersMerger({ book }) {
           {jsonDataArray.length > 0 && (
             <div className="py-5 border-y">
               <p>{t('UploadedFiles')}</p>
-              <div className="flex gap-2.5 pt-4">
+              <div className="flex flex-wrap gap-2.5 pt-4">
                 {jsonDataArray.map((json, index) => (
                   <div
                     className="flex items-center gap-2.5 py-4 px-5 border w-fit rounded-full border-th-text-primary"
@@ -263,7 +263,7 @@ export default function ChaptersMerger({ book }) {
           )}
           {jsonDataArray.length > 0 && (
             <button
-              className="w-fit btn-strong"
+              className="w-fit btn-quaternary"
               disabled={jsonDataArray.length < 2}
               onClick={() => mergeChapters()}
             >

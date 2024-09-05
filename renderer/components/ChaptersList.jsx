@@ -87,11 +87,19 @@ function ChapterList({ id, chapters, steps, mutate, book, project }) {
       <table className="border-collapse w-full text-sm">
         <thead>
           <tr className="text-left font-bold text-th-primary border-b border-th-secondary-200 bg-th-secondary-10 cursor-default">
-            <th className="min-w-28 font-medium py-4 pl-8">{t('projects:Chapter')}</th>
-            <th className="min-w-28 font-medium py-4 pl-8">{t('projects:Verses')}</th>
-            <th className="min-w-32 font-medium py-4 pl-8">{t('projects:Step')}</th>
-            <th className="min-w-28 font-medium py-4 pl-8">{t('projects:Navigation')}</th>
-            <th className="min-w-20 font-medium py-4 px-8 flex text-end justify-end">
+            <th className="w-2/12 min-w-28 font-medium py-4 pl-8">
+              {t('projects:Chapter')}
+            </th>
+            <th className="w-1/12 min-w-28 font-medium py-4 pl-8">
+              {t('projects:Verses')}
+            </th>
+            <th className="w-4/12 min-w-32 font-medium py-4 pl-8">
+              {t('projects:Step')}
+            </th>
+            <th className="w-4/12 min-w-28 font-medium py-4 pl-8">
+              {t('projects:Navigation')}
+            </th>
+            <th className="w-2/12 min-w-20 font-medium py-4 px-8 ">
               <div>{t('common:Download')}</div>
             </th>
           </tr>
@@ -109,22 +117,22 @@ function ChapterList({ id, chapters, steps, mutate, book, project }) {
                 )
               }
             >
-              <td className="py-4 pl-8 cursor-pointer">
+              <td className="w-2/12 py-4 pl-8 cursor-pointer">
                 <span className="break-words px-3 py-2 bg-th-secondary-100 rounded">
                   {t('projects:Chapter')} {chapter}
                 </span>
               </td>
-              <td className="py-4 pl-8 break-words cursor-pointer">
+              <td className="w-1/12 py-4 pl-8 break-words cursor-pointer">
                 <span className="px-3 py-2 bg-th-secondary-100 rounded">
                   {versesCount?.[chapter]}
                 </span>
               </td>
-              <td className="py-4 pl-8 break-words cursor-pointer">
+              <td className="w-4/12 py-4 pl-8 break-words cursor-pointer">
                 <span className="px-3 py-2 bg-th-secondary-100 rounded">
                   {steps[step].title}
                 </span>
               </td>
-              <td className="py-4 pl-8 cursor-pointer">
+              <td className="w-4/12 py-4 pl-8 cursor-pointer">
                 <StepNavigator
                   currentStep={step}
                   handleBackStep={handleBackStep}
@@ -134,7 +142,7 @@ function ChapterList({ id, chapters, steps, mutate, book, project }) {
                   stepsInfo={steps}
                 />
               </td>
-              <td className="py-4 px-8">
+              <td className="w-2/12 py-4 px-8">
                 <div className="flex justify-end cursor-pointer">
                   <button
                     className="bg-th-primary-100 text-th-secondary-10 p-1 rounded-md hover:opacity-70"

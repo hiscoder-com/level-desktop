@@ -308,7 +308,11 @@
 }
 
 .btn-quaternary {
-  @apply btn-base text-th-text-secondary-100 bg-th-secondary-400 hover:bg-th-secondary-200  border border-th-secondary-400 disabled:cursor-auto hover:border-th-secondary-300 hover:text-th-text-primary disabled:opacity-50 disabled:hover:bg-th-secondary-400  disabled:hover:border-th-secondary-400 disabled:hover:text-th-text-secondary-100;
+  @apply btn-base text-th-text-secondary-100 bg-th-secondary-400 hover:bg-th-secondary-200 border border-th-secondary-400 disabled:cursor-auto hover:border-th-secondary-300 hover:text-th-text-primary disabled:opacity-50 disabled:hover:bg-th-secondary-400  disabled:hover:border-th-secondary-400 disabled:hover:text-th-text-secondary-100;
+}
+
+.btn-strong-quaternary {
+  @apply rounded-md py-2.5 px-4 text-center cursor-pointer text-th-text-secondary-100 text-sm md:text-base bg-th-secondary-400 hover:bg-th-secondary-200 border border-th-secondary-400 disabled:cursor-auto hover:border-th-secondary-300 hover:text-th-text-primary disabled:opacity-50 disabled:hover:bg-th-secondary-400 disabled:hover:border-th-secondary-400 disabled:hover:text-th-text-secondary-100;
 }
 
 .btn-red {
