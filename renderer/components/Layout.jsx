@@ -22,9 +22,13 @@ function Layout({ children }) {
   }
 
   const isShowSidebar = useMemo(() => {
-    return router && router.pathname !== homePath && !router.pathname.includes('chapter')
+    return (
+      router &&
+      router.pathname !== homePath &&
+      !router.pathname.includes('chapter') &&
+      router.pathname.includes('account')
+    )
   }, [router])
-  console.log({ isShowSidebar, router })
   const isStep = useMemo(() => {
     return (
       router &&
@@ -32,6 +36,9 @@ function Layout({ children }) {
       router.pathname.includes('chapter') &&
       !router.pathname.includes('intro')
     )
+  }, [router])
+  const isShowAppBar = useMemo(() => {
+    return router && router.pathname.includes('account')
   }, [router])
 
   useEffect(() => {
@@ -50,7 +57,9 @@ function Layout({ children }) {
       <div className={getMainClassName()}>
         <LoadingPage loadingPage={loadingPage} />
         <main>
-          {router.pathname !== homePath && <AppBar isStep={isStep} />}
+          {router.pathname !== homePath && (
+            <AppBar isStep={isStep} isShowAppBar={isShowAppBar} />
+          )}
           {isShowSidebar && <Sidebar />}
           {children}
         </main>

@@ -5,6 +5,6 @@ module.exports = {
         preload: './main/preload.js',
         background: './main/background.js',
       },
-    });
+    })
   },
-};
+}

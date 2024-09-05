@@ -1,6 +1,12 @@
 import { Fragment } from 'react'
 
-import { Transition, Dialog, DialogPanel, DialogTitle } from '@headlessui/react'
+import {
+  Transition,
+  Dialog,
+  DialogPanel,
+  DialogTitle,
+  TransitionChild,
+} from '@headlessui/react'
 
 import Close from 'public/icons/close-round.svg'
 
@@ -19,7 +25,7 @@ function Modal({
       main: 'z-50 relative',
       dialogTitle: 'text-2xl font-medium leading-6 p-6',
       dialogPanel:
-        'w-full max-w-md align-middle transform overflow-hidden shadow-xl transition-all bg-th-primary-100 text-th-text-secondary-100 rounded-3xl',
+        'w-full max-w-md align-middle transform overflow-hidden md:overflow-visible shadow-xl transition-all bg-th-primary-100 text-th-text-secondary-100 rounded-3xl',
       transitionChild: 'fixed inset-0 bg-opacity-25 backdrop-brightness-90',
       content:
         'inset-0 fixed flex items-center justify-center min-h-full overflow-y-auto',
@@ -36,7 +42,7 @@ function Modal({
         className={classNames.main}
         onClose={() => !handleCloseDisabled && closeHandle()}
       >
-        <Transition.Child
+        <TransitionChild
           as={Fragment}
           enter="ease-out duration-100"
           leave="ease-in duration-100"
@@ -46,13 +52,10 @@ function Modal({
           leaveTo="opacity-0"
         >
           <div className={classNames.transitionChild} />
-        </Transition.Child>
+        </TransitionChild>
         <div className={classNames.backdrop}>
           <div className={classNames.content}>
-            {isCloseButton && (
-              <Close className="absolute cursor-pointer top-0 translate-y-[6rem] translate-x-[16rem] z-20" />
-            )}
-            <Transition.Child
+            <TransitionChild
               as={Fragment}
               leaveFrom="opacity-100 scale-100"
               enterFrom="opacity-100 scale-95"
@@ -62,13 +65,20 @@ function Modal({
               leave="ease-in duration-100"
             >
               <DialogPanel className={classNames.dialogPanel}>
+                {isCloseButton && (
+                  <Close
+                    onClick={closeHandle}
+                    className="absolute cursor-pointer md:translate-x-14 right-0 z-20"
+                  />
+                )}
+
                 <DialogTitle as="h3" className={classNames.dialogTitle}>
                   {title}
                 </DialogTitle>
                 <div className={classNames.contentBody}>{children}</div>
                 <div className={classNames.buttonsContainer}>{buttons}</div>
               </DialogPanel>
-            </Transition.Child>
+            </TransitionChild>
           </div>
         </div>
       </Dialog>
