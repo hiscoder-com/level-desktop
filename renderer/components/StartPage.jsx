@@ -1,12 +1,11 @@
-import { useRouter } from 'next/router'
+import Image from 'next/image'
 import Link from 'next/link'
-
-import LanguageSwitcher from './LanguageSwitcher'
+import { useRouter } from 'next/router'
 
 import { useTranslation } from '@/next-i18next'
-
 import VcanaLogo from 'public/icons/vcana-logo-color.svg'
-import Image from 'next/image'
+
+import LanguageSwitcher from './LanguageSwitcher'
 
 export default function StartPage() {
   const router = useRouter()
@@ -24,8 +23,8 @@ export default function StartPage() {
     router.push(allAgreed ? `/account` : `/agreements`)
   }
   return (
-    <div className="flex h-screen abcolute">
-      <div className="flex items-center justify-center w-3/5 bg-th-primary-100">
+    <div className="abcolute flex h-screen">
+      <div className="flex w-3/5 items-center justify-center bg-th-primary-100">
         <Image
           src="/icons/start-page.svg"
           alt="Vcana Logo"
@@ -35,18 +34,18 @@ export default function StartPage() {
         />
       </div>
 
-      <div className="relative w-2/5 flex items-center justify-center">
+      <div className="relative flex w-2/5 items-center justify-center">
         <div className="flex flex-col gap-2.5">
-          <div className="flex items-center justify-center px-7 py-10 bg-th-secondary-10 rounded-3xl">
+          <div className="flex items-center justify-center rounded-3xl bg-th-secondary-10 px-7 py-10">
             <VcanaLogo className="w-[14.5rem]" />
           </div>
-          <div className="flex flex-grow items-center justify-between px-7 py-4 bg-th-secondary-10 rounded-3xl z-10">
+          <div className="z-10 flex flex-grow items-center justify-between rounded-3xl bg-th-secondary-10 px-7 py-4">
             <p className="text-xl">{t('projects:Language')}</p>
             <LanguageSwitcher />
           </div>
 
           <div className="rounded-3xl bg-th-primary-100" onClick={checkAgreements}>
-            <p className="px-7 py-8 green-two-layers rounded-3xl after:rounded-3xl text-th-secondary-10 text-xl cursor-pointer">
+            <p className="green-two-layers cursor-pointer rounded-3xl px-7 py-8 text-xl text-th-secondary-10 after:rounded-3xl">
               {t('users:SignIn')}
             </p>
           </div>
@@ -54,7 +53,7 @@ export default function StartPage() {
 
         <Link
           href="https://v-cana.com"
-          className="absolute bottom-10 left-1/2 -translate-x-1/2 text-th-primary-100 text-sm uppercase"
+          className="absolute bottom-10 left-1/2 -translate-x-1/2 text-sm uppercase text-th-primary-100"
           target="_blank"
         >
           v-cana.com

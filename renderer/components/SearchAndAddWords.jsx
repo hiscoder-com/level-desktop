@@ -1,11 +1,10 @@
 import dynamic from 'next/dynamic'
 
 import { useTranslation } from '@/next-i18next'
-
 import Close from 'public/icons/close.svg'
-import Plus from 'public/icons/plus.svg'
 import Export from 'public/icons/export.svg'
 import Import from 'public/icons/import.svg'
+import Plus from 'public/icons/plus.svg'
 
 const MenuButtons = dynamic(
   () => import('@texttree/v-cana-rcl').then((mod) => mod.MenuButtons),
@@ -45,8 +44,8 @@ function SearchAndAddWords({
       {
         id: 'export',
         buttonContent: (
-          <span className="flex items-center gap-2.5 py-1 pr-7 pl-2.5">
-            <Export className="w-5 h-5" /> {t('Export')}
+          <span className="flex items-center gap-2.5 py-1 pl-2.5 pr-7">
+            <Export className="h-5 w-5" /> {t('Export')}
           </span>
         ),
         action: () => exportWords(),
@@ -54,8 +53,8 @@ function SearchAndAddWords({
       {
         id: 'import',
         buttonContent: (
-          <span className="flex items-center gap-2.5 py-1 pr-7 pl-2.5">
-            <Import className="w-5 h-5" /> {t('Import')}
+          <span className="flex items-center gap-2.5 py-1 pl-2.5 pr-7">
+            <Import className="h-5 w-5" /> {t('Import')}
           </span>
         ),
         action: () => importWords(true),
@@ -65,17 +64,17 @@ function SearchAndAddWords({
 
   const icons = {
     dots: (
-      <div className="flex items-center justify-center w-6 h-6 space-x-1">
+      <div className="flex h-6 w-6 items-center justify-center space-x-1">
         {[...Array(3).keys()].map((key) => (
-          <div key={key} className="h-1 w-1 bg-white rounded-full" />
+          <div key={key} className="h-1 w-1 rounded-full bg-white" />
         ))}
       </div>
     ),
   }
 
   return (
-    <div className="flex gap-2.5 w-full items-center">
-      <div className="relative w-full flex items-center">
+    <div className="flex w-full items-center gap-2.5">
+      <div className="relative flex w-full items-center">
         <input
           className="input-primary"
           value={searchQuery}
@@ -85,7 +84,7 @@ function SearchAndAddWords({
         />
         {searchQuery && (
           <Close
-            className="absolute р-6 w-6 z-10 cursor-pointer right-2 rtl:left-1"
+            className="р-6 absolute right-2 z-10 w-6 cursor-pointer rtl:left-1"
             onClick={() => (!activeWord ? setSearchQuery('') : null)}
           />
         )}
@@ -108,7 +107,7 @@ function SearchAndAddWords({
           title={t('AddWord')}
           disabled={activeWord}
         >
-          <Plus className="w-6 h-6 stroke-th-text-secondary-100 stroke-2" />
+          <Plus className="h-6 w-6 stroke-th-text-secondary-100 stroke-2" />
         </button>
       </div>
     </div>

@@ -4,9 +4,9 @@ import { useRouter } from 'next/router'
 
 import { Toaster } from 'react-hot-toast'
 
+import AppBar from './AppBar'
 import LoadingPage from './LoadingPage'
 import Sidebar from './Sidebar'
-import AppBar from './AppBar'
 
 function Layout({ children }) {
   const [loadingPage, setLoadingPage] = useState(false)

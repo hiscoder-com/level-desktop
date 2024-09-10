@@ -2,32 +2,30 @@ import { useEffect, useState } from 'react'
 
 import dynamic from 'next/dynamic'
 
-import toast from 'react-hot-toast'
-
-import Modal from './Modal'
-import LoadingPage from './LoadingPage'
-
-import { useTranslation } from '@/next-i18next'
-import { useGetTeamNotes } from '@/hooks/useGetTeamNotes'
 import {
   convertNotesToTree,
   generateFolderName,
   generateUniqueId,
 } from '@/helpers/noteEditor'
-
-import Back from 'public/icons/left.svg'
-import Trash from 'public/icons/trash.svg'
-import FileIcon from 'public/icons/file-icon.svg'
+import { useGetTeamNotes } from '@/hooks/useGetTeamNotes'
+import { useTranslation } from '@/next-i18next'
 import CloseFolder from 'public/icons/close-folder.svg'
-import OpenFolder from 'public/icons/open-folder.svg'
+import Close from 'public/icons/close.svg'
+import Export from 'public/icons/export.svg'
+import FileIcon from 'public/icons/file-icon.svg'
 import ArrowDown from 'public/icons/folder-arrow-down.svg'
 import ArrowRight from 'public/icons/folder-arrow-right.svg'
-import Export from 'public/icons/export.svg'
 import Import from 'public/icons/import.svg'
-import Rename from 'public/icons/rename.svg'
-import Close from 'public/icons/close.svg'
+import Back from 'public/icons/left.svg'
+import OpenFolder from 'public/icons/open-folder.svg'
 import Plus from 'public/icons/plus.svg'
 import Progress from 'public/icons/progress.svg'
+import Rename from 'public/icons/rename.svg'
+import Trash from 'public/icons/trash.svg'
+import toast from 'react-hot-toast'
+
+import LoadingPage from './LoadingPage'
+import Modal from './Modal'
 
 const t = (str) => str
 
@@ -60,16 +58,16 @@ const TreeView = dynamic(
 )
 
 const icons = {
-  file: <FileIcon className="w-6 h-6" />,
+  file: <FileIcon className="h-6 w-6" />,
   arrowDown: <ArrowDown className="stroke-2" />,
   arrowRight: <ArrowRight className="stroke-2" />,
-  openFolder: <OpenFolder className="w-6 h-6 stroke-[1.7]" />,
-  closeFolder: <CloseFolder className="w-6 h-6" />,
-  plus: <Plus className="w-6 h-6 stroke-2" />,
+  openFolder: <OpenFolder className="h-6 w-6 stroke-[1.7]" />,
+  closeFolder: <CloseFolder className="h-6 w-6" />,
+  plus: <Plus className="h-6 w-6 stroke-2" />,
   dots: (
-    <div className="flex items-center justify-center w-6 h-6 space-x-1">
+    <div className="flex h-6 w-6 items-center justify-center space-x-1">
       {[...Array(3).keys()].map((key) => (
-        <div key={key} className="h-1 w-1 bg-white rounded-full" />
+        <div key={key} className="h-1 w-1 rounded-full bg-white" />
       ))}
     </div>
   ),
@@ -368,7 +366,7 @@ export default function TeamNotes({ config: { id } }) {
       {
         id: 'adding_note',
         buttonContent: (
-          <span className="flex items-center gap-2.5 py-1 pr-7 pl-2.5">
+          <span className="flex items-center gap-2.5 py-1 pl-2.5 pr-7">
             <FileIcon />
             {t('NewNote')}
           </span>
@@ -378,7 +376,7 @@ export default function TeamNotes({ config: { id } }) {
       {
         id: 'adding_folder',
         buttonContent: (
-          <span className="flex items-center gap-2.5 py-1 pr-7 pl-2.5">
+          <span className="flex items-center gap-2.5 py-1 pl-2.5 pr-7">
             <CloseFolder />
             {t('NewFolder')}
           </span>
@@ -388,7 +386,7 @@ export default function TeamNotes({ config: { id } }) {
       {
         id: 'rename',
         buttonContent: (
-          <span className="flex items-center gap-2.5 py-1 pr-7 pl-2.5">
+          <span className="flex items-center gap-2.5 py-1 pl-2.5 pr-7">
             <Rename /> {t('Rename')}
           </span>
         ),
@@ -397,8 +395,8 @@ export default function TeamNotes({ config: { id } }) {
       {
         id: 'delete',
         buttonContent: (
-          <span className="flex items-center gap-2.5 py-1 pr-7 pl-2.5">
-            <Trash className="w-5 h-5" /> {t('projects:Delete')}
+          <span className="flex items-center gap-2.5 py-1 pl-2.5 pr-7">
+            <Trash className="h-5 w-5" /> {t('projects:Delete')}
           </span>
         ),
         action: () => setIsOpenModal(true),
@@ -408,8 +406,8 @@ export default function TeamNotes({ config: { id } }) {
       {
         id: 'export',
         buttonContent: (
-          <span className="flex items-center gap-2.5 py-1 pr-7 pl-2.5">
-            <Export className="w-4 h-4" /> {t('Export')}
+          <span className="flex items-center gap-2.5 py-1 pl-2.5 pr-7">
+            <Export className="h-4 w-4" /> {t('Export')}
           </span>
         ),
         action: () => exportNotes(),
@@ -417,8 +415,8 @@ export default function TeamNotes({ config: { id } }) {
       {
         id: 'import',
         buttonContent: (
-          <span className="flex items-center gap-2.5 py-1 pr-7 pl-2.5">
-            <Import className="w-4 h-4" /> {t('Import')}
+          <span className="flex items-center gap-2.5 py-1 pl-2.5 pr-7">
+            <Import className="h-4 w-4" /> {t('Import')}
           </span>
         ),
         action: () => importNotes(true),
@@ -426,8 +424,8 @@ export default function TeamNotes({ config: { id } }) {
       {
         id: 'remove',
         buttonContent: (
-          <span className="flex items-center gap-2.5 py-1 pr-7 pl-2.5">
-            <Trash className="w-5 h-5" /> {t('RemoveAll')}
+          <span className="flex items-center gap-2.5 py-1 pl-2.5 pr-7">
+            <Trash className="h-5 w-5" /> {t('RemoveAll')}
           </span>
         ),
         action: () => {
@@ -531,8 +529,8 @@ export default function TeamNotes({ config: { id } }) {
   return (
     <>
       <LoadingPage loadingPage={isLoading} />
-      <div className="flex gap-2.5 w-full items-center">
-        <div className="relative flex items-center w-full">
+      <div className="flex w-full items-center gap-2.5">
+        <div className="relative flex w-full items-center">
           <input
             className="input-primary w-full !pr-8"
             value={term}
@@ -542,7 +540,7 @@ export default function TeamNotes({ config: { id } }) {
           />
           {term && (
             <Close
-              className="absolute р-6 w-6 z-10 cursor-pointer right-2 rtl:left-1"
+              className="р-6 absolute right-2 z-10 w-6 cursor-pointer rtl:left-1"
               onClick={() => !activeNote && setTerm('')}
             />
           )}
@@ -605,13 +603,13 @@ export default function TeamNotes({ config: { id } }) {
                 />
               </>
             ) : (
-              <Progress className="progress-custom-colors w-14 animate-spin stroke-th-primary-100 mx-auto" />
+              <Progress className="progress-custom-colors mx-auto w-14 animate-spin stroke-th-primary-100" />
             )}
           </>
         ) : (
           <>
             <div
-              className="flex w-fit p-1 cursor-pointer hover:opacity-70 rounded-full bg-th-secondary-100 absolute"
+              className="absolute flex w-fit cursor-pointer rounded-full bg-th-secondary-100 p-1 hover:opacity-70"
               onClick={() => {
                 saveNote()
                 setActiveNote(null)
@@ -639,7 +637,7 @@ export default function TeamNotes({ config: { id } }) {
       </div>
 
       <Modal isOpen={isOpenModal} closeHandle={() => setIsOpenModal(false)}>
-        <div className="flex flex-col gap-7 items-center">
+        <div className="flex flex-col items-center gap-7">
           <div className="text-center text-2xl">
             {t('AreYouSureDelete') +
               ' ' +
@@ -650,7 +648,7 @@ export default function TeamNotes({ config: { id } }) {
               ) +
               '?'}
           </div>
-          <div className="flex gap-7 w-1/2 text-th-text-primary">
+          <div className="flex w-1/2 gap-7 text-th-text-primary">
             <button
               className="btn-base flex-1 bg-th-secondary-10 hover:opacity-70"
               onClick={() => {

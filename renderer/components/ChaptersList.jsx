@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react'
 
 import Link from 'next/link'
-
-import { JsonToPdf } from '@texttree/obs-format-convert-rcl'
-import { useTranslation } from '@/next-i18next'
 import { useRouter } from 'next/router'
 
+import { useTranslation } from '@/next-i18next'
+import { JsonToPdf } from '@texttree/obs-format-convert-rcl'
 import Left from 'public/icons/left.svg'
 import TechSteps from 'public/icons/techsteps.svg'
 
@@ -73,33 +72,33 @@ function ChapterList({ id, chapters, steps, mutate, book, project }) {
   }
   return (
     <div className="overflow-x-auto">
-      <div className="h-7 bg-th-primary-100 rounded-t-lg"></div>
-      <div className="flex h-16 border-b border-th-secondary-200 items-center text-lg bg-th-secondary-10 ">
-        <Link className="pl-8 flex items-center" href="/account">
+      <div className="h-7 rounded-t-lg bg-th-primary-100"></div>
+      <div className="flex h-16 items-center border-b border-th-secondary-200 bg-th-secondary-10 text-lg">
+        <Link className="flex items-center pl-8" href="/account">
           <Left className="w-6 stroke-th-secondary-300" />
-          <span className="text-th-secondary-300 text-sm ml-2.5">
+          <span className="ml-2.5 text-sm text-th-secondary-300">
             {t('common:Projects')}
           </span>
         </Link>
-        <span className="ml-6 font-bold text-lg inline">{t('books:' + book.code)}</span>
+        <span className="ml-6 inline text-lg font-bold">{t('books:' + book.code)}</span>
       </div>
 
-      <table className="border-collapse w-full text-sm">
+      <table className="w-full border-collapse text-sm">
         <thead>
-          <tr className="text-left font-bold text-th-primary border-b border-th-secondary-200 bg-th-secondary-10 cursor-default">
-            <th className="w-2/12 min-w-28 font-medium py-4 pl-8">
+          <tr className="text-th-primary cursor-default border-b border-th-secondary-200 bg-th-secondary-10 text-left font-bold">
+            <th className="w-2/12 min-w-28 py-4 pl-8 font-medium">
               {t('projects:Chapter')}
             </th>
-            <th className="w-1/12 min-w-28 font-medium py-4 pl-8">
+            <th className="w-1/12 min-w-28 py-4 pl-8 font-medium">
               {t('projects:Verses')}
             </th>
-            <th className="w-4/12 min-w-32 font-medium py-4 pl-8">
+            <th className="w-4/12 min-w-32 py-4 pl-8 font-medium">
               {t('projects:Step')}
             </th>
-            <th className="w-4/12 min-w-28 font-medium py-4 pl-8">
+            <th className="w-4/12 min-w-28 py-4 pl-8 font-medium">
               {t('projects:Navigation')}
             </th>
-            <th className="w-2/12 min-w-20 font-medium py-4 px-8 ">
+            <th className="w-2/12 min-w-20 px-8 py-4 font-medium">
               <div>{t('common:Download')}</div>
             </th>
           </tr>
@@ -108,7 +107,7 @@ function ChapterList({ id, chapters, steps, mutate, book, project }) {
           {chapters.map(([chapter, step]) => (
             <tr
               key={chapter}
-              className="border-b border-th-secondary-200 text-th-primary-100 hover:bg-th-secondary-20 "
+              className="border-b border-th-secondary-200 text-th-primary-100 hover:bg-th-secondary-20"
               onClick={() =>
                 router.push(
                   `/account/project/${id}/${chapter}/${
@@ -117,22 +116,22 @@ function ChapterList({ id, chapters, steps, mutate, book, project }) {
                 )
               }
             >
-              <td className="w-2/12 py-4 pl-8 cursor-pointer">
-                <span className="break-words px-3 py-2 bg-th-secondary-100 rounded">
+              <td className="w-2/12 cursor-pointer py-4 pl-8">
+                <span className="break-words rounded bg-th-secondary-100 px-3 py-2">
                   {t('projects:Chapter')} {chapter}
                 </span>
               </td>
-              <td className="w-1/12 py-4 pl-8 break-words cursor-pointer">
-                <span className="px-3 py-2 bg-th-secondary-100 rounded">
+              <td className="w-1/12 cursor-pointer break-words py-4 pl-8">
+                <span className="rounded bg-th-secondary-100 px-3 py-2">
                   {versesCount?.[chapter]}
                 </span>
               </td>
-              <td className="w-4/12 py-4 pl-8 break-words cursor-pointer">
-                <span className="px-3 py-2 bg-th-secondary-100 rounded">
+              <td className="w-4/12 cursor-pointer break-words py-4 pl-8">
+                <span className="rounded bg-th-secondary-100 px-3 py-2">
                   {steps[step].title}
                 </span>
               </td>
-              <td className="w-4/12 py-4 pl-8 cursor-pointer">
+              <td className="w-4/12 cursor-pointer py-4 pl-8">
                 <StepNavigator
                   currentStep={step}
                   handleBackStep={handleBackStep}
@@ -142,10 +141,10 @@ function ChapterList({ id, chapters, steps, mutate, book, project }) {
                   stepsInfo={steps}
                 />
               </td>
-              <td className="w-2/12 py-4 px-8">
-                <div className="flex justify-end cursor-pointer">
+              <td className="w-2/12 px-8 py-4">
+                <div className="flex cursor-pointer justify-end">
                   <button
-                    className="bg-th-primary-100 text-th-secondary-10 p-1 rounded-md hover:opacity-70"
+                    className="rounded-md bg-th-primary-100 p-1 text-th-secondary-10 hover:opacity-70"
                     onClick={(e) => {
                       e.stopPropagation()
                       handleDownloadChapter(chapter)
@@ -195,14 +194,14 @@ const StepNavigator = ({
   return (
     <div className="flex items-center gap-2.5">
       <button
-        className="w-6 h-6 rounded-full bg-th-primary-100 border-none cursor-pointer text-th-secondary-10 flex items-center justify-center disabled:cursor-auto disabled:bg-th-secondary-200"
+        className="flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border-none bg-th-primary-100 text-th-secondary-10 disabled:cursor-auto disabled:bg-th-secondary-200"
         disabled={currentStep === 0}
         onClick={(e) => {
           e.stopPropagation()
           handleBackStep(chapter, currentStep)
         }}
       >
-        <Left className="w-5 h-5" />
+        <Left className="h-5 w-5" />
       </button>
 
       {steps.map((step, index) => (
@@ -212,20 +211,20 @@ const StepNavigator = ({
             step.originalIndex === currentStep
               ? `${
                   step.isTech ? 'p-1.5' : ''
-                } text-lg bg-th-primary-100 text-th-secondary-10 font-bold`
-              : 'text-sm border border-th-secondary-100'
+                } bg-th-primary-100 text-lg font-bold text-th-secondary-10`
+              : 'border border-th-secondary-100 text-sm'
           }`}
         >
           {step.isTech ? (
             <TechSteps
-              className={`${step.originalIndex === currentStep ? 'w-5 h-5' : 'w-4 h-4'}`}
+              className={`${step.originalIndex === currentStep ? 'h-5 w-5' : 'h-4 w-4'}`}
             />
           ) : (
             <div
-              className={`bg-th-primary-100 rounded-full ${
+              className={`rounded-full bg-th-primary-100 ${
                 step.originalIndex === currentStep
-                  ? 'w-8 h-8'
-                  : 'w-6 h-6 bg-th-secondary-10'
+                  ? 'h-8 w-8'
+                  : 'h-6 w-6 bg-th-secondary-10'
               } flex items-center justify-center font-bold`}
             >
               {step.stepNumber}

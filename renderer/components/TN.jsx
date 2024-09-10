@@ -2,13 +2,12 @@ import { useEffect, useState } from 'react'
 
 import dynamic from 'next/dynamic'
 
+import { currentVerse } from '@/helpers/atoms'
+import { checkLSVal } from '@/helpers/checkls'
+import { useGetTnResource } from '@/hooks/useGetTnResource'
 import { useRecoilState } from 'recoil'
 
 import { Placeholder } from './Placeholder'
-
-import { useGetTnResource } from '@/hooks/useGetTnResource'
-import { checkLSVal } from '@/helpers/checkls'
-import { currentVerse } from '@/helpers/atoms'
 
 import Back from 'public/icons/left.svg'
 
@@ -63,7 +62,7 @@ function TN({
   }, [data])
 
   return (
-    <div id="container_tn" className="overflow-y-auto h-full">
+    <div id="container_tn" className="h-full overflow-y-auto">
       <TNotes
         tnotes={tnotes}
         nodeContentBack={

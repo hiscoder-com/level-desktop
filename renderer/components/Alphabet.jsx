@@ -94,7 +94,7 @@ function Alphabet({ alphabet, setCurrentPage, setSearchQuery, disabled }) {
   }
 
   return (
-    <div className="flex flex-wrap py-3 px-4 bg-th-secondary-100 rounded-lg w-full font-bold">
+    <div className="flex w-full flex-wrap rounded-lg bg-th-secondary-100 px-4 py-3 font-bold">
       {alphabet.map((letter, index) => (
         <div key={letter}>
           {index > 0 &&
@@ -106,7 +106,7 @@ function Alphabet({ alphabet, setCurrentPage, setSearchQuery, disabled }) {
               setCurrentPage(0)
               setSearchQuery(letter.toLowerCase())
             }}
-            className="px-1.5 cursor-pointer hover:opacity-50"
+            className="cursor-pointer px-1.5 hover:opacity-50"
             key={letter}
             disabled={disabled}
           >

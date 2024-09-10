@@ -1,9 +1,11 @@
 import Link from 'next/link'
-import { useRecoilValue } from 'recoil'
-import Timer from './Timer'
-import Dropdown from './Dropdown'
+
 import { stepConfigState } from 'helpers/atoms'
 import VcanaLogo from 'public/icons/vcana-logo.svg'
+import { useRecoilValue } from 'recoil'
+
+import Dropdown from './Dropdown'
+import Timer from './Timer'
 
 export default function AppBar({ isStep = false, isShowAppBar = false }) {
   const stepConfig = useRecoilValue(stepConfigState)
@@ -12,20 +14,20 @@ export default function AppBar({ isStep = false, isShowAppBar = false }) {
       {isShowAppBar && (
         <>
           {isStep ? (
-            <div className="bg-th-primary-100 absolute top-0 left-0 w-full">
+            <div className="absolute left-0 top-0 w-full bg-th-primary-100">
               <div className="appbar">
                 <Link href="/account" className="">
                   <VcanaLogo className="h-6 fill-th-text-secondary-100" />
                 </Link>
 
-                <div className="block md:flex flex-col text-center text-th-text-secondary-100">
+                <div className="block flex-col text-center text-th-text-secondary-100 md:flex">
                   <div>{stepConfig.title}</div>
                   {stepConfig.subtitle && (
                     <div className="text-xs">{stepConfig.subtitle}</div>
                   )}
                 </div>
-                <div className="block md:flex items-center gap-4 justify-center md:justify-start text-th-text-primary ">
-                  <div className="hidden md:flex px-5 py-2.5 bg-th-secondary-10 rounded-3xl">
+                <div className="block items-center justify-center gap-4 text-th-text-primary md:flex md:justify-start">
+                  <div className="hidden rounded-3xl bg-th-secondary-10 px-5 py-2.5 md:flex">
                     <Timer time={stepConfig.time} />
                   </div>
                   <Dropdown description={stepConfig?.description} />
@@ -33,9 +35,9 @@ export default function AppBar({ isStep = false, isShowAppBar = false }) {
               </div>
             </div>
           ) : (
-            <div className="fixed bg-th-primary-100 top-0 left-0 w-full h-16 flex items-center">
+            <div className="fixed left-0 top-0 flex h-16 w-full items-center bg-th-primary-100">
               <Link href={'/account'}>
-                <VcanaLogo className="h-6 fill-th-text-secondary-100 ml-14" />
+                <VcanaLogo className="ml-14 h-6 fill-th-text-secondary-100" />
               </Link>
             </div>
           )}

@@ -1,15 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
 
+import { checkedVersesBibleState } from '@/helpers/atoms'
+import { useTranslation } from '@/next-i18next'
+import Check from 'public/icons/check.svg'
+import Pencil from 'public/icons/pencil.svg'
 import { useSetRecoilState } from 'recoil'
 
-import Modal from './Modal'
 import { obsCheckAdditionalVerses } from './Bible'
-
-import { useTranslation } from '@/next-i18next'
-import { checkedVersesBibleState } from '@/helpers/atoms'
-
-import Pencil from 'public/icons/pencil.svg'
-import Check from 'public/icons/check.svg'
+import Modal from './Modal'
 
 function BlindEditor({ config: { id, mainResource, chapter = false }, toolName }) {
   const { t } = useTranslation()
@@ -136,7 +134,7 @@ function BlindEditor({ config: { id, mainResource, chapter = false }, toolName }
           const isTranslating = enabledInputs.includes(verseObject.num.toString())
           const isTranslated = translatedVerses.includes(currentNumVerse)
           return (
-            <div key={verseObject.num} className="flex my-3 items-start">
+            <div key={verseObject.num} className="my-3 flex items-start">
               <button
                 onClick={() =>
                   handleSaveVerse({
@@ -147,21 +145,21 @@ function BlindEditor({ config: { id, mainResource, chapter = false }, toolName }
                     isTranslating,
                   })
                 }
-                className={`p-3 rounded-2xl ${
-                  isTranslating ? 'bg-th-primary-100 cursor-auto' : 'bg-th-secondary-100'
+                className={`rounded-2xl p-3 ${
+                  isTranslating ? 'cursor-auto bg-th-primary-100' : 'bg-th-secondary-100'
                 }`}
                 disabled={disabledButton}
               >
                 {isTranslated ? (
-                  <Check className="w-4 h-4 stroke-2" />
+                  <Check className="h-4 w-4 stroke-2" />
                 ) : (
                   <Pencil
-                    className={`w-4 h-4 stroke-2 ${
+                    className={`h-4 w-4 stroke-2 ${
                       disabledButton
                         ? 'stroke-th-secondary-300'
                         : !isTranslating
-                        ? 'fill-th-secondary-100'
-                        : 'stroke-th-text-secondary-100'
+                          ? 'fill-th-secondary-100'
+                          : 'stroke-th-text-secondary-100'
                     }`}
                   />
                 )}
@@ -173,7 +171,7 @@ function BlindEditor({ config: { id, mainResource, chapter = false }, toolName }
                   ref={(el) => (textAreaRef.current[index] = el)}
                   autoFocus
                   rows={1}
-                  className="resize-none focus:outline-none focus:inline-none w-full"
+                  className="focus:inline-none w-full resize-none focus:outline-none"
                   onChange={(e) => {
                     e.target.style.height = 'inherit'
                     e.target.style.height = `${e.target.scrollHeight}px`
@@ -207,9 +205,9 @@ function BlindEditor({ config: { id, mainResource, chapter = false }, toolName }
         )}
       </div>
       <Modal isOpen={isOpenModal} closeHandle={() => setIsOpenModal(false)}>
-        <div className="flex flex-col gap-7 items-center">
+        <div className="flex flex-col items-center gap-7">
           <div className="text-center text-2xl">{t('AreYouSureWantStartBlind')}</div>
-          <div className="flex gap-7 w-1/2">
+          <div className="flex w-1/2 gap-7">
             <button
               className="btn-secondary flex-1"
               onClick={() => {

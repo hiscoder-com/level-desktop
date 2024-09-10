@@ -1,14 +1,13 @@
 import { useEffect, useState } from 'react'
 
 import { useRouter } from 'next/router'
+
+import { inactiveState } from '@/helpers/atoms'
+import { useTranslation } from '@/next-i18next'
+import Back from 'public/icons/left.svg'
 import { useRecoilState, useSetRecoilState } from 'recoil'
 
 import Recorder from './Recorder'
-
-import { useTranslation } from '@/next-i18next'
-import { inactiveState } from '@/helpers/atoms'
-
-import Back from 'public/icons/left.svg'
 
 export default function Retelling() {
   const { t } = useTranslation()
@@ -48,7 +47,7 @@ export default function Retelling() {
   return (
     <>
       {!option && (
-        <div className="flex flex-col justify-center items-center h-full">
+        <div className="flex h-full flex-col items-center justify-center">
           <button
             className="btn-base bg-th-secondary-300 text-th-text-secondary-100 hover:opacity-70"
             onClick={() => handleOption('partner')}
@@ -66,15 +65,15 @@ export default function Retelling() {
       )}
 
       {option && (
-        <div className="flex flex-col gap-4 min-h-full">
+        <div className="flex min-h-full flex-col gap-4">
           <div className="flex gap-4">
             <button
-              className="w-fit h-fit p-1 cursor-pointer hover:opacity-70 rounded-full bg-th-secondary-100"
+              className="h-fit w-fit cursor-pointer rounded-full bg-th-secondary-100 p-1 hover:opacity-70"
               onClick={resetState}
             >
               <Back className="w-8 stroke-th-primary-200" />
             </button>
-            <p className="self-center font-bold text-xl">
+            <p className="self-center text-xl font-bold">
               {option === 'partner' ? t('PartnerRetelling') : t('YourselfRetelling')}
             </p>
           </div>
@@ -106,11 +105,11 @@ export default function Retelling() {
 
 function RecorderSection({ isRecording, voice, setIsRecording, setVoice, label }) {
   return (
-    <div className="w-full pb-4 px-2">
+    <div className="w-full px-2 pb-4">
       <p className="mb-4">{label}</p>
       <Recorder setIsRecording={setIsRecording} voice={voice} setVoice={setVoice} />
       <div
-        className={`pb-4 px-2 border-b-4 ${
+        className={`border-b-4 px-2 pb-4 ${
           isRecording || voice.length > 0
             ? 'border-th-primary-200'
             : 'border-th-secondary-200'
@@ -125,11 +124,11 @@ function RetellPartner() {
   const { t } = useTranslation()
 
   return (
-    <div className="w-full pb-4 px-2 my-auto">
-      <div className="flex flex-col items-center gap-5 min-h-full justify-center relative">
+    <div className="my-auto w-full px-2 pb-4">
+      <div className="relative flex min-h-full flex-col items-center justify-center gap-5">
         {inactive ? (
           <button
-            className="btn-base bg-th-secondary-300 text-th-text-secondary-100 mr-2 hover:opacity-70"
+            className="btn-base mr-2 bg-th-secondary-300 text-th-text-secondary-100 hover:opacity-70"
             onClick={() => setInactive(false)}
           >
             {t('FinishRetelling')}
@@ -139,7 +138,7 @@ function RetellPartner() {
             <p>{t('StartRetelling')}</p>
             <div className="flex">
               <button
-                className="btn-base bg-th-secondary-300 text-th-text-secondary-100 mr-2 hover:opacity-70"
+                className="btn-base mr-2 bg-th-secondary-300 text-th-text-secondary-100 hover:opacity-70"
                 onClick={() => setInactive(true)}
               >
                 {t('InOriginalLanguage')}

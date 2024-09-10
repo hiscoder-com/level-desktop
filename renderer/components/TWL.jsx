@@ -2,16 +2,15 @@ import { useEffect, useState } from 'react'
 
 import dynamic from 'next/dynamic'
 
-import localforage from 'localforage'
+import { currentVerse } from '@/helpers/atoms'
+import { checkLSVal } from '@/helpers/checkls'
+import { useGetTwlResource } from '@/hooks/useGetTwlResource'
+import { useTranslation } from '@/next-i18next'
 import jszip from 'jszip'
+import localforage from 'localforage'
 import { useRecoilState } from 'recoil'
 
 import { Placeholder } from './Placeholder'
-
-import { useTranslation } from '@/next-i18next'
-import { useGetTwlResource } from '@/hooks/useGetTwlResource'
-import { currentVerse } from '@/helpers/atoms'
-import { checkLSVal } from '@/helpers/checkls'
 
 import Back from 'public/icons/left.svg'
 
@@ -129,9 +128,9 @@ function TWL({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data])
   return (
-    <div id="container_tw" className="overflow-y-auto h-full">
+    <div id="container_tw" className="h-full overflow-y-auto">
       {!word && (
-        <div className="text-center mb-2">
+        <div className="mb-2 text-center">
           {<FilterRepeated filter={filter} setFilter={setFilter} />}
         </div>
       )}

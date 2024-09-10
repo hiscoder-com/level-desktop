@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react'
 
+import { useGetUsfmResource } from '@/hooks/useGetUsfmResource'
+import { useScroll } from '@/hooks/useScroll'
 import ReactMarkdown from 'react-markdown'
 
-import { Placeholder } from './Placeholder'
 import CheckBox from './CheckBox'
-
-import { useScroll } from '@/hooks/useScroll'
-import { useGetUsfmResource } from '@/hooks/useGetUsfmResource'
+import { Placeholder } from './Placeholder'
 
 export const obsCheckAdditionalVerses = (numVerse) => {
   if (['0', '200'].includes(String(numVerse))) {
@@ -77,7 +76,7 @@ function Verses({ verseObjects, id, chapter, currentScrollVerse = 1 }) {
         <div
           key={verseObject.verse}
           id={'id' + verseObject.verse}
-          className={`p-2 flex gap-2 items-start ${
+          className={`flex items-start gap-2 p-2 ${
             'id' + currentScrollVerse === 'id' + verseObject.verse ? 'bg-gray-200' : ''
           }`}
           // onClick={() => {
@@ -92,8 +91,8 @@ function Verses({ verseObjects, id, chapter, currentScrollVerse = 1 }) {
             checked={versesDivide[verseObject.verse]}
             className={{
               accent:
-                'bg-th-secondary-10 checked:bg-th-primary-100 checked:border-th-secondary-400 checked:before:bg-th-secondary-400 border-th-secondary',
-              cursor: 'fill-th-secondary-10 text-th-secondary-10 stroke-th-secondary-10',
+                'border-th-secondary bg-th-secondary-10 checked:border-th-secondary-400 checked:bg-th-primary-100 checked:before:bg-th-secondary-400',
+              cursor: 'fill-th-secondary-10 stroke-th-secondary-10 text-th-secondary-10',
             }}
             id={`checkBox-${verseObject.verse}`}
             label={t('Done')}

@@ -1,13 +1,12 @@
 import { Fragment } from 'react'
 
 import {
-  Transition,
   Dialog,
   DialogPanel,
   DialogTitle,
+  Transition,
   TransitionChild,
 } from '@headlessui/react'
-
 import Close from 'public/icons/close-round.svg'
 
 function Modal({
@@ -68,7 +67,7 @@ function Modal({
                 {isCloseButton && (
                   <Close
                     onClick={closeHandle}
-                    className="absolute cursor-pointer md:translate-x-14 right-0 z-20"
+                    className="absolute right-0 z-20 cursor-pointer md:translate-x-14"
                   />
                 )}
 

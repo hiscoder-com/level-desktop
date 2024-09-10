@@ -1,11 +1,9 @@
-import { useRef, useState, useEffect } from 'react'
-
-import JSZip from 'jszip'
-import toast from 'react-hot-toast'
+import { useEffect, useRef, useState } from 'react'
 
 import { useTranslation } from '@/next-i18next'
-
+import JSZip from 'jszip'
 import Close from 'public/icons/close.svg'
+import toast from 'react-hot-toast'
 
 function Merger({ config }) {
   const { t } = useTranslation(['common', 'projects'])
@@ -90,12 +88,12 @@ function Merger({ config }) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex gap-2.5 pb-4 border-b">
-        <button onClick={() => exportChapterToZip()} className="w-fit btn-strong">
+      <div className="flex gap-2.5 border-b pb-4">
+        <button onClick={() => exportChapterToZip()} className="btn-strong w-fit">
           {t('Export')}
         </button>
         <button
-          className="w-fit btn-strong"
+          className="btn-strong w-fit"
           onClick={() => fileInputRef.current.click()}
           disabled={importedChapter}
         >
@@ -111,13 +109,13 @@ function Merger({ config }) {
       />
       {importedChapter && (
         <>
-          <div className="flex gap-2.5 pb-4 border-b">
-            <div className="flex items-center gap-2.5 py-4 px-5 border w-fit rounded-full border-th-text-primary">
+          <div className="flex gap-2.5 border-b pb-4">
+            <div className="flex w-fit items-center gap-2.5 rounded-full border border-th-text-primary px-5 py-4">
               <p>
                 {t('Projects:Chapter')} {Object.keys(importedChapter)[0]}
               </p>
               <Close
-                className="w-5 h-5 cursor-pointer stroke-2"
+                className="h-5 w-5 cursor-pointer stroke-2"
                 onClick={() => {
                   setImportedChapter(null)
                   if (fileInputRef.current) {
@@ -127,7 +125,7 @@ function Merger({ config }) {
               />
             </div>
           </div>
-          <div className="flex justify-center gap-2.5 pb-4 border-b">
+          <div className="flex justify-center gap-2.5 border-b pb-4">
             <button
               onClick={merge}
               className="btn-strong-quaternary w-fit"
