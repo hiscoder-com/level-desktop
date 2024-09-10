@@ -41,12 +41,12 @@ export default function StartPage() {
             <VcanaLogo className="w-[14.5rem]" />
           </div>
           <div className="flex flex-grow items-center justify-between px-7 py-4 bg-th-secondary-10 rounded-3xl z-10">
-            <p className="font-semibold text-xl">{t('projects:Language')}</p>
+            <p className="text-xl">{t('projects:Language')}</p>
             <LanguageSwitcher />
           </div>
 
           <div className="rounded-3xl bg-th-primary-100" onClick={checkAgreements}>
-            <p className="px-7 py-8 green-two-layers rounded-3xl after:rounded-3xl text-th-secondary-10 text-2xl font-bold cursor-pointer">
+            <p className="px-7 py-8 green-two-layers rounded-3xl after:rounded-3xl text-th-secondary-10 text-xl cursor-pointer">
               {t('users:SignIn')}
             </p>
           </div>
@@ -54,7 +54,7 @@ export default function StartPage() {
 
         <Link
           href="https://v-cana.com"
-          className="absolute bottom-10 left-1/2 -translate-x-1/2"
+          className="absolute bottom-10 left-1/2 -translate-x-1/2 text-th-primary-100 text-sm uppercase"
           target="_blank"
         >
           v-cana.com

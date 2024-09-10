@@ -101,9 +101,6 @@ function Merger({ config }) {
         >
           {t('Import')}
         </button>
-        <button onClick={merge} className="btn-strong w-fit" disabled={!importedChapter}>
-          {t('Merge')}
-        </button>
       </div>
 
       <input
@@ -112,22 +109,34 @@ function Merger({ config }) {
         onChange={(e) => e.target.files.length > 0 && importChapter(e.target.files)}
         style={{ display: 'none' }}
       />
-
       {importedChapter && (
-        <div className="flex items-center gap-2.5 py-4 px-5 border w-fit rounded-full border-th-text-primary">
-          <p>
-            {t('Projects:Chapter')} {Object.keys(importedChapter)[0]}
-          </p>
-          <Close
-            className="w-5 h-5 cursor-pointer stroke-2"
-            onClick={() => {
-              setImportedChapter(null)
-              if (fileInputRef.current) {
-                fileInputRef.current.value = ''
-              }
-            }}
-          />
-        </div>
+        <>
+          <div className="flex gap-2.5 pb-4 border-b">
+            <div className="flex items-center gap-2.5 py-4 px-5 border w-fit rounded-full border-th-text-primary">
+              <p>
+                {t('Projects:Chapter')} {Object.keys(importedChapter)[0]}
+              </p>
+              <Close
+                className="w-5 h-5 cursor-pointer stroke-2"
+                onClick={() => {
+                  setImportedChapter(null)
+                  if (fileInputRef.current) {
+                    fileInputRef.current.value = ''
+                  }
+                }}
+              />
+            </div>
+          </div>
+          <div className="flex justify-center gap-2.5 pb-4 border-b">
+            <button
+              onClick={merge}
+              className="btn-strong-quaternary w-fit"
+              disabled={!importedChapter}
+            >
+              {t('Merge')}
+            </button>
+          </div>
+        </>
       )}
     </div>
   )

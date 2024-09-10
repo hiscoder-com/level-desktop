@@ -4,8 +4,10 @@ import Link from 'next/link'
 
 import { JsonToPdf } from '@texttree/obs-format-convert-rcl'
 import { useTranslation } from '@/next-i18next'
+import { useRouter } from 'next/router'
 
-import DownloadPDF from 'public/icons/download-pdf.svg'
+import Left from 'public/icons/left.svg'
+import TechSteps from 'public/icons/techsteps.svg'
 
 const styles = {
   currentPage: {
@@ -20,15 +22,27 @@ const styles = {
   text: { alignment: 'justify' },
 }
 
-function ChapterList({ id, chapters, steps, mutate }) {
-  const { t } = useTranslation(['projects', 'common'])
-
+function ChapterList({ id, chapters, steps, mutate, book, project }) {
+  const { t } = useTranslation(['projects', 'common', 'books'])
+  const [versesCount, setVersesCount] = useState(null)
+  const router = useRouter()
   const [showIntro, setShowIntro] = useState(true)
-
   useEffect(() => {
     const config = window.electronAPI.getProject(id)
     setShowIntro(config.showIntro)
   }, [id])
+
+  useEffect(() => {
+    const chapters = window.electronAPI.getBook(id)
+    const _chapters = {}
+    for (const key in chapters) {
+      if (Object.hasOwnProperty.call(chapters, key)) {
+        const element = chapters[key]
+        _chapters[key] = Object.keys(element).length
+      }
+    }
+    setVersesCount(_chapters)
+  }, [])
 
   const handleBackStep = (chapter, step) => {
     const backStep = window.electronAPI.goToStep(id, chapter, step - 1)
@@ -43,8 +57,7 @@ function ChapterList({ id, chapters, steps, mutate }) {
 
     const project = window.electronAPI.getProject(id)
     const currentDate = new Date().toISOString().split('T')[0]
-
-    const fileName = `${project.project}_${project.book.code}_c_${chapter}_${currentDate}`
+    const fileName = `${project.project.code}_${project.book.name}_c_${chapter}_${currentDate}`
 
     JsonToPdf({
       data: [{ title: 'Chapter ' + chapter, verseObjects: savedVerses }],
@@ -60,20 +73,34 @@ function ChapterList({ id, chapters, steps, mutate }) {
   }
   return (
     <div className="overflow-x-auto">
+      <div className="h-7 bg-th-primary-100 rounded-t-lg"></div>
+      <div className="flex h-16 border-b border-th-secondary-200 items-center text-lg bg-th-secondary-10 ">
+        <Link className="pl-8 flex items-center" href="/account">
+          <Left className="w-6 stroke-th-secondary-300" />
+          <span className="text-th-secondary-300 text-sm ml-2.5">
+            {t('common:Projects')}
+          </span>
+        </Link>
+        <span className="ml-6 font-bold text-lg inline">{t('books:' + book.code)}</span>
+      </div>
+
       <table className="border-collapse w-full text-sm">
         <thead>
-          <tr className="text-th-secondary-300 border-b border-th-secondary-200 cursor-default">
-            <th className="w-3/12 min-w-28 font-medium pt-0 pr-2 pb-3 pl-2 text-left sm:pr-4 sm:pl-8">
+          <tr className="text-left font-bold text-th-primary border-b border-th-secondary-200 bg-th-secondary-10 cursor-default">
+            <th className="w-2/12 min-w-28 font-medium py-4 pl-8">
               {t('projects:Chapter')}
             </th>
-            <th className="w-4/12 min-w-32 font-medium pt-0 pr-2 pb-3 pl-2 text-left sm:pr-4 sm:pl-8">
+            <th className="w-1/12 min-w-28 font-medium py-4 pl-8">
+              {t('projects:Verses')}
+            </th>
+            <th className="w-4/12 min-w-32 font-medium py-4 pl-8">
               {t('projects:Step')}
             </th>
-            <th className="w-3/12 min-w-28 font-medium pt-0 pr-2 pb-3 pl-2 text-center sm:pr-4 sm:pl-8">
-              {t('projects:StepBack')}
+            <th className="w-4/12 min-w-28 font-medium py-4 pl-8">
+              {t('projects:Navigation')}
             </th>
-            <th className="w-2/12 min-w-20 font-medium pt-0 pr-2 pb-3 pl-2 text-center sm:pr-4 sm:pl-8">
-              {t('common:Download')}
+            <th className="w-2/12 min-w-20 font-medium py-4 px-8 ">
+              <div>{t('common:Download')}</div>
             </th>
           </tr>
         </thead>
@@ -81,39 +108,51 @@ function ChapterList({ id, chapters, steps, mutate }) {
           {chapters.map(([chapter, step]) => (
             <tr
               key={chapter}
-              className="border-b border-th-secondary-200 text-th-primary-100"
-            >
-              <td className="p-2 sm:p-4 sm:pl-8">
-                <Link
-                  href={`/account/project/${id}/${chapter}/${
+              className="border-b border-th-secondary-200 text-th-primary-100 hover:bg-th-secondary-20 "
+              onClick={() =>
+                router.push(
+                  `/account/project/${id}/${chapter}/${
                     showIntro ? `intro?step=${step}` : step
-                  }`}
-                  legacyBehavior
-                >
-                  <a className="font-bold hover:opacity-70 break-words">
-                    {t('projects:Chapter')} {chapter}
-                  </a>
-                </Link>
+                  }`
+                )
+              }
+            >
+              <td className="w-2/12 py-4 pl-8 cursor-pointer">
+                <span className="break-words px-3 py-2 bg-th-secondary-100 rounded">
+                  {t('projects:Chapter')} {chapter}
+                </span>
               </td>
-              <td className="p-2 sm:p-4 sm:pl-8 cursor-default break-words">
-                {steps[step].title}
+              <td className="w-1/12 py-4 pl-8 break-words cursor-pointer">
+                <span className="px-3 py-2 bg-th-secondary-100 rounded">
+                  {versesCount?.[chapter]}
+                </span>
               </td>
-              <td className="p-2 sm:p-4 sm:pl-8">
-                {step > 0 && (
-                  <div
-                    className="btn-primary text-sm py-2 px-3 select-none text-center whitespace-nowrap overflow-hidden text-ellipsis"
-                    onClick={() => handleBackStep(chapter, step)}
+              <td className="w-4/12 py-4 pl-8 break-words cursor-pointer">
+                <span className="px-3 py-2 bg-th-secondary-100 rounded">
+                  {steps[step].title}
+                </span>
+              </td>
+              <td className="w-4/12 py-4 pl-8 cursor-pointer">
+                <StepNavigator
+                  currentStep={step}
+                  handleBackStep={handleBackStep}
+                  totalSteps={project.steps.length}
+                  chapter={chapter}
+                  isTech={steps[step].isTech}
+                  stepsInfo={steps}
+                />
+              </td>
+              <td className="w-2/12 py-4 px-8">
+                <div className="flex justify-end cursor-pointer">
+                  <button
+                    className="bg-th-primary-100 text-th-secondary-10 p-1 rounded-md hover:opacity-70"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleDownloadChapter(chapter)
+                    }}
                   >
-                    {t('projects:BackToStep')}
-                  </div>
-                )}
-              </td>
-              <td className="p-2 sm:p-4 sm:pl-8">
-                <div className="flex justify-center cursor-pointer">
-                  <DownloadPDF
-                    className="w-6 sm:w-8 hover:opacity-70"
-                    onClick={() => handleDownloadChapter(chapter)}
-                  />
+                    PDF
+                  </button>
                 </div>
               </td>
             </tr>
@@ -125,3 +164,75 @@ function ChapterList({ id, chapters, steps, mutate }) {
 }
 
 export default ChapterList
+
+const StepNavigator = ({
+  totalSteps,
+  currentStep,
+  handleBackStep,
+  chapter,
+  stepsInfo,
+}) => {
+  const isTechSteps = stepsInfo.map((s) => s.isTech)
+  const getStepNumbers = () => {
+    const filteredSteps = stepsInfo.map((s, index) => ({
+      isTech: s.isTech,
+      originalIndex: index,
+      stepNumber: s.isTech
+        ? 'T'
+        : index - isTechSteps.slice(0, index).filter(Boolean).length + 1,
+    }))
+    if (currentStep === 0) return filteredSteps.slice(0, 3)
+    if (currentStep === totalSteps - 1) {
+      return filteredSteps.slice(totalSteps - 3, totalSteps)
+    }
+    if (currentStep > 0 && currentStep < totalSteps - 1) {
+      return filteredSteps.slice(currentStep - 1, currentStep + 2)
+    }
+    return filteredSteps.slice(currentStep - 1, currentStep + 2)
+  }
+
+  const steps = getStepNumbers()
+  return (
+    <div className="flex items-center gap-2.5">
+      <button
+        className="w-6 h-6 rounded-full bg-th-primary-100 border-none cursor-pointer text-th-secondary-10 flex items-center justify-center disabled:cursor-auto disabled:bg-th-secondary-200"
+        disabled={currentStep === 0}
+        onClick={(e) => {
+          e.stopPropagation()
+          handleBackStep(chapter, currentStep)
+        }}
+      >
+        <Left className="w-5 h-5" />
+      </button>
+
+      {steps.map((step, index) => (
+        <div
+          key={index}
+          className={`rounded-full ${step.isTech ? 'p-1' : ''} ${
+            step.originalIndex === currentStep
+              ? `${
+                  step.isTech ? 'p-1.5' : ''
+                } text-lg bg-th-primary-100 text-th-secondary-10 font-bold`
+              : 'text-sm border border-th-secondary-100'
+          }`}
+        >
+          {step.isTech ? (
+            <TechSteps
+              className={`${step.originalIndex === currentStep ? 'w-5 h-5' : 'w-4 h-4'}`}
+            />
+          ) : (
+            <div
+              className={`bg-th-primary-100 rounded-full ${
+                step.originalIndex === currentStep
+                  ? 'w-8 h-8'
+                  : 'w-6 h-6 bg-th-secondary-10'
+              } flex items-center justify-center font-bold`}
+            >
+              {step.stepNumber}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  )
+}
