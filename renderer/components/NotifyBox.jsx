@@ -18,7 +18,7 @@ function NotifyBox() {
   return (
     <>
       {notify && (
-        <div className="fixed right-2 bottom-2 px-4 py-2 rounded-md bg-green-600 text-white shadow-md">
+        <div className="fixed bottom-2 right-2 rounded-md bg-green-600 px-4 py-2 text-white shadow-md">
           {notify}
         </div>
       )}

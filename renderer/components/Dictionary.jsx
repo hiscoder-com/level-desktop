@@ -1,21 +1,18 @@
 import { useEffect, useMemo, useState } from 'react'
 
+import { generateUniqueId } from '@/helpers/noteEditor'
+import { useGetDictionary } from '@/hooks/useGetDictionary'
+import { useTranslation } from '@/next-i18next'
 import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react'
-
+import Down from 'public/icons/arrow-down.svg'
+import LeftArrow from 'public/icons/left-arrow.svg'
+import RightArrow from 'public/icons/right-arrow.svg'
 import toast from 'react-hot-toast'
 
-import SearchAndAddWords from './SearchAndAddWords'
 import Alphabet from './Alphabet'
-import WordList from './WordList'
 import LoadingPage from './LoadingPage'
-
-import { useTranslation } from '@/next-i18next'
-import { useGetDictionary } from '@/hooks/useGetDictionary'
-import { generateUniqueId } from '@/helpers/noteEditor'
-
-import RightArrow from 'public/icons/right-arrow.svg'
-import LeftArrow from 'public/icons/left-arrow.svg'
-import Down from 'public/icons/arrow-down.svg'
+import SearchAndAddWords from './SearchAndAddWords'
+import WordList from './WordList'
 
 const countWordsOnPage = 10
 
@@ -235,7 +232,7 @@ function Dictionary({ config: { id } }) {
             </div>
           </Card>
         ) : (
-          <p className="py-8 opacity-40 cursor-default">{t('EmptyAlphabet')}</p>
+          <p className="cursor-default py-8 opacity-40">{t('EmptyAlphabet')}</p>
         )}
 
         <div className="relative">
@@ -252,9 +249,9 @@ function Dictionary({ config: { id } }) {
           />
         </div>
         {totalPageCount > 1 && !activeWord && (
-          <div className="w-full flex justify-center gap-10">
+          <div className="flex w-full justify-center gap-10">
             <button
-              className="px-5 py-5 rounded-full duration-300 hover:bg-white active:bg-gray-100 disabled:opacity-50 disabled:hover:bg-transparent"
+              className="rounded-full px-5 py-5 duration-300 hover:bg-white active:bg-gray-100 disabled:opacity-50 disabled:hover:bg-transparent"
               disabled={currentPage === 0}
               onClick={() =>
                 setCurrentPage((prev) => {
@@ -263,10 +260,10 @@ function Dictionary({ config: { id } }) {
                 })
               }
             >
-              <LeftArrow className="w-6 h-6" />
+              <LeftArrow className="h-6 w-6" />
             </button>
             <button
-              className="px-5 py-5 rounded-full duration-300 hover:bg-white active:bg-gray-100 disabled:opacity-50 disabled:hover:bg-transparent"
+              className="rounded-full px-5 py-5 duration-300 hover:bg-white active:bg-gray-100 disabled:opacity-50 disabled:hover:bg-transparent"
               disabled={currentPage >= totalPageCount - 1}
               onClick={() => {
                 setCurrentPage((prev) => {
@@ -275,7 +272,7 @@ function Dictionary({ config: { id } }) {
                 })
               }}
             >
-              <RightArrow className="w-6 h-6" />
+              <RightArrow className="h-6 w-6" />
             </button>
           </div>
         )}
@@ -288,14 +285,14 @@ export default Dictionary
 
 function Card({ children, t, isOpen = true, isHidden = false }) {
   return (
-    <div className="flex flex-col w-full gap-3 bg-th-secondary-10 mt-6">
+    <div className="mt-6 flex w-full flex-col gap-3 bg-th-secondary-10">
       <Disclosure defaultOpen={isOpen}>
         {({ open }) => (
           <>
             <DisclosurePanel>{children}</DisclosurePanel>
             <DisclosureButton>
               {!isHidden && (
-                <div className="flex gap-1 justify-center w-full pt-3 border-t border-th-secondary-300 text-th-secondary-300">
+                <div className="flex w-full justify-center gap-1 border-t border-th-secondary-300 pt-3 text-th-secondary-300">
                   <span>{t(open ? 'Hide' : 'Open')}</span>
                   <Down
                     className={`w-6 max-w-[1.5rem] stroke-th-secondary-300 ${

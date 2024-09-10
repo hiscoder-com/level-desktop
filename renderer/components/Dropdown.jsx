@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 
 import { useTranslation } from '@/next-i18next'
+import Tools from 'public/icons/tools.svg'
 
 import Modal from './Modal'
-
-import Tools from 'public/icons/tools.svg'
 
 function Dropdown({ description }) {
   const [showModalStepGoal, setShowModalStepGoal] = useState(false)
@@ -35,7 +34,7 @@ function Dropdown({ description }) {
   return (
     <div>
       <div
-        className="relative hidden md:flex px-3 py-4 rounded-md whitespace-nowrap cursor-pointer"
+        className="relative hidden cursor-pointer whitespace-nowrap rounded-md px-3 py-4 md:flex"
         onClick={toggle}
         ref={toolsButton}
       >
@@ -46,10 +45,10 @@ function Dropdown({ description }) {
         <>
           <div
             ref={dropdownMenu}
-            className="absolute flex flex-col justify-center right-5 xl:right-0 border border-th-primary-100-border divide-y divide-solid bg-th-secondary-10 rounded-md shadow-md z-40"
+            className="border-th-primary-100-border absolute right-5 z-40 flex flex-col justify-center divide-y divide-solid rounded-md border bg-th-secondary-10 shadow-md xl:right-0"
           >
             <button
-              className="px-4 py-2 rounded-t-lg	hover:bg-th-secondary-100 active:bg-th-secondary-100"
+              className="rounded-t-lg px-4 py-2 hover:bg-th-secondary-100 active:bg-th-secondary-100"
               onClick={(e) => {
                 toggle()
                 setShowModalStepGoal(true)
@@ -66,9 +65,9 @@ function Dropdown({ description }) {
         closeModal={closeModal}
         description={description}
       />
-      <div className="flex items-center py-1 whitespace-nowrap text-xs font-bold rounded-md divide-x divide-solid md:hidden bg-th-secondary-10">
+      <div className="flex items-center divide-x divide-solid whitespace-nowrap rounded-md bg-th-secondary-10 py-1 text-xs font-bold md:hidden">
         <button
-          className="px-2 rounded-l-lg hover:opacity-70"
+          className="rounded-l-lg px-2 hover:opacity-70"
           onClick={(e) => {
             setShowModalStepGoal(true)
             e.stopPropagation()
@@ -87,8 +86,8 @@ function StepGoal({ showModalStepGoal, closeModal, description }) {
   const { t } = useTranslation(['common'])
   return (
     <Modal isOpen={showModalStepGoal} closeHandle={closeModal} title={t('Goal')}>
-      <div className="my-6 py-3 px-4 max-h-[50vh] overflow-y-auto">
-        <p className="text-sm text-th-secondary-10 whitespace-pre-line">
+      <div className="my-6 max-h-[50vh] overflow-y-auto px-4 py-3">
+        <p className="whitespace-pre-line text-sm text-th-secondary-10">
           {description.replaceAll('\n\n', '\n')}
         </p>
       </div>

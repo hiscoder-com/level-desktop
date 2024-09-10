@@ -1,17 +1,16 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
-import toast from 'react-hot-toast'
+import { useRouter } from 'next/router'
+
+import { convertBookChapters, convertToUsfm } from '@/helpers/usfm'
+import { useTranslation } from '@/next-i18next'
+import { Field, Label, Switch } from '@headlessui/react'
 import { JsonToPdf } from '@texttree/obs-format-convert-rcl'
+import Gear from 'public/icons/gear.svg'
+import toast from 'react-hot-toast'
 
 import Modal from './Modal'
 import Property from './Property'
-
-import { useTranslation } from '@/next-i18next'
-import { convertToUsfm, convertBookChapters } from '@/helpers/usfm'
-
-import Gear from 'public/icons/gear.svg'
-import { useRouter } from 'next/router'
-import { Switch, Label, Field } from '@headlessui/react'
 
 const styles = {
   currentPage: {
@@ -223,18 +222,18 @@ function ProjectsList({ projectsList, setProjectsList }) {
 
   return (
     <>
-      <div className="h-7 bg-th-primary-100 rounded-t-lg"></div>
-      <div className="pl-8 h-16 bg-th-secondary-10 border-b border-th-secondary-200 flex items-center font-bold text-lg">
+      <div className="h-7 rounded-t-lg bg-th-primary-100"></div>
+      <div className="flex h-16 items-center border-b border-th-secondary-200 bg-th-secondary-10 pl-8 text-lg font-bold">
         {t('common:Projects')}
       </div>
-      <table className="border-collapse table-auto w-full text-sm">
+      <table className="w-full table-auto border-collapse text-sm">
         <thead>
-          <tr className="text-left font-bold text-th-primary border-b border-th-secondary-200 bg-th-secondary-10 cursor-default">
+          <tr className="text-th-primary cursor-default border-b border-th-secondary-200 bg-th-secondary-10 text-left font-bold">
             <th className="py-4 pl-8">{t('Book')}</th>
             <th className="py-4 pl-8">{t('projects:Project')}</th>
             <th className="py-4 pl-8">{t('CreatedAt')}</th>
             <th className="py-4 pl-8">{t('Settings')}</th>
-            <th className="py-4 px-8 flex justify-end">
+            <th className="flex justify-end px-8 py-4">
               <span>{t('common:Download')}</span>
             </th>
           </tr>
@@ -243,22 +242,21 @@ function ProjectsList({ projectsList, setProjectsList }) {
           {projectsList.map((project) => (
             <tr
               key={project.id}
-              className="border-b border-th-secondary-200 text-th-primary-100 hover:bg-th-secondary-20
-               cursor-pointer"
+              className="cursor-pointer border-b border-th-secondary-200 text-th-primary-100 hover:bg-th-secondary-20"
               onClick={() => router.push(`/account/project/${project.id}`)}
             >
               <td className="py-4 pl-8">
-                <span className="px-3 py-2 bg-th-secondary-100 rounded">
+                <span className="rounded bg-th-secondary-100 px-3 py-2">
                   {project.book.name}
                 </span>
               </td>
               <td className="py-4 pl-8">
-                <span className="px-3 py-2 bg-th-secondary-100 rounded">
+                <span className="rounded bg-th-secondary-100 px-3 py-2">
                   {project.name}
                 </span>
               </td>
               <td className="py-4 pl-8">
-                <span className="px-3 py-2 bg-th-secondary-100 rounded">
+                <span className="rounded bg-th-secondary-100 px-3 py-2">
                   {new Date(project.createdAt).toLocaleDateString()}
                 </span>
               </td>
@@ -272,10 +270,10 @@ function ProjectsList({ projectsList, setProjectsList }) {
                   }}
                 />
               </td>
-              <td className="py-4 px-8">
-                <div className="flex justify-end gap-5 cursor-pointer">
+              <td className="px-8 py-4">
+                <div className="flex cursor-pointer justify-end gap-5">
                   <button
-                    className="bg-th-primary-100 text-th-secondary-10 p-1 rounded-md hover:opacity-70"
+                    className="rounded-md bg-th-primary-100 p-1 text-th-secondary-10 hover:opacity-70"
                     onClick={(e) => {
                       e.stopPropagation()
                       setSelectedOption('usfm')
@@ -285,7 +283,7 @@ function ProjectsList({ projectsList, setProjectsList }) {
                     USFM
                   </button>
                   <button
-                    className="bg-th-primary-100 text-th-secondary-10 p-1 rounded-md hover:opacity-70"
+                    className="rounded-md bg-th-primary-100 p-1 text-th-secondary-10 hover:opacity-70"
                     onClick={(e) => {
                       e.stopPropagation()
                       setSelectedOption('pdf')
@@ -315,7 +313,7 @@ function ProjectsList({ projectsList, setProjectsList }) {
         isCloseButton
         buttons={
           isConfirmDelete ? (
-            <div className="flex justify-center self-center gap-7 w-2/3 pt-6">
+            <div className="flex w-2/3 justify-center gap-7 self-center pt-6">
               <button
                 className="btn-secondary flex-1"
                 onClick={() => {
@@ -335,7 +333,7 @@ function ProjectsList({ projectsList, setProjectsList }) {
               </button>
             </div>
           ) : (
-            <div className="flex justify-center self-center gap-7 w-2/3">
+            <div className="flex w-2/3 justify-center gap-7 self-center">
               <button className="btn-red flex-1" onClick={() => setIsConfirmDelete(true)}>
                 {t('Delete')}
               </button>
@@ -347,7 +345,7 @@ function ProjectsList({ projectsList, setProjectsList }) {
         }
       >
         {isConfirmDelete ? (
-          <div className="flex flex-col gap-7 items-center">
+          <div className="flex flex-col items-center gap-7">
             <div className="text-center text-2xl">
               {t('AreYouSureDelete') + ' ' + currentProject?.book.name + '?'}
             </div>
@@ -365,7 +363,7 @@ function ProjectsList({ projectsList, setProjectsList }) {
               >
                 <span
                   aria-hidden="true"
-                  className={`pointer-events-none inline-block size-5 rounded-full bg-white ring-0 shadow-lg transition duration-200 ease-in-out ${
+                  className={`pointer-events-none inline-block size-5 rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
                     showIntro ? 'translate-x-0' : 'translate-x-7'
                   }`}
                 />
