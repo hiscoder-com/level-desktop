@@ -1,10 +1,12 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { useRouter } from 'next/router'
 
 import { Toaster } from 'react-hot-toast'
 
 import LoadingPage from './LoadingPage'
+import Sidebar from './Sidebar'
+import AppBar from './AppBar'
 
 function Layout({ children }) {
   const [loadingPage, setLoadingPage] = useState(false)
@@ -15,9 +17,29 @@ function Layout({ children }) {
     if (router.pathname === homePath) {
       return 'mx-auto min-h-screen'
     } else {
-      return 'mx-auto h-[calc(100vh-5rem)] mt-20'
+      return 'mx-auto h-[calc(100vh-5rem)] mt-16'
     }
   }
+
+  const isShowSidebar = useMemo(() => {
+    return (
+      router &&
+      router.pathname !== homePath &&
+      !router.pathname.includes('chapter') &&
+      router.pathname.includes('account')
+    )
+  }, [router])
+  const isStep = useMemo(() => {
+    return (
+      router &&
+      router.pathname !== homePath &&
+      router.pathname.includes('chapter') &&
+      !router.pathname.includes('intro')
+    )
+  }, [router])
+  const isShowAppBar = useMemo(() => {
+    return router && router.pathname.includes('account')
+  }, [router])
 
   useEffect(() => {
     const handleStart = (url, { shallow }) => {
@@ -34,7 +56,13 @@ function Layout({ children }) {
     <>
       <div className={getMainClassName()}>
         <LoadingPage loadingPage={loadingPage} />
-        <main>{children}</main>
+        <main>
+          {router.pathname !== homePath && (
+            <AppBar isStep={isStep} isShowAppBar={isShowAppBar} />
+          )}
+          {isShowSidebar && <Sidebar />}
+          {children}
+        </main>
       </div>
 
       <Toaster />

@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 
-import Breadcrumbs from '@/components/Breadcrumbs'
 import ChapterList from '@/components/ChaptersList'
 
 import { useTranslation } from '@/next-i18next'
@@ -32,15 +31,15 @@ function Project() {
       <Head>
         <title>{t('V-CANA')}</title>
       </Head>
-      <div className="w-full">
-        <Breadcrumbs currentTitle={project?.book?.name} />
-        <h2 className="my-6 text-4xl">{t('projects:Chapters')}</h2>
+      <div className="py-4 mb-10 max-w-xs md:max-w-2xl xl:max-w-5xl 2xl:max-w-7xl mx-auto">
         {project ? (
           <ChapterList
             id={id}
             steps={project.steps}
             chapters={Object.entries(project.chapters)}
             mutate={mutate}
+            book={project.book}
+            project={project}
           />
         ) : (
           <>{t('Loading')}</>

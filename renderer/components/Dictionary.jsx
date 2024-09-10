@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 
-import { Disclosure } from '@headlessui/react'
+import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react'
 
 import toast from 'react-hot-toast'
 
@@ -292,8 +292,8 @@ function Card({ children, t, isOpen = true, isHidden = false }) {
       <Disclosure defaultOpen={isOpen}>
         {({ open }) => (
           <>
-            <Disclosure.Panel>{children}</Disclosure.Panel>
-            <Disclosure.Button>
+            <DisclosurePanel>{children}</DisclosurePanel>
+            <DisclosureButton>
               {!isHidden && (
                 <div className="flex gap-1 justify-center w-full pt-3 border-t border-th-secondary-300 text-th-secondary-300">
                   <span>{t(open ? 'Hide' : 'Open')}</span>
@@ -304,7 +304,7 @@ function Card({ children, t, isOpen = true, isHidden = false }) {
                   />
                 </div>
               )}
-            </Disclosure.Button>
+            </DisclosureButton>
           </>
         )}
       </Disclosure>

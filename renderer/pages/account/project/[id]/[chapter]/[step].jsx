@@ -3,11 +3,10 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 
 import { useRecoilValue, useSetRecoilState } from 'recoil'
-import { Tab } from '@headlessui/react'
+import { Tab, TabPanels, TabGroup, TabList, TabPanel } from '@headlessui/react'
 
 import Tool from '@/components/Tool'
 import CheckBox from '@/components/CheckBox'
-import AppBar from '@/components/AppBar'
 import ProgressBar from '@/components/ProgressBar'
 
 import { useTranslation } from '@/next-i18next'
@@ -103,8 +102,7 @@ function StepPage() {
   }
 
   return (
-    <div className="w-full">
-      <AppBar />
+    <div className="w-full pt-4">
       <div className="layout-step mt-32 md:mt-0">
         {project?.steps?.[step] &&
           project.steps[step].cards.map((el, columnIndex) => (
@@ -192,7 +190,7 @@ function Panel({
   }, [tools])
 
   return (
-    <Tab.Group
+    <TabGroup
       selectedIndex={activeTabIndexes[columnIndex] || 0}
       onChange={(index) =>
         setActiveTabIndexes((prev) => ({
@@ -201,8 +199,8 @@ function Panel({
         }))
       }
     >
-      <Tab.List
-        className={`flex overflow-auto text-xs -mb-2 lg:-mb-7
+      <TabList
+        className={`flex overflow-auto text-xs -mb-2 
       ${!isSingleTab ? 'px-3 space-x-3' : ''}
       `}
       >
@@ -249,11 +247,11 @@ function Panel({
             )}
           </Tab>
         ))}
-      </Tab.List>
-      <Tab.Panels>
+      </TabList>
+      <TabPanels>
         {tools?.map((tool, index) => {
           return (
-            <Tab.Panel key={index}>
+            <TabPanel key={index}>
               <div className="flex flex-col bg-white rounded-xl h-full">
                 <Tool
                   config={{
@@ -269,11 +267,11 @@ function Panel({
                   isSingleTab={isSingleTab}
                 />
               </div>
-            </Tab.Panel>
+            </TabPanel>
           )
         })}
-      </Tab.Panels>
-    </Tab.Group>
+      </TabPanels>
+    </TabGroup>
   )
 }
 

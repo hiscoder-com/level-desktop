@@ -4,9 +4,12 @@ import toast from 'react-hot-toast'
 import JSZip from 'jszip'
 
 import { useTranslation } from '@/next-i18next'
+import Link from 'next/link'
+
 import { convertToUsfm } from '@/helpers/usfm'
 
 import Close from 'public/icons/close.svg'
+import Left from 'public/icons/left.svg'
 
 export default function ChaptersMerger({ book }) {
   const { t } = useTranslation(['common', 'projects'])
@@ -202,97 +205,114 @@ export default function ChaptersMerger({ book }) {
   }
 
   return (
-    <div className="flex flex-col gap-4 self-start">
-      <h2 className="my-6 text-4xl">{t('projects:VerseMerge')}</h2>
-      <input
-        ref={fileInputRef}
-        type="file"
-        multiple
-        accept=".zip"
-        onChange={(e) => handleFiles(e.target.files)}
-        style={{ display: 'none' }}
-      />
-      <div className="flex gap-4 items-center">
-        <button className="w-fit btn-strong" onClick={() => fileInputRef.current.click()}>
-          {t('projects:SelectFiles')}
-        </button>
+    <>
+      <div className="h-7 bg-th-primary-100 rounded-t-lg"></div>
+      <div className="flex h-16 border-b border-th-secondary-200 items-center text-lg bg-th-secondary-10 ">
+        <Link className="pl-8 flex items-center" href="/account">
+          <Left className="w-6 stroke-th-secondary-300" />
+          <span className="text-th-secondary-300 text-sm ml-2.5">
+            {t('common:Projects')}
+          </span>
+        </Link>
+        <span className="ml-6 font-bold text-lg inline">{t('common:Merger')}</span>
       </div>
-      {jsonDataArray.length > 0 && (
-        <div className="py-5 border-y">
-          <p>{t('UploadedFiles')}</p>
-          <div className="flex gap-2.5 pt-4">
-            {jsonDataArray.map((json, index) => (
-              <div
-                className="flex items-center gap-2.5 py-4 px-5 border w-fit rounded-full border-th-text-primary"
-                key={index}
-              >
-                <p>{json.filename}</p>
-                <Close
-                  className="w-5 h-5 cursor-pointer stroke-2"
-                  onClick={() => {
-                    setJsonDataArray(jsonDataArray.filter((_, i) => i !== index))
-                    setConflicts(null)
-                    if (fileInputRef.current) {
-                      fileInputRef.current.value = ''
-                    }
-                    setMergedContent(null)
-                  }}
-                />
-              </div>
-            ))}
+      <div className="flex border-b border-th-secondary-200 items-center text-lg bg-th-secondary-10 rounded-b-lg px-8 py-8">
+        <div className="flex flex-col gap-4 self-start">
+          <h2 className="my-6 text-2xl">{t('projects:VerseMerge')}</h2>
+          <input
+            ref={fileInputRef}
+            type="file"
+            multiple
+            accept=".zip"
+            onChange={(e) => handleFiles(e.target.files)}
+            style={{ display: 'none' }}
+          />
+          <div className="flex gap-4 items-center">
+            <button
+              className="w-fit btn-strong"
+              onClick={() => fileInputRef.current.click()}
+            >
+              {t('projects:SelectFiles')}
+            </button>
           </div>
-        </div>
-      )}
-      {jsonDataArray.length > 0 && (
-        <button
-          className="w-fit btn-strong"
-          disabled={jsonDataArray.length < 2}
-          onClick={() => mergeChapters()}
-        >
-          {t('Merge')}
-        </button>
-      )}
-      {conflicts ? (
-        <>
-          <p className="font-bold">{t('ConflictTitle')}</p>
-          {conflicts.map((conflict, index) => (
-            <div key={index} className="py-5 border-y">
-              <p>
-                {t('projects:Chapter')} {conflict.chapter}, {t('projects:Verse')}
-                {conflict.verse}
-              </p>
-              <p>
-                {t('projects:ExistingText')} {conflict.existingText}
-              </p>
-              <p>
-                {t('projects:NewText')} {conflict.newText}
-              </p>
+          {jsonDataArray.length > 0 && (
+            <div className="py-5 border-y">
+              <p>{t('UploadedFiles')}</p>
+              <div className="flex flex-wrap gap-2.5 pt-4">
+                {jsonDataArray.map((json, index) => (
+                  <div
+                    className="flex items-center gap-2.5 py-4 px-5 border w-fit rounded-full border-th-text-primary"
+                    key={index}
+                  >
+                    <p>{json.filename}</p>
+                    <Close
+                      className="w-5 h-5 cursor-pointer stroke-2"
+                      onClick={() => {
+                        setJsonDataArray(jsonDataArray.filter((_, i) => i !== index))
+                        setConflicts(null)
+                        if (fileInputRef.current) {
+                          fileInputRef.current.value = ''
+                        }
+                        setMergedContent(null)
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
-          ))}
-        </>
-      ) : (
-        mergedContent && (
-          <>
-            <p>{t('projects:NoConflicts')}</p>
-            <div className="flex gap-2.5 pt-5 border-t">
-              <button
-                className="w-fit btn-strong"
-                onClick={() => downloadUsfm(mergedContent)}
-              >
-                {t('USFM')}
-              </button>
+          )}
+          {jsonDataArray.length > 0 && (
+            <button
+              className="w-fit btn-quaternary"
+              disabled={jsonDataArray.length < 2}
+              onClick={() => mergeChapters()}
+            >
+              {t('Merge')}
+            </button>
+          )}
+          {conflicts ? (
+            <>
+              <p className="font-bold">{t('ConflictTitle')}</p>
+              {conflicts.map((conflict, index) => (
+                <div key={index} className="py-5 border-y">
+                  <p>
+                    {t('projects:Chapter')} {conflict.chapter}, {t('projects:Verse')}
+                    {conflict.verse}
+                  </p>
+                  <p>
+                    {t('projects:ExistingText')} {conflict.existingText}
+                  </p>
+                  <p>
+                    {t('projects:NewText')} {conflict.newText}
+                  </p>
+                </div>
+              ))}
+            </>
+          ) : (
+            mergedContent && (
+              <>
+                <p>{t('projects:NoConflicts')}</p>
+                <div className="flex gap-2.5 pt-5 border-t">
+                  <button
+                    className="w-fit btn-strong"
+                    onClick={() => downloadUsfm(mergedContent)}
+                  >
+                    {t('USFM')}
+                  </button>
 
-              <button
-                className="w-fit btn-strong"
-                onClick={() => exportToZip(mergedContent, 'merged')}
-              >
-                {t('ArchiveTranslators')}
-              </button>
-            </div>
-          </>
-        )
-      )}
-    </div>
+                  <button
+                    className="w-fit btn-strong"
+                    onClick={() => exportToZip(mergedContent, 'merged')}
+                  >
+                    {t('ArchiveTranslators')}
+                  </button>
+                </div>
+              </>
+            )
+          )}
+        </div>
+      </div>
+    </>
   )
 }
 

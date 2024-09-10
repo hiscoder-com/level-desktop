@@ -6,7 +6,7 @@ import LanguageSwitcher from './LanguageSwitcher'
 import { useTranslation } from '@/next-i18next'
 
 import VcanaLogo from 'public/icons/vcana-logo-color.svg'
-import Gear from 'public/icons/gear.svg'
+import Image from 'next/image'
 
 export default function StartPage() {
   const router = useRouter()
@@ -24,31 +24,41 @@ export default function StartPage() {
     router.push(allAgreed ? `/account` : `/agreements`)
   }
   return (
-    <div className="relative flex flex-col justify-center items-center gap-4 h-screen w-full mx-auto max-w-7xl ">
-      <div className="absolute top-10 right-0">
-        <Link href={`/chapter-merger`}>
-          <Gear className="w-10 h-10" />
-        </Link>
+    <div className="flex h-screen abcolute">
+      <div className="flex items-center justify-center w-3/5 bg-th-primary-100">
+        <Image
+          src="/icons/start-page.svg"
+          alt="Vcana Logo"
+          width={500}
+          height={500}
+          className="w-5/6"
+        />
       </div>
 
-      <div className="w-72">
-        <div className="flex flex-grow items-center justify-between p-5 h-20 bg-white rounded-3xl cursor-pointer mb-4">
-          <p className="font-semibold text-xl">{t('projects:Language')}</p>
-          <LanguageSwitcher />
+      <div className="relative w-2/5 flex items-center justify-center">
+        <div className="flex flex-col gap-2.5">
+          <div className="flex items-center justify-center px-7 py-10 bg-th-secondary-10 rounded-3xl">
+            <VcanaLogo className="w-[14.5rem]" />
+          </div>
+          <div className="flex flex-grow items-center justify-between px-7 py-4 bg-th-secondary-10 rounded-3xl z-10">
+            <p className="text-xl">{t('projects:Language')}</p>
+            <LanguageSwitcher />
+          </div>
+
+          <div className="rounded-3xl bg-th-primary-100" onClick={checkAgreements}>
+            <p className="px-7 py-8 green-two-layers rounded-3xl after:rounded-3xl text-th-secondary-10 text-xl cursor-pointer">
+              {t('users:SignIn')}
+            </p>
+          </div>
         </div>
-        <div className="flex flex-grow items-center justify-center p-5 h-32 bg-white rounded-3xl cursor-pointer mb-4">
-          <VcanaLogo className="w-44" />
-        </div>
-        <div
-          className="h-24 rounded-3xl bg-slate-550"
-          onClick={() => {
-            checkAgreements()
-          }}
+
+        <Link
+          href="https://v-cana.com"
+          className="absolute bottom-10 left-1/2 -translate-x-1/2 text-th-primary-100 text-sm uppercase"
+          target="_blank"
         >
-          <p className="p-5 lg:p-7 green-two-layers z-10 h-full w-full rounded-3xl after:rounded-3xl text-th-secondary-10 cursor-pointer">
-            {t('users:SignIn')}
-          </p>
-        </div>
+          v-cana.com
+        </Link>
       </div>
     </div>
   )

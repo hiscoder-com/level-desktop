@@ -23,5 +23,5 @@ export const generateFolderName = (title) => {
   const formattedDate = `${String(date.getMonth() + 1).padStart(2, '0')}-${String(
     date.getDate()
   ).padStart(2, '0')}-${date.getFullYear()}`
-  return `${title}_${formattedDate}.json`
+  return `${title}_${formattedDate}`
 }

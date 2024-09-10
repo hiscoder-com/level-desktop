@@ -2,7 +2,7 @@
   "private": true,
   "name": "v-cana-offline",
   "description": "App for step-by-step Bible translation",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "author": "@texttree Movement",
   "main": "app/background.js",
   "scripts": {
@@ -14,7 +14,7 @@
     "dist": "electron-builder --win --x64 --ia32"
   },
   "dependencies": {
-    "@headlessui/react": "1.7.19",
+    "@headlessui/react": "2.1.5",
     "@texttree/notepad-rcl": "^2.5.0",
     "@texttree/obs-format-convert-rcl": "^0.5.0",
     "@texttree/tn-quote-helpers": "^0.1.1",
@@ -48,7 +48,7 @@
     "electron": "^30.0.0",
     "electron-builder": "^24.13.3",
     "next": "^14.1.1",
-    "nextron": "^8.15.0",
+    "nextron": "^9.1.0",
     "postcss": "^8.4.38",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

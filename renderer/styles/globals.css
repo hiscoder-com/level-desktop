@@ -4,6 +4,7 @@
 
 :root {
   --secondary-10: theme("colors.white");
+  --secondary-20: theme("colors.zinc.50");
   --secondary-100: theme("colors.gray.150");
   --secondary-200: theme("colors.gray.250");
   --secondary-300: theme("colors.gray.450");
@@ -183,7 +184,7 @@
 }
 
 .appbar {
-  @apply fixed sm:relative top-0 sm:top-auto left-0 sm:left-auto right-0 sm:right-auto bg-th-primary-100 sm:bg-inherit z-[999] sm:z-auto mx-auto flex md:items-center flex-1 flex-col justify-between px-5 py-2 gap-1 sm:px-5 md:flex-row md:h-16 lg:px-8 xl:px-0 xl:w-11/12 2xl:px-0 shadow-lg md:shadow-none;
+  @apply fixed sm:relative top-0 sm:top-auto left-0 sm:left-auto right-0 sm:right-auto bg-th-primary-100 sm:bg-inherit z-[999] sm:z-auto flex md:items-center flex-1 flex-col justify-between px-5 py-2 gap-1 sm:px-5 md:flex-row md:h-16 lg:px-8 xl:px-14 2xl:px-14 shadow-lg md:shadow-none;
 }
 
 .arrow {
@@ -307,11 +308,15 @@
 }
 
 .btn-quaternary {
-  @apply btn-base text-th-text-secondary-100 bg-th-secondary-400 hover:bg-th-secondary-200  border border-th-secondary-400 disabled:cursor-auto hover:border-th-secondary-300 hover:text-th-text-primary disabled:opacity-50 disabled:hover:bg-th-secondary-400  disabled:hover:border-th-secondary-400 disabled:hover:text-th-text-secondary-100;
+  @apply btn-base text-th-text-secondary-100 bg-th-secondary-400 hover:bg-th-secondary-200 border border-th-secondary-400 disabled:cursor-auto hover:border-th-secondary-300 hover:text-th-text-primary disabled:opacity-50 disabled:hover:bg-th-secondary-400  disabled:hover:border-th-secondary-400 disabled:hover:text-th-text-secondary-100;
+}
+
+.btn-strong-quaternary {
+  @apply rounded-md py-2.5 px-4 text-center cursor-pointer text-th-text-secondary-100 text-sm md:text-base bg-th-secondary-400 hover:bg-th-secondary-200 border border-th-secondary-400 disabled:cursor-auto hover:border-th-secondary-300 hover:text-th-text-primary disabled:opacity-50 disabled:hover:bg-th-secondary-400 disabled:hover:border-th-secondary-400 disabled:hover:text-th-text-secondary-100;
 }
 
 .btn-red {
-  @apply btn-base text-th-invalid border-th-invalid border hover:bg-th-invalid hover:text-th-text-secondary-100;
+  @apply btn-base border-th-invalid border bg-th-invalid text-th-text-secondary-100 hover:opacity-70;
 }
 
 .step-link {
@@ -437,8 +442,8 @@
 
 @layer base {
   body {
-    @apply bg-gray-100 text-gray-900 mx-4;
-  }
+    @apply bg-gray-100 text-gray-900;
+  }   
 }
 
 @layer components {
@@ -512,3 +517,8 @@
     height: calc(100vh - 230px);
   }
 }
+
+
+
+
+

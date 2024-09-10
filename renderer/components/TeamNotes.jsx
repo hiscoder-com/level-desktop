@@ -562,7 +562,7 @@ export default function TeamNotes({ config: { id } }) {
       <div className="relative mt-6">
         {!activeNote || !Object.keys(activeNote)?.length ? (
           <>
-            {isLoading ? (
+            {!isLoading ? (
               <>
                 <TreeView
                   term={term}
