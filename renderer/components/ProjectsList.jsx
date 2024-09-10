@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 
 import toast from 'react-hot-toast'
-import jszip from 'jszip'
 import { JsonToPdf } from '@texttree/obs-format-convert-rcl'
 
 import Modal from './Modal'
@@ -33,7 +32,6 @@ function ProjectsList({ projectsList, setProjectsList }) {
 
   const options = [
     { label: t('projects:ExportToPDF'), value: 'pdf' },
-    { label: t('projects:ExportToZIP'), value: 'zip' },
     { label: t('projects:ExportToUSFM'), value: 'usfm' },
   ]
 
@@ -134,33 +132,6 @@ function ProjectsList({ projectsList, setProjectsList }) {
       .catch((error) => console.error('PDF creation failed:', error))
   }
 
-  const exportToZip = (chapters, project) => {
-    try {
-      if (!chapters || !project) {
-        throw new Error(t('NoData'))
-      }
-
-      const jsonContent = JSON.stringify(chapters, null, 2)
-      const zip = new jszip()
-      const formattedDate = new Date().toISOString().split('T')[0]
-      const fileName = `${project.name}_${project.book.code}_chapters_${formattedDate}.json`
-      zip.file(fileName, jsonContent)
-      zip.generateAsync({ type: 'blob' }).then(function (content) {
-        const blob = content
-        const url = window.URL.createObjectURL(blob)
-        const downloadLink = document.createElement('a')
-        downloadLink.href = url
-        downloadLink.download = `${project.name}_${project.book.code}_chapters_${formattedDate}.zip`
-        document.body.appendChild(downloadLink)
-        downloadLink.click()
-        document.body.removeChild(downloadLink)
-        window.URL.revokeObjectURL(url)
-      })
-    } catch (error) {
-      console.log(error.message)
-    }
-  }
-
   const exportToUsfm = (chapters, project) => {
     const convertedBook = convertBookChapters(chapters)
     const { h, toc1, toc2, toc3, mt, chapter_label } = properties
@@ -201,9 +172,8 @@ function ProjectsList({ projectsList, setProjectsList }) {
       exportToPdf(chapters, project)
     } else if (selectedOption === 'usfm') {
       exportToUsfm(chapters, project)
-    } else {
-      exportToZip(chapters, project)
     }
+
     setSelectedOption(null)
   }
 
@@ -323,16 +293,6 @@ function ProjectsList({ projectsList, setProjectsList }) {
                     }}
                   >
                     PDF
-                  </button>
-                  <button
-                    className="bg-th-primary-100 text-th-secondary-10 p-1 rounded-md hover:opacity-70"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      setSelectedOption('zip')
-                      download(project)
-                    }}
-                  >
-                    ZIP
                   </button>
                 </div>
               </td>

@@ -14,13 +14,10 @@ export default function AppBar({ isStep = false, isShowAppBar = false }) {
           {isStep ? (
             <div className="bg-th-primary-100 absolute top-0 left-0 w-full">
               <div className="appbar">
-                <div className="relative md:static flex items-center h-10 md:justify-start md:gap-7">
-                  <div className={`flex justify-center w-full md:ml-0 `}>
-                    <Link href="/account">
-                      <VcanaLogo className="h-6 fill-th-text-secondary-100 ml-6" />
-                    </Link>
-                  </div>
-                </div>
+                <Link href="/account" className="">
+                  <VcanaLogo className="h-6 fill-th-text-secondary-100" />
+                </Link>
+
                 <div className="block md:flex flex-col text-center text-th-text-secondary-100">
                   <div>{stepConfig.title}</div>
                   {stepConfig.subtitle && (

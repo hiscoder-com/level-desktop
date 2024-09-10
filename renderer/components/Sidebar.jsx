@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
+import { useTranslation } from '@/next-i18next'
 import { useRouter } from 'next/router'
 import LanguageSwitcher from './LanguageSwitcher'
 import Modal from './Modal'
@@ -46,10 +46,12 @@ export default function Sidebar() {
             />
             <div
               className={`ml-2 ${
-                isHovered && !isOpenAbout ? 'opacity-100' : 'opacity-0'
+                isHovered && !isOpenAbout
+                  ? 'opacity-100'
+                  : 'opacity-0 pointer-events-none'
               } w-0`}
             >
-              <span>{t('Projects')}</span>
+              <span>{t('projects:Projects')}</span>
             </div>
           </div>
           <div
@@ -69,10 +71,12 @@ export default function Sidebar() {
             />
             <div
               className={`ml-2 ${
-                isHovered && !isOpenAbout ? 'opacity-100' : 'opacity-0'
+                isHovered && !isOpenAbout
+                  ? 'opacity-100'
+                  : 'opacity-0 pointer-events-none'
               } w-0`}
             >
-              <span>{t('Import')}</span>
+              <span>{t('projects:Import')}</span>
             </div>
           </div>
           <div
@@ -92,10 +96,12 @@ export default function Sidebar() {
             />
             <div
               className={`ml-2 ${
-                isHovered && !isOpenAbout ? 'opacity-100' : 'opacity-0'
+                isHovered && !isOpenAbout
+                  ? 'opacity-100'
+                  : 'opacity-0 pointer-events-none'
               } w-0`}
             >
-              <span>{t('Merger')}</span>
+              <span>{t('projects:Merger')}</span>
             </div>
           </div>
         </div>
@@ -108,11 +114,13 @@ export default function Sidebar() {
             />
             <div
               className={`ml-2 ${
-                isHovered && !isOpenAbout ? 'opacity-100' : 'opacity-0'
+                isHovered && !isOpenAbout
+                  ? 'opacity-100'
+                  : 'opacity-0 pointer-events-none'
               } w-0`}
             >
-              <div className="flex gap-10 justify-between items-center w-full">
-                <div>{t('Language')}</div>
+              <div className="flex gap-12 justify-between items-center w-full">
+                <div>{t('projects:Language')}</div>
                 <LanguageSwitcher />
               </div>
             </div>
@@ -131,10 +139,12 @@ export default function Sidebar() {
             />
             <div
               className={`ml-2 ${
-                isHovered && !isOpenAbout ? 'opacity-100' : 'opacity-0'
+                isHovered && !isOpenAbout
+                  ? 'opacity-100'
+                  : 'opacity-0 pointer-events-none'
               } w-0`}
             >
-              <span>About</span>
+              <span>{t('projects:About').replace(' ', '\u00A0')}</span>
             </div>
           </div>
           <Modal
