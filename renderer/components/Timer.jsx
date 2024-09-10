@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 
 import { useRouter } from 'next/router'
 
-import Time from 'public/icons/time.svg'
 import Check from 'public/icons/check.svg'
+import Time from 'public/icons/time.svg'
 
 function Timer({ time }) {
   const timer = useRef(null)
@@ -83,7 +83,7 @@ function Timer({ time }) {
   }
 
   return (
-    <div className="flex items-center gap-1 cursor-default">
+    <div className="flex cursor-default items-center gap-1">
       {isChanging ? (
         <>
           <Check onClick={handleSave} className="w-5" />

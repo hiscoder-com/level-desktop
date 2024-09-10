@@ -1,20 +1,20 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-import Retelling from './Retelling'
+import { useTranslation } from '@/next-i18next'
+
 import Bible from './Bible'
 import BlindEditor from './BlindEditor'
 import Dictionary from './Dictionary'
+import Divider from './Divider'
 import Editor from './Editor'
 import Info from './Info'
+import Merger from './Merger'
 import PersonalNotes from './PersonalNotes'
+import Retelling from './Retelling'
+import TeamNotes from './TeamNotes'
 import TN from './TN'
 import TQ from './TQ'
 import TWL from './TWL'
-import Divider from './Divider'
-import TeamNotes from './TeamNotes'
-import Merger from './Merger'
-
-import { useTranslation } from '@/next-i18next'
 
 function Tool({ config, toolName, isSingleTab, resourceTitle }) {
   const { t } = useTranslation(['common', 'books'])
@@ -146,7 +146,7 @@ function Tool({ config, toolName, isSingleTab, resourceTitle }) {
         className={`h-10 bg-th-primary-200 ${
           isSingleTab
             ? 'rounded-tr-xl'
-            : 'pt-2.5 px-4 font-bold truncate text-th-text-secondary-100 rounded-t-xl'
+            : 'truncate rounded-t-xl px-4 pt-2.5 font-bold text-th-text-secondary-100'
         }`}
       >
         {!isSingleTab && (
@@ -156,9 +156,9 @@ function Tool({ config, toolName, isSingleTab, resourceTitle }) {
           </>
         )}
       </div>
-      <div className="adaptive-card border border-b-th-secondary-300 border-l-th-secondary-300 border-r-th-secondary-300 rounded-b-lg box-border">
+      <div className="adaptive-card box-border rounded-b-lg border border-b-th-secondary-300 border-l-th-secondary-300 border-r-th-secondary-300">
         <div
-          className={`h-full overflow-x-hidden overflow-y-auto py-4 pl-4 ${
+          className={`h-full overflow-y-auto overflow-x-hidden py-4 pl-4 ${
             hasVerticalScroll ? 'pr-1' : 'pr-5'
           }`}
           ref={contentRef}

@@ -1,18 +1,16 @@
-import { useRef, useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
+import { inactiveState } from '@/helpers/atoms'
+import { useTranslation } from '@/next-i18next'
+import RecorderCrossedButton from 'public/icons/error-outline.svg'
+import PauseButton from 'public/icons/pause.svg'
+import PlayButton from 'public/icons/play.svg'
+import RecorderButton from 'public/icons/recorder.svg'
+import StopButton from 'public/icons/stop.svg'
+import TrashButton from 'public/icons/trash.svg'
 import { useSetRecoilState } from 'recoil'
 
 import Modal from './Modal'
-
-import { useTranslation } from '@/next-i18next'
-import { inactiveState } from '@/helpers/atoms'
-
-import RecorderCrossedButton from 'public/icons/error-outline.svg'
-import RecorderButton from 'public/icons/recorder.svg'
-import TrashButton from 'public/icons/trash.svg'
-import StopButton from 'public/icons/stop.svg'
-import PlayButton from 'public/icons/play.svg'
-import PauseButton from 'public/icons/pause.svg'
 
 export default function Recorder({ setIsRecording, voice, setVoice }) {
   const { t } = useTranslation()
@@ -31,7 +29,7 @@ export default function Recorder({ setIsRecording, voice, setVoice }) {
       setVoice([])
       mediaRec.start()
       setButtonRecord(
-        <StopButton className="stroke-th-primary-200 stroke-2 animate-pulse" />
+        <StopButton className="animate-pulse stroke-th-primary-200 stroke-2" />
       )
       setInactive(true)
       setIsRecording(true)
@@ -82,7 +80,7 @@ export default function Recorder({ setIsRecording, voice, setVoice }) {
     if (audioRef.current.paused) {
       audioRef.current.play()
       setButtonPlay(
-        <PauseButton className="stroke-th-primary-200 stroke-2 animate-pulse" />
+        <PauseButton className="animate-pulse stroke-th-primary-200 stroke-2" />
       )
     } else {
       audioRef.current.pause()
@@ -92,17 +90,17 @@ export default function Recorder({ setIsRecording, voice, setVoice }) {
 
   return (
     <div className="flex flex-row items-center gap-7">
-      <button className="w-6 h-6" onClick={startStop}>
+      <button className="h-6 w-6" onClick={startStop}>
         {buttonRecord}
       </button>
       <audio ref={audioRef}></audio>
-      <button className="w-6 h-6" disabled={!voice?.length} onClick={playPause}>
+      <button className="h-6 w-6" disabled={!voice?.length} onClick={playPause}>
         {buttonPlay}
       </button>
 
       <button
         disabled={voice.length === 0}
-        className="w-6 h-6"
+        className="h-6 w-6"
         onClick={() => setVoice([])}
       >
         <TrashButton
@@ -113,7 +111,7 @@ export default function Recorder({ setIsRecording, voice, setVoice }) {
       </button>
       <Modal isOpen={showModal} closeHandle={() => setShowModal(false)}>
         <div className="flex flex-col gap-7">
-          <div className="text-2xl text-center">{t('MicrophoneAccess')}</div>
+          <div className="text-center text-2xl">{t('MicrophoneAccess')}</div>
           <p>{t('TurnMicrophone')}</p>
           <div className="flex justify-end">
             <button className="btn-secondary" onClick={() => setShowModal(false)}>

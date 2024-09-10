@@ -1,11 +1,11 @@
 import dynamic from 'next/dynamic'
 
-import Modal from './Modal'
-
 import { useTranslation } from '@/next-i18next'
 
-import Trash from 'public/icons/trash.svg'
+import Modal from './Modal'
+
 import Back from 'public/icons/left.svg'
+import Trash from 'public/icons/trash.svg'
 
 const Redactor = dynamic(
   () => import('@texttree/notepad-rcl').then((mod) => mod.Redactor),
@@ -42,7 +42,7 @@ const WordList = ({
       {!activeWord ? (
         <>
           {!words?.data?.length ? (
-            <div className="mt-4 opacity-40 cursor-default">
+            <div className="mt-4 cursor-default opacity-40">
               {searchQuery !== '' ? t('NoMatches') : t('NoWords')}
             </div>
           ) : (
@@ -50,19 +50,19 @@ const WordList = ({
               {words.data.map((el) => (
                 <div
                   key={el.id}
-                  className="flex justify-between items-start group my-3 bg-th-secondary-100 rounded-lg cursor-pointer"
+                  className="group my-3 flex cursor-pointer items-start justify-between rounded-lg bg-th-secondary-100"
                   onClick={() => setWordId(el.id)}
                 >
-                  <div className="p-2 mr-4 font-bold">{el.title}</div>
+                  <div className="mr-4 p-2 font-bold">{el.title}</div>
                   <button
-                    className="p-2 m-1 top-0 opacity-0 group-hover:opacity-100"
+                    className="top-0 m-1 p-2 opacity-0 group-hover:opacity-100"
                     onClick={(e) => {
                       e.stopPropagation()
                       setIsOpenModal(true)
                       setWordToDel(el)
                     }}
                   >
-                    <Trash className={'w-4 h-4 text-cyan-800'} />
+                    <Trash className={'h-4 w-4 text-cyan-800'} />
                   </button>
                 </div>
               ))}
@@ -72,7 +72,7 @@ const WordList = ({
       ) : (
         <>
           <div
-            className="absolute flex w-fit p-1 cursor-pointer hover:opacity-70 rounded-full bg-th-secondary-100"
+            className="absolute flex w-fit cursor-pointer rounded-full bg-th-secondary-100 p-1 hover:opacity-70"
             onClick={() => {
               saveWord()
               setActiveWord(null)
@@ -96,7 +96,7 @@ const WordList = ({
       )}
 
       <Modal isOpen={isOpenModal} closeHandle={() => setIsOpenModal(false)}>
-        <div className="flex flex-col gap-7 items-center">
+        <div className="flex flex-col items-center gap-7">
           <div className="text-center text-2xl">
             {t('AreYouSureDelete') + ' ' + wordToDel?.title + '?'}
           </div>

@@ -1,7 +1,7 @@
-import { Placeholder } from './Placeholder'
-import MarkdownExtended from './MarkdownExtended'
-
 import { useGetInfoResource } from '@/hooks/useGetInfoResource'
+
+import MarkdownExtended from './MarkdownExtended'
+import { Placeholder } from './Placeholder'
 
 function Info({ config: { resource, id, mainResource, chapter = false }, toolName }) {
   const { isLoading, data: intro } = useGetInfoResource({

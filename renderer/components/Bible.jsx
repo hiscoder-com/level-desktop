@@ -1,13 +1,12 @@
 import { useMemo } from 'react'
 
+import { checkedVersesBibleState } from '@/helpers/atoms'
+import { useGetUsfmResource } from '@/hooks/useGetUsfmResource'
+import { useScroll } from '@/hooks/useScroll'
 import ReactMarkdown from 'react-markdown'
 import { useRecoilValue } from 'recoil'
 
 import { Placeholder } from './Placeholder'
-
-import { useScroll } from '@/hooks/useScroll'
-import { useGetUsfmResource } from '@/hooks/useGetUsfmResource'
-import { checkedVersesBibleState } from '@/helpers/atoms'
 
 export const obsCheckAdditionalVerses = (numVerse) => {
   if (['0', '200'].includes(String(numVerse))) {
@@ -90,7 +89,7 @@ function VersesExtended({ verseObjects, handleSaveScroll, currentScrollVerse = 1
             onClick={() => {
               handleSaveScroll(verseObject.verse)
             }}
-            className={`my-3 flex items-start select-none ${
+            className={`my-3 flex select-none items-start ${
               'id' + currentScrollVerse === 'id' + verseObject.verse && !checkedCurrent
                 ? 'bg-th-secondary-100'
                 : ''
@@ -121,7 +120,7 @@ function Blur({ verse }) {
     [verse]
   )
   return (
-    <ReactMarkdown className="ml-2 bg-th-secondary-100 text-th-secondary-100 rounded-lg select-none">
+    <ReactMarkdown className="ml-2 select-none rounded-lg bg-th-secondary-100 text-th-secondary-100">
       {text}
     </ReactMarkdown>
   )

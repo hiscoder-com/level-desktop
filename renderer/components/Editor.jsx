@@ -22,7 +22,7 @@ function Editor({ config: { id, chapter = false, wholeChapter } }) {
   return (
     <div>
       {verseObjects.map((verseObject, idx) => (
-        <div key={verseObject.num} className="flex my-3">
+        <div key={verseObject.num} className="my-3 flex">
           <div>{obsCheckAdditionalVerses(verseObject.num)}</div>
           <AutoSizeTextArea
             idx={idx}
@@ -61,7 +61,7 @@ export function AutoSizeTextArea({ updateVerse, verseObject, idx }) {
           updateVerse(idx, verseObject.num, e.target.innerText.trim())
         }
       }}
-      className={`block w-full mx-3 focus:outline-none focus:inline-none whitespace-pre-line focus:bg-th-secondary-10  ${
+      className={`focus:inline-none mx-3 block w-full whitespace-pre-line focus:bg-th-secondary-10 focus:outline-none ${
         verseObject.verse ? '' : 'bg-th-secondary-200'
       }`}
       // eslint-disable-next-line prettier/prettier

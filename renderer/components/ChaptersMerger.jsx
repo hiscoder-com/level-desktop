@@ -1,15 +1,13 @@
 import { useRef, useState } from 'react'
 
-import toast from 'react-hot-toast'
-import JSZip from 'jszip'
-
-import { useTranslation } from '@/next-i18next'
 import Link from 'next/link'
 
 import { convertToUsfm } from '@/helpers/usfm'
-
+import { useTranslation } from '@/next-i18next'
+import JSZip from 'jszip'
 import Close from 'public/icons/close.svg'
 import Left from 'public/icons/left.svg'
+import toast from 'react-hot-toast'
 
 export default function ChaptersMerger({ book }) {
   const { t } = useTranslation(['common', 'projects'])
@@ -206,17 +204,17 @@ export default function ChaptersMerger({ book }) {
 
   return (
     <>
-      <div className="h-7 bg-th-primary-100 rounded-t-lg"></div>
-      <div className="flex h-16 border-b border-th-secondary-200 items-center text-lg bg-th-secondary-10 ">
-        <Link className="pl-8 flex items-center" href="/account">
+      <div className="h-7 rounded-t-lg bg-th-primary-100"></div>
+      <div className="flex h-16 items-center border-b border-th-secondary-200 bg-th-secondary-10 text-lg">
+        <Link className="flex items-center pl-8" href="/account">
           <Left className="w-6 stroke-th-secondary-300" />
-          <span className="text-th-secondary-300 text-sm ml-2.5">
+          <span className="ml-2.5 text-sm text-th-secondary-300">
             {t('common:Projects')}
           </span>
         </Link>
-        <span className="ml-6 font-bold text-lg inline">{t('common:Merger')}</span>
+        <span className="ml-6 inline text-lg font-bold">{t('common:Merger')}</span>
       </div>
-      <div className="flex border-b border-th-secondary-200 items-center text-lg bg-th-secondary-10 rounded-b-lg px-8 py-8">
+      <div className="flex items-center rounded-b-lg border-b border-th-secondary-200 bg-th-secondary-10 px-8 py-8 text-lg">
         <div className="flex flex-col gap-4 self-start">
           <h2 className="my-6 text-2xl">{t('projects:VerseMerge')}</h2>
           <input
@@ -227,26 +225,26 @@ export default function ChaptersMerger({ book }) {
             onChange={(e) => handleFiles(e.target.files)}
             style={{ display: 'none' }}
           />
-          <div className="flex gap-4 items-center">
+          <div className="flex items-center gap-4">
             <button
-              className="w-fit btn-strong"
+              className="btn-strong w-fit"
               onClick={() => fileInputRef.current.click()}
             >
               {t('projects:SelectFiles')}
             </button>
           </div>
           {jsonDataArray.length > 0 && (
-            <div className="py-5 border-y">
+            <div className="border-y py-5">
               <p>{t('UploadedFiles')}</p>
               <div className="flex flex-wrap gap-2.5 pt-4">
                 {jsonDataArray.map((json, index) => (
                   <div
-                    className="flex items-center gap-2.5 py-4 px-5 border w-fit rounded-full border-th-text-primary"
+                    className="flex w-fit items-center gap-2.5 rounded-full border border-th-text-primary px-5 py-4"
                     key={index}
                   >
                     <p>{json.filename}</p>
                     <Close
-                      className="w-5 h-5 cursor-pointer stroke-2"
+                      className="h-5 w-5 cursor-pointer stroke-2"
                       onClick={() => {
                         setJsonDataArray(jsonDataArray.filter((_, i) => i !== index))
                         setConflicts(null)
@@ -263,7 +261,7 @@ export default function ChaptersMerger({ book }) {
           )}
           {jsonDataArray.length > 0 && (
             <button
-              className="w-fit btn-quaternary"
+              className="btn-quaternary w-fit"
               disabled={jsonDataArray.length < 2}
               onClick={() => mergeChapters()}
             >
@@ -274,7 +272,7 @@ export default function ChaptersMerger({ book }) {
             <>
               <p className="font-bold">{t('ConflictTitle')}</p>
               {conflicts.map((conflict, index) => (
-                <div key={index} className="py-5 border-y">
+                <div key={index} className="border-y py-5">
                   <p>
                     {t('projects:Chapter')} {conflict.chapter}, {t('projects:Verse')}
                     {conflict.verse}
@@ -292,16 +290,16 @@ export default function ChaptersMerger({ book }) {
             mergedContent && (
               <>
                 <p>{t('projects:NoConflicts')}</p>
-                <div className="flex gap-2.5 pt-5 border-t">
+                <div className="flex gap-2.5 border-t pt-5">
                   <button
-                    className="w-fit btn-strong"
+                    className="btn-strong w-fit"
                     onClick={() => downloadUsfm(mergedContent)}
                   >
                     {t('USFM')}
                   </button>
 
                   <button
-                    className="w-fit btn-strong"
+                    className="btn-strong w-fit"
                     onClick={() => exportToZip(mergedContent, 'merged')}
                   >
                     {t('ArchiveTranslators')}

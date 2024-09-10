@@ -1,11 +1,9 @@
 import dynamic from 'next/dynamic'
 
-import { useRecoilState } from 'recoil'
-
-import { useGetTqResource } from '@/hooks/useGetTqResource'
 import { currentVerse } from '@/helpers/atoms'
-
+import { useGetTqResource } from '@/hooks/useGetTqResource'
 import Down from 'public/icons/arrow-down.svg'
+import { useRecoilState } from 'recoil'
 
 const TQuestions = dynamic(
   () => import('@texttree/v-cana-rcl').then((mod) => mod.TQuestions),
@@ -23,7 +21,7 @@ function TQ({ config: { resource, id, mainResource, chapter = false, wholeChapte
   })
   const [currentScrollVerse, setCurrentScrollVerse] = useRecoilState(currentVerse)
   return (
-    <div id="container_tq" className="overflow-y-auto h-full">
+    <div id="container_tq" className="h-full overflow-y-auto">
       <TQuestions
         questionObjects={data}
         toolId="tquestions"
@@ -43,7 +41,7 @@ function TQ({ config: { resource, id, mainResource, chapter = false, wholeChapte
             highlightButton: 'bg-th-secondary-100 rounded-lg',
           },
         }}
-        nodeOpen={<Down className="w-5 h-5 min-w-[1.25rem] stroke-th-text-primary" />}
+        nodeOpen={<Down className="h-5 w-5 min-w-[1.25rem] stroke-th-text-primary" />}
       />
     </div>
   )
