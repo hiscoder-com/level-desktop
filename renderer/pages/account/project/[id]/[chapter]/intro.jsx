@@ -3,10 +3,9 @@ import { useEffect, useState } from 'react'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 
-import { useTranslation } from '@/next-i18next'
-
 import CheckBox from '@/components/CheckBox'
 import MarkdownExtended from '@/components/MarkdownExtended'
+import { useTranslation } from '@/next-i18next'
 
 export default function IntroPage() {
   const { t } = useTranslation(['common', 'projects'])
@@ -43,6 +42,23 @@ export default function IntroPage() {
     setChecked(false)
   }
 
+  const saveStepLocalStorage = () => {
+    let viewedSteps = JSON.parse(window.electronAPI.getItem('viewedIntroSteps'))
+    const { id, chapter, step } = query
+    const idIntro = id + '_' + chapter + '_' + step
+
+    if (!viewedSteps) {
+      window.electronAPI.setItem('viewedIntroSteps', JSON.stringify([idIntro]))
+      return
+    }
+
+    if (!viewedSteps.includes(idIntro)) {
+      window.electronAPI.setItem(
+        'viewedIntroSteps',
+        JSON.stringify([...viewedSteps, idIntro])
+      )
+    }
+  }
   return (
     <div className="layout-appbar">
       <Head>
@@ -52,30 +68,33 @@ export default function IntroPage() {
       <div className="f-screen-appbar mb-4 w-full max-w-3xl pt-4">
         <div
           style={{ height: 'calc(100vh - 11rem)' }}
-          className="mb-4 mx-auto py-6 px-6 lg:px-8 bg-th-secondary-10 overflow-auto rounded-lg"
+          className="mx-auto mb-4 overflow-auto rounded-lg bg-th-secondary-10 px-6 py-6 lg:px-8"
         >
           <h2 className="mb-4 text-3xl">{title.title}</h2>
           {title.subtitle && <h3 className="mb-4 text-xl">{title.subtitle}</h3>}
 
           <MarkdownExtended className="markdown-body">{introMd}</MarkdownExtended>
 
-          <p className="mt-10 opacity-40 cursor-default">
+          <p className="mt-10 cursor-default opacity-40">
             * {t('projects:DisableIntroClue')}
           </p>
         </div>
-        <div className="flex items-center justify-end h-12 md:h-16 flex-row space-x-6">
+        <div className="flex h-12 flex-row items-center justify-end space-x-6 md:h-16">
           <CheckBox
-            onChange={() => setChecked((prev) => !prev)}
+            onChange={() => {
+              saveStepLocalStorage()
+              setChecked((prev) => !prev)
+            }}
             checked={checked}
             className={{
               accent:
-                'bg-th-secondary-10 checked:bg-th-secondary-400 checked:border-th-secondary-400 checked:before:bg-th-secondary-400 border-th-secondary',
-              cursor: 'fill-th-secondary-10 text-th-secondary-10 stroke-th-secondary-10',
+                'border-th-secondary bg-th-secondary-10 checked:border-th-secondary-400 checked:bg-th-secondary-400 checked:before:bg-th-secondary-400',
+              cursor: 'fill-th-secondary-10 stroke-th-secondary-10 text-th-secondary-10',
             }}
             label={t('Ok')}
           />
           <button
-            className="relative btn-quaternary w-28 text-center"
+            className="btn-quaternary relative w-28 text-center"
             onClick={nextStepHandle}
             disabled={!checked}
           >
