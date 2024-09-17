@@ -38,6 +38,7 @@
   "Information": "Información",
   "Language": "Language",
   "Merger": "Fusión",
+  "MergeVerses": "Combinando versos",
   "Method": "Method",
   "mt": "Título principal del libro",
   "mt_placeholder": "3 Juanes",
@@ -73,7 +74,8 @@
   "Translator": "translator",
   "Translators": "Traductores",
   "UpdatedProjectSettings": "Configuración del proyecto actualizada",
+  "UploadFilesForArchive": "Descargar archivos para crear un archivo",
+  "Upload": "Cargar",
   "V-CANAProjects": "V-CANA projects",
-  "Verse": "Verso",
-  "VerseMerge": "fusión de versos"
+  "Verse": "Verso"
 }

@@ -2,11 +2,12 @@ import { useEffect, useRef, useState } from 'react'
 
 import { useTranslation } from '@/next-i18next'
 import JSZip from 'jszip'
-import Close from 'public/icons/close.svg'
 import toast from 'react-hot-toast'
 
+import Close from 'public/icons/close.svg'
+
 function Merger({ config }) {
-  const { t } = useTranslation(['common', 'projects'])
+  const { t } = useTranslation(['common', 'projects', 'merger'])
   const [importedChapter, setImportedChapter] = useState(null)
 
   const fileInputRef = useRef()
@@ -87,13 +88,18 @@ function Merger({ config }) {
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="mx-auto flex w-1/2 flex-col gap-4">
       <div className="flex gap-2.5 border-b pb-4">
-        <button onClick={() => exportChapterToZip()} className="btn-strong w-fit">
+        <div>{t('merger:ExportText')}</div>
+        <button onClick={() => exportChapterToZip()} className="btn-strong h-fit w-fit">
           {t('Export')}
         </button>
+      </div>
+      <div className="border-b pb-4">{t('merger:WaitModerator')}</div>
+      <div className="flex gap-2.5 border-b pb-4">
+        <div>{t('merger:Importext')}</div>
         <button
-          className="btn-strong w-fit"
+          className="btn-strong h-fit w-fit"
           onClick={() => fileInputRef.current.click()}
           disabled={importedChapter}
         >

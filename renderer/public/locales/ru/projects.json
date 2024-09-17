@@ -38,6 +38,7 @@
   "Information": "Информация",
   "Language": "Язык",
   "Merger": "Слияние",
+  "MergeVerses": "Объединение cтихов",
   "Method": "Метод",
   "mt": "Титульное название книги",
   "mt_placeholder": "3 Иоанна",
@@ -73,7 +74,8 @@
   "Translator": "переводчика",
   "Translators": "Переводчики",
   "UpdatedProjectSettings": "Обновлены настройки проекта",
+  "UploadFilesForArchive": "Загрузите файлы для создания архива",
+  "Upload": "Загрузить",
   "V-CANAProjects": "Проекты V-CANA",
-  "Verse": "Стих",
-  "VerseMerge": "Объединение Стихов"
+  "Verse": "Стих"
 }
