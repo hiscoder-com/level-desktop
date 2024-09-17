@@ -6,11 +6,12 @@ import { convertBookChapters, convertToUsfm } from '@/helpers/usfm'
 import { useTranslation } from '@/next-i18next'
 import { Field, Label, Switch } from '@headlessui/react'
 import { JsonToPdf } from '@texttree/obs-format-convert-rcl'
-import Gear from 'public/icons/gear.svg'
 import toast from 'react-hot-toast'
 
 import Modal from './Modal'
 import Property from './Property'
+
+import Gear from 'public/icons/gear.svg'
 
 const styles = {
   currentPage: {
@@ -232,7 +233,7 @@ function ProjectsList({ projectsList, setProjectsList }) {
             <th className="py-4 pl-8">{t('Book')}</th>
             <th className="py-4 pl-8">{t('projects:Project')}</th>
             <th className="py-4 pl-8">{t('CreatedAt')}</th>
-            <th className="py-4 pl-8">{t('Settings')}</th>
+            <th className="py-4 pl-8">{t('common:Settings')}</th>
             <th className="flex justify-end px-8 py-4">
               <span>{t('common:Download')}</span>
             </th>
