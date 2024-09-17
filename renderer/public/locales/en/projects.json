@@ -38,6 +38,7 @@
   "Information": "Information",
   "Language": "Language",
   "Merger": "Merger",
+  "MergeVerses": "Merge verses",
   "Method": "Method",
   "mt": "The main title of the book",
   "mt_placeholder": "3 John",
@@ -73,7 +74,8 @@
   "Translator": "translator",
   "Translators": "Translators",
   "UpdatedProjectSettings": "Updated project settings",
+  "UploadFilesForArchive": "Upload the files to create an archive",
+  "Upload": "Upload",
   "V-CANAProjects": "V-CANA projects",
-  "Verse": "Verse",
-  "VerseMerge": "Verse merge"
+  "Verse": "Verse"
 }
