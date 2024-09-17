@@ -5,9 +5,10 @@ import Link from 'next/link'
 import { convertToUsfm } from '@/helpers/usfm'
 import { useTranslation } from '@/next-i18next'
 import JSZip from 'jszip'
+import toast from 'react-hot-toast'
+
 import Close from 'public/icons/close.svg'
 import Left from 'public/icons/left.svg'
-import toast from 'react-hot-toast'
 
 export default function ChaptersMerger({ book }) {
   const { t } = useTranslation(['common', 'projects'])
@@ -212,11 +213,11 @@ export default function ChaptersMerger({ book }) {
             {t('common:Projects')}
           </span>
         </Link>
-        <span className="ml-6 inline text-lg font-bold">{t('common:Merger')}</span>
+        <span className="ml-6 inline text-lg font-bold">{t('projects:MergeVerses')}</span>
       </div>
       <div className="flex items-center rounded-b-lg border-b border-th-secondary-200 bg-th-secondary-10 px-8 py-8 text-lg">
         <div className="flex flex-col gap-4 self-start">
-          <h2 className="my-6 text-2xl">{t('projects:VerseMerge')}</h2>
+          <h2 className="my-6 text-2xl"> {t('projects:UploadFilesForArchive')}</h2>
           <input
             ref={fileInputRef}
             type="file"
@@ -230,7 +231,7 @@ export default function ChaptersMerger({ book }) {
               className="btn-strong w-fit"
               onClick={() => fileInputRef.current.click()}
             >
-              {t('projects:SelectFiles')}
+              {t('projects:Upload')}
             </button>
           </div>
           {jsonDataArray.length > 0 && (
