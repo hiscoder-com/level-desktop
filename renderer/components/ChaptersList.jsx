@@ -5,6 +5,7 @@ import { useRouter } from 'next/router'
 
 import { useTranslation } from '@/next-i18next'
 import { JsonToPdf } from '@texttree/obs-format-convert-rcl'
+
 import Left from 'public/icons/left.svg'
 import TechSteps from 'public/icons/techsteps.svg'
 
@@ -70,6 +71,19 @@ function ChapterList({ id, chapters, steps, mutate, book, project }) {
       .then(() => console.log('PDF creation completed'))
       .catch((error) => console.error('PDF creation failed:', error))
   }
+  const getIsRepeatIntro = (step, chapter, id, localStorageSteps) => {
+    const idIntro = `${id}_${chapter}_${step}`
+    return localStorageSteps?.includes(idIntro)
+  }
+
+  const goToStep = ({ chapter, step }) => {
+    const localStorageSteps = JSON.parse(window.electronAPI.getItem('viewedIntroSteps'))
+    const isRepeatIntro = getIsRepeatIntro(step, chapter, id, localStorageSteps)
+
+    router.push(
+      `/account/project/${id}/${chapter}/${showIntro && !isRepeatIntro ? `intro?step=${step}` : step}`
+    )
+  }
   return (
     <div className="overflow-x-auto">
       <div className="h-7 rounded-t-lg bg-th-primary-100"></div>
@@ -108,13 +122,7 @@ function ChapterList({ id, chapters, steps, mutate, book, project }) {
             <tr
               key={chapter}
               className="border-b border-th-secondary-200 text-th-primary-100 hover:bg-th-secondary-20"
-              onClick={() =>
-                router.push(
-                  `/account/project/${id}/${chapter}/${
-                    showIntro ? `intro?step=${step}` : step
-                  }`
-                )
-              }
+              onClick={() => goToStep({ chapter, step })}
             >
               <td className="w-2/12 cursor-pointer py-4 pl-8">
                 <span className="break-words rounded bg-th-secondary-100 px-3 py-2">
