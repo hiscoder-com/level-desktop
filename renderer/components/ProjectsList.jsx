@@ -408,7 +408,9 @@ function ProjectsList({ projectsList, setProjectsList }) {
                 />
               </Switch>
               <Label>
-                {showIntro ? t('projects:DisableIntro') : t('projects:EnableIntro')}
+                {showIntro
+                  ? t('projects:DisableStepDescription')
+                  : t('projects:EnableStepDescription')}
               </Label>
             </Field>
           </div>
