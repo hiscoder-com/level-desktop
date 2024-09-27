@@ -76,7 +76,7 @@ export default function IntroPage() {
           <MarkdownExtended className="markdown-body">{introMd}</MarkdownExtended>
 
           <p className="mt-10 cursor-default opacity-40">
-            * {t('projects:DisableIntroClue')}
+            * {t('projects:DisableStepDescriptionClue')}
           </p>
         </div>
         <div className="flex h-12 flex-row items-center justify-end space-x-6 md:h-16">
