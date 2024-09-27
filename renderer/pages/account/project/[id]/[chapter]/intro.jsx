@@ -98,7 +98,7 @@ export default function IntroPage() {
             onClick={nextStepHandle}
             disabled={!checked}
           >
-            {project?.steps?.length === parseInt(step) + 1 ? t('Finish') : t('Next')}
+            {t('Next')}
           </button>
         </div>
       </div>

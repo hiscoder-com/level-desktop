@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 
 import { useTranslation } from '@/next-i18next'
-import Tools from 'public/icons/tools.svg'
 
 import Modal from './Modal'
+
+import Tools from 'public/icons/tools.svg'
 
 function Dropdown({ description }) {
   const [showModalStepGoal, setShowModalStepGoal] = useState(false)
@@ -45,10 +46,10 @@ function Dropdown({ description }) {
         <>
           <div
             ref={dropdownMenu}
-            className="border-th-primary-100-border absolute right-5 z-40 flex flex-col justify-center divide-y divide-solid rounded-md border bg-th-secondary-10 shadow-md xl:right-0"
+            className="absolute z-40 flex -translate-x-1/2 flex-col justify-center divide-y divide-solid shadow-md"
           >
             <button
-              className="rounded-t-lg px-4 py-2 hover:bg-th-secondary-100 active:bg-th-secondary-100"
+              className="btn-quaternary-color rounded-lg px-4 py-2"
               onClick={(e) => {
                 toggle()
                 setShowModalStepGoal(true)
@@ -87,7 +88,7 @@ function StepGoal({ showModalStepGoal, closeModal, description }) {
   return (
     <Modal isOpen={showModalStepGoal} closeHandle={closeModal} title={t('Goal')}>
       <div className="my-6 max-h-[50vh] overflow-y-auto px-4 py-3">
-        <p className="whitespace-pre-line text-sm text-th-secondary-10">
+        <p className="whitespace-pre-line text-base text-th-secondary-10">
           {description.replaceAll('\n\n', '\n')}
         </p>
       </div>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { useRouter } from 'next/router'
 
@@ -30,12 +30,6 @@ function ProjectsList({ projectsList, setProjectsList }) {
   const { t } = useTranslation(['common', 'projects'])
   const router = useRouter()
 
-  const options = [
-    { label: t('projects:ExportToPDF'), value: 'pdf' },
-    { label: t('projects:ExportToUSFM'), value: 'usfm' },
-  ]
-
-  const [selectedOption, setSelectedOption] = useState(options[0].value)
   const [currentProject, setCurrentProject] = useState(null)
   const [isOpenSettingsModal, setIsOpenSettingsModal] = useState(false)
   const [properties, setProperties] = useState(null)
@@ -45,8 +39,17 @@ function ProjectsList({ projectsList, setProjectsList }) {
 
   useEffect(() => {
     const loadProjects = () => {
-      const projects = window.electronAPI.getProjects()
-      setProjectsList(projects || [])
+      try {
+        const projects = window.electronAPI.getProjects()
+        if (projects) {
+          setProjectsList(projects)
+        } else {
+          throw new Error('No projects found')
+        }
+      } catch (error) {
+        console.error('Failed to load projects:', error)
+        toast.error(t('common:FailedToLoadProjects'))
+      }
     }
 
     loadProjects()
@@ -63,8 +66,10 @@ function ProjectsList({ projectsList, setProjectsList }) {
   }, [])
 
   useEffect(() => {
-    if (currentProject) {
+    if (!currentProject) return
+    try {
       const loadedProperties = window.electronAPI.getProperties(currentProject.id)
+      if (!loadedProperties) throw new Error('Failed to load project properties')
 
       if (loadedProperties.h === '') {
         loadedProperties.h = currentProject.book.name
@@ -72,6 +77,9 @@ function ProjectsList({ projectsList, setProjectsList }) {
 
       setProperties(loadedProperties)
       setEditedProperties(loadedProperties)
+    } catch (error) {
+      console.error('Failed to load project properties:', error)
+      toast.error(t('projects:FailedToLoadProperties'))
     }
   }, [currentProject])
 
@@ -102,79 +110,102 @@ function ProjectsList({ projectsList, setProjectsList }) {
   }, [currentProject])
 
   const exportToPdf = (chapters, project) => {
-    const formattedDate = new Date().toISOString().split('T')[0]
-    const fileName = `${project.name}_${project.book.code}_${formattedDate}`
+    try {
+      const formattedDate = new Date().toISOString().split('T')[0]
+      const fileName = `${project.name}_${project.book.code}_${formattedDate}`
 
-    const book = []
-    for (const chapterNum in chapters) {
-      if (Object.hasOwnProperty.call(chapters, chapterNum)) {
-        const chapter = Object.entries(chapters[chapterNum]).map(([k, v]) => ({
-          verse: k,
-          text: v.text,
-          enabled: v.enabled,
-        }))
-        book.push({
-          title: 'Chapter ' + chapterNum,
-          verseObjects: chapter,
-        })
+      const book = []
+      for (const chapterNum in chapters) {
+        if (Object.hasOwnProperty.call(chapters, chapterNum)) {
+          const chapter = Object.entries(chapters[chapterNum]).map(([k, v]) => ({
+            verse: k,
+            text: v.text,
+            enabled: v.enabled,
+          }))
+          book.push({
+            title: 'Chapter ' + chapterNum,
+            verseObjects: chapter,
+          })
+        }
       }
+      JsonToPdf({
+        data: book,
+        styles,
+        fileName,
+        showImages: false,
+        showChapterTitlePage: false,
+        showVerseNumber: true,
+        showPageFooters: false,
+      })
+        .then(() => console.log('PDF creation completed'))
+        .catch((error) => {
+          console.error('PDF creation failed:', error)
+          toast.error(t('projects:FailedToCreatePDF'))
+        })
+    } catch (error) {
+      console.error('Error during PDF export:', error)
+      toast.error(t('projects:ErrorExportingPDF'))
     }
-    JsonToPdf({
-      data: book,
-      styles,
-      fileName,
-      showImages: false,
-      showChapterTitlePage: false,
-      showVerseNumber: true,
-      showPageFooters: false,
-    })
-      .then(() => console.log('PDF creation completed'))
-      .catch((error) => console.error('PDF creation failed:', error))
   }
 
   const exportToUsfm = (chapters, project) => {
-    const convertedBook = convertBookChapters(chapters)
-    const { h, toc1, toc2, toc3, mt, chapter_label } = properties
-    const formattedDate = new Date().toISOString().split('T')[0]
-    const fileName = `${project.name}_${project.book.code}_${formattedDate}`
+    if (!project) {
+      return
+    }
+    try {
+      const bookProperties = window.electronAPI.getProperties(project.id)
+      if (!bookProperties) throw new Error('Failed to load book properties')
 
-    const merge = convertToUsfm({
-      jsonChapters: convertedBook,
-      book: {
-        code: project.book.code,
-        properties: {
-          scripture: {
-            h,
-            toc1,
-            toc2,
-            toc3,
-            mt,
-            chapter_label,
+      const convertedBook = convertBookChapters(chapters)
+      const { h, toc1, toc2, toc3, mt, chapter_label } = bookProperties
+      const formattedDate = new Date().toISOString().split('T')[0]
+      const fileName = `${project.name}_${project.book.code}_${formattedDate}`
+
+      const merge = convertToUsfm({
+        jsonChapters: convertedBook,
+        book: {
+          code: project.book.code,
+          properties: {
+            scripture: {
+              h,
+              toc1,
+              toc2,
+              toc3,
+              mt,
+              chapter_label,
+            },
           },
         },
-      },
-      project: { code: '', language: { code: '', orig_name: '' }, title: '' },
-    })
+        project: { code: '', language: { code: '', orig_name: '' }, title: '' },
+      })
 
-    const blob = new Blob([merge], { type: 'text/plain;charset=utf-8' })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.setAttribute('download', `${fileName}.usfm`)
-    document.body.appendChild(link)
-    link.click()
+      const blob = new Blob([merge], { type: 'text/plain;charset=utf-8' })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download', `${fileName}.usfm`)
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    } catch (error) {
+      console.error('Error during USFM export:', error)
+      toast.error(t('projects:ErrorExportingUSFM'))
+    }
   }
 
-  const download = (project) => {
-    const chapters = window.electronAPI.getBook(project.id)
+  const download = (project, type) => {
+    try {
+      const chapters = window.electronAPI.getBook(project.id)
 
-    if (selectedOption === 'pdf') {
-      exportToPdf(chapters, project)
-    } else if (selectedOption === 'usfm') {
-      exportToUsfm(chapters, project)
+      if (type === 'pdf') {
+        exportToPdf(chapters, project)
+      } else if (type === 'usfm') {
+        exportToUsfm(chapters, project)
+      }
+    } catch (error) {
+      console.error('Download error:', error)
+      toast.error(t('projects:FailedToDownload'))
     }
-
-    setSelectedOption(null)
   }
 
   const updateEditedProperty = (text, property) => {
@@ -185,12 +216,18 @@ function ProjectsList({ projectsList, setProjectsList }) {
   }
 
   const saveProperties = () => {
-    setProperties(editedProperties)
-    toast.success(t('projects:UpdatedProjectSettings'))
-    window.electronAPI.updateProperties(currentProject.id, editedProperties)
-    if (editedProperties.h) {
-      window.electronAPI.updateProjectName(currentProject.id, editedProperties.h)
+    try {
+      setProperties(editedProperties)
+      toast.success(t('projects:UpdatedProjectSettings'))
+      window.electronAPI.updateProperties(currentProject.id, editedProperties)
+      if (editedProperties.h) {
+        window.electronAPI.updateProjectName(currentProject.id, editedProperties.h)
+      }
+    } catch (error) {
+      console.error('Failed to save properties:', error)
+      toast.error(t('projects:FailedToSaveProperties'))
     }
+    setIsOpenSettingsModal(false)
   }
 
   const handleSettingsModalClose = () => {
@@ -198,17 +235,20 @@ function ProjectsList({ projectsList, setProjectsList }) {
     setIsOpenSettingsModal(false)
   }
 
-  const renderProperties =
-    properties &&
-    Object.entries(properties)?.map(([property, content], index) => (
-      <Property
-        t={t}
-        key={index}
-        property={property}
-        content={editedProperties[property] || content}
-        onContentChange={updateEditedProperty}
-      />
-    ))
+  const renderProperties = useMemo(() => {
+    return (
+      properties &&
+      Object.entries(properties)?.map(([property, content], index) => (
+        <Property
+          t={t}
+          key={index}
+          property={property}
+          content={editedProperties[property] || content}
+          onContentChange={updateEditedProperty}
+        />
+      ))
+    )
+  }, [properties, editedProperties])
 
   const projectRemove = (id) => {
     window.electronAPI.deleteProject(id)
@@ -277,8 +317,7 @@ function ProjectsList({ projectsList, setProjectsList }) {
                     className="rounded-md bg-th-primary-100 p-1 text-th-secondary-10 hover:opacity-70"
                     onClick={(e) => {
                       e.stopPropagation()
-                      setSelectedOption('usfm')
-                      download(project)
+                      download(project, 'usfm')
                     }}
                   >
                     USFM
@@ -287,8 +326,7 @@ function ProjectsList({ projectsList, setProjectsList }) {
                     className="rounded-md bg-th-primary-100 p-1 text-th-secondary-10 hover:opacity-70"
                     onClick={(e) => {
                       e.stopPropagation()
-                      setSelectedOption('pdf')
-                      download(project)
+                      download(project, 'pdf')
                     }}
                   >
                     PDF
@@ -336,7 +374,7 @@ function ProjectsList({ projectsList, setProjectsList }) {
           ) : (
             <div className="flex w-2/3 justify-center gap-7 self-center">
               <button className="btn-red flex-1" onClick={() => setIsConfirmDelete(true)}>
-                {t('Delete')}
+                {t('projects:Delete')}
               </button>
               <button className="btn-secondary flex-1" onClick={saveProperties}>
                 {t('Save')}
@@ -370,7 +408,9 @@ function ProjectsList({ projectsList, setProjectsList }) {
                 />
               </Switch>
               <Label>
-                {showIntro ? t('projects:DisableIntro') : t('projects:EnableIntro')}
+                {showIntro
+                  ? t('projects:DisableStepDescription')
+                  : t('projects:EnableStepDescription')}
               </Label>
             </Field>
           </div>

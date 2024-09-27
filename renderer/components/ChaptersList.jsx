@@ -72,6 +72,7 @@ function ChapterList({ id, chapters, steps, mutate, book, project }) {
       .catch((error) => console.error('PDF creation failed:', error))
   }
   const getIsRepeatIntro = (step, chapter, id, localStorageSteps) => {
+    if (!localStorageSteps) return false
     const idIntro = `${id}_${chapter}_${step}`
     return localStorageSteps?.includes(idIntro)
   }
