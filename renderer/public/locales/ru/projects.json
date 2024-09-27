@@ -29,6 +29,7 @@
   "ExportToPDF": "Экспортировать в PDF",
   "ExportToUSFM": "Экспортировать в USFM",
   "ExportToZIP": "Экспортировать в ZIP",
+  "FileAlreadyExists": "Файл уже существует",
   "FailedAddProject": "Не удалось добавить проект",
   "FailedToCreatePDF": "Не удалось создать PDF",
   "FailedToLoadProperties": "Не удалось загрузить свойства",

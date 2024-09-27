@@ -29,6 +29,7 @@
   "ExportToPDF": "Exportar a PDF",
   "ExportToUSFM": "Exportar a USFM",
   "ExportToZIP": "Exportar a ZIP",
+  "FileAlreadyExists": "El archivo ya existe",
   "FailedAddProject": "No se pudo agregar el proyecto",
   "FailedToCreatePDF": "No se pudo crear el archivo PDF",
   "FailedToLoadProperties": "No se pudieron cargar las propiedades",
