@@ -50,6 +50,8 @@ export default function ChaptersMerger({ book }) {
   }
 
   const handleFiles = async (files) => {
+    setMergedContent(null)
+    setConflicts(null)
     const jsonPromises = []
 
     for (let file of files) {
@@ -83,6 +85,7 @@ export default function ChaptersMerger({ book }) {
                 })
               jsonPromises.push(filePromise)
             } else {
+              toast.error(t('projects:FileAlreadyExists'))
               console.log(`File ${filename} already exists and will be skipped`)
             }
           }
@@ -264,7 +267,7 @@ export default function ChaptersMerger({ book }) {
             <button
               className="btn-quaternary w-fit"
               disabled={jsonDataArray.length < 2}
-              onClick={() => mergeChapters()}
+              onClick={mergeChapters}
             >
               {t('Merge')}
             </button>

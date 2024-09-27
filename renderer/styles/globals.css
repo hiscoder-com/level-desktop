@@ -306,9 +306,12 @@
 .btn-tertiary {
   @apply right-0 bg-th-primary-100 text-th-text-secondary-100 font-bold rounded-xl cursor-pointer disabled:opacity-70 disabled:cursor-auto hover:opacity-70;
 }
+.btn-quaternary-color {
+  @apply text-th-text-secondary-100 bg-th-secondary-400 hover:bg-th-secondary-200 border border-th-secondary-400 disabled:cursor-auto hover:border-th-secondary-300 hover:text-th-text-primary disabled:opacity-50 disabled:hover:bg-th-secondary-400  disabled:hover:border-th-secondary-400 disabled:hover:text-th-text-secondary-100;
+}
 
 .btn-quaternary {
-  @apply btn-base text-th-text-secondary-100 bg-th-secondary-400 hover:bg-th-secondary-200 border border-th-secondary-400 disabled:cursor-auto hover:border-th-secondary-300 hover:text-th-text-primary disabled:opacity-50 disabled:hover:bg-th-secondary-400  disabled:hover:border-th-secondary-400 disabled:hover:text-th-text-secondary-100;
+  @apply btn-base btn-quaternary-color;
 }
 
 .btn-strong-quaternary {

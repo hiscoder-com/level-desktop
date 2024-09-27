@@ -9,6 +9,11 @@ import {
 } from '@/helpers/noteEditor'
 import { useGetTeamNotes } from '@/hooks/useGetTeamNotes'
 import { useTranslation } from '@/next-i18next'
+import toast from 'react-hot-toast'
+
+import LoadingPage from './LoadingPage'
+import Modal from './Modal'
+
 import CloseFolder from 'public/icons/close-folder.svg'
 import Close from 'public/icons/close.svg'
 import Export from 'public/icons/export.svg'
@@ -22,10 +27,6 @@ import Plus from 'public/icons/plus.svg'
 import Progress from 'public/icons/progress.svg'
 import Rename from 'public/icons/rename.svg'
 import Trash from 'public/icons/trash.svg'
-import toast from 'react-hot-toast'
-
-import LoadingPage from './LoadingPage'
-import Modal from './Modal'
 
 const t = (str) => str
 

@@ -3,15 +3,16 @@ import { useState } from 'react'
 import { useRouter } from 'next/router'
 
 import { useTranslation } from '@/next-i18next'
+
+import About from './About'
+import LanguageSwitcher from './LanguageSwitcher'
+import Modal from './Modal'
+
 import AboutIcon from 'public/icons/about.svg'
 import Folder from 'public/icons/folder.svg'
 import Localization from 'public/icons/localization.svg'
 import Merger from 'public/icons/merger.svg'
 import Upload from 'public/icons/upload.svg'
-
-import About from './About'
-import LanguageSwitcher from './LanguageSwitcher'
-import Modal from './Modal'
 
 export default function Sidebar() {
   const { t } = useTranslation(['projects'])
@@ -25,7 +26,7 @@ export default function Sidebar() {
 
   return (
     <div
-      className={`fixed left-0 top-16 h-[calc(100vh-4rem)] w-[52px] bg-th-secondary-10 py-10 transition-all duration-100 ease-in-out hover:w-56 ${
+      className={`fixed left-0 top-16 z-10 h-[calc(100vh-4rem)] w-[52px] bg-th-secondary-10 py-10 transition-all duration-100 ease-in-out hover:w-56 ${
         isOpenAbout ? 'pointer-events-none' : ''
       }`}
       onMouseEnter={handleMouseEnter}

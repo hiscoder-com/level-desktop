@@ -7,6 +7,7 @@ import {
   Transition,
   TransitionChild,
 } from '@headlessui/react'
+
 import Close from 'public/icons/close-round.svg'
 
 function Modal({
@@ -24,7 +25,7 @@ function Modal({
       main: 'z-50 relative',
       dialogTitle: 'text-2xl font-medium leading-6 p-6',
       dialogPanel:
-        'w-full max-w-md align-middle transform overflow-hidden md:overflow-visible shadow-xl transition-all bg-th-primary-100 text-th-text-secondary-100 rounded-3xl',
+        'w-full max-w-[38.5rem] align-middle transform overflow-hidden md:overflow-visible shadow-xl transition-all bg-th-primary-100 text-th-text-secondary-100 rounded-3xl',
       transitionChild: 'fixed inset-0 bg-opacity-25 backdrop-brightness-90',
       content:
         'inset-0 fixed flex items-center justify-center min-h-full overflow-y-auto',

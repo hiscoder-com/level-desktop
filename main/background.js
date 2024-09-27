@@ -54,7 +54,7 @@ async function handleConfigOpen() {
   }
 }
 
-;(async () => {
+; (async () => {
   await app.whenReady()
 
   const mainWindow = createWindow('main', {
@@ -519,6 +519,8 @@ ipcMain.on('divide-verse', (event, projectid, chapter, verse, enabled) => {
     })
   )
   chapterData[verse].enabled = enabled
+  if (!enabled) { chapterData[verse].text = '' }
+
   fs.writeFileSync(
     path.join(projectUrl, projectid, 'chapters', chapter + '.json'),
     JSON.stringify(chapterData, null, 2),

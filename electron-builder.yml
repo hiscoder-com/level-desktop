@@ -4,6 +4,13 @@ copyright: Texttree Movement
 directories:
   output: dist
   buildResources: resources
+linux:
+  target:
+    - deb
+    - appimage
+  category: Utility
+  synopsis: "V-CANA - Step-by-step Bible translation tool"
+  description: "An app for step-by-step Bible translation."
 win:
   target:
     - target: nsis

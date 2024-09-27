@@ -2,8 +2,8 @@
   "private": true,
   "name": "v-cana-offline",
   "description": "App for step-by-step Bible translation",
-  "version": "0.2.1",
-  "author": "@texttree Movement",
+  "version": "0.3.1",
+  "author": "Glogas",
   "main": "app/background.js",
   "scripts": {
     "dev": "nextron",
@@ -11,7 +11,13 @@
     "start": "yarn clear && yarn dev",
     "postinstall": "electron-builder install-app-deps",
     "clear": "rm -rf ./app ./dist ./renderer/.next",
-    "dist": "electron-builder --win --x64 --ia32"
+    "dist:win": "electron-builder --win --x64 --ia32",
+    "dist:linux": "electron-builder --linux",
+    "build:mac": "nextron build --mac",
+    "build:mac:universal": "nextron build --mac --universal",
+    "build:linux": "nextron build --linux",
+    "build:win32": "nextron build --win --ia32",
+    "build:win64": "nextron build --win --x64"
   },
   "dependencies": {
     "@headlessui/react": "2.1.5",

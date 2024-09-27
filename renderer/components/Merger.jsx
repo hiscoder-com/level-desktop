@@ -15,7 +15,9 @@ function Merger({ config }) {
   useEffect(() => {
     const handleUpdate = () => {
       setImportedChapter(null)
-      fileInputRef.current.value = ''
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
     }
 
     window.electronAPI.onUpdateChapter(handleUpdate)
@@ -24,25 +26,40 @@ function Merger({ config }) {
       window.electronAPI.removeUpdateChapterListener(handleUpdate)
     }
   }, [])
+  function cleanData(obj) {
+    return Object.fromEntries(
+      Object.entries(obj).map(([key, value]) => {
+        if (value.enabled === false) {
+          return [key, { ...value, text: '', history: [] }]
+        }
+        return [key, value]
+      })
+    )
+  }
 
   const exportChapterToZip = () => {
     const chapter = window.electronAPI.getChapter(config.id, config.chapter)
+
     try {
       if (!chapter) {
         throw new Error('error:NoData')
       }
-      const jsonContent = JSON.stringify({ [config.chapter]: chapter }, null, 2)
+      const ownedVerses = cleanData(chapter)
+      const jsonContent = JSON.stringify({ [config.chapter]: ownedVerses }, null, 2)
       const zip = new JSZip()
       const currentDate = new Date()
       const formattedDate = currentDate.toISOString().replace(/:/g, '-').split('.')[0]
-      const fileName = `chapter_${formattedDate}.json`
-      zip.file(fileName, jsonContent)
+      const project = window.electronAPI.getProject(config.id)
+
+      const fileName = `${project.project.code || 'project'}_${project.book.code || 'book'}_chapter${config.chapter ?? ''}_${config?.id.split('-')[0] || formattedDate}`
+
+      zip.file(fileName + '.json', jsonContent)
       zip.generateAsync({ type: 'blob' }).then(function (content) {
         const blob = content
         const url = window.URL.createObjectURL(blob)
         const downloadLink = document.createElement('a')
         downloadLink.href = url
-        downloadLink.download = `chapter${config.chapter ?? ''}_${formattedDate}.zip`
+        downloadLink.download = fileName + '.zip'
         document.body.appendChild(downloadLink)
         downloadLink.click()
         document.body.removeChild(downloadLink)
@@ -100,7 +117,11 @@ function Merger({ config }) {
         <div>{t('merger:Importext')}</div>
         <button
           className="btn-strong h-fit w-fit"
-          onClick={() => fileInputRef.current.click()}
+          onClick={() => {
+            if (fileInputRef.current) {
+              fileInputRef.current.click()
+            }
+          }}
           disabled={importedChapter}
         >
           {t('Import')}
