@@ -2,7 +2,7 @@
   "private": true,
   "name": "v-cana-offline",
   "description": "App for step-by-step Bible translation",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "author": "Glogas",
   "main": "app/background.js",
   "scripts": {
