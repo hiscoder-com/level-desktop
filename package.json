@@ -80,7 +80,8 @@
         "deb"
       ],
       "category": "Utility",
-      "icon": "resources"
+      "icon": "resources",
+      "artifactName": "${productName}_${version}.${ext}"
     },
     "win": {
       "target": [
