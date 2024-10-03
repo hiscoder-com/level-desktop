@@ -25,7 +25,7 @@ function About() {
               <li>{t('about:ExperienceContent').li1}</li>
               <li>{t('about:ExperienceContent').li2}</li>
             </ul>
-            <h2 className="font-bold">omg@v-cana.com</h2>
+            <h2 className="font-bold">omg@level.bible</h2>
             <p>{t('about:ThankYou')}</p>
           </div>
         </div>
