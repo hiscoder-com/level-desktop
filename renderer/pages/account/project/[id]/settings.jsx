@@ -1,4 +1,5 @@
 import React from 'react'
+
 import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -13,7 +14,7 @@ function Settings() {
   return (
     <React.Fragment>
       <Head>
-        <title>{t('V-CANA')}</title>
+        <title>{t('LEVEL')}</title>
       </Head>
       <div>
         <Link href={'/project/' + id}>

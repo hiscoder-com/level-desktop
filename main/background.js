@@ -9,6 +9,7 @@ import { markRepeatedWords } from '@texttree/translation-words-helpers'
 const fs = require('fs')
 import i18next from '../next-i18next.config.js'
 import { localeStore } from './helpers/user-store'
+import decompress from 'decompress'
 
 import {
   formatToString,
@@ -91,6 +92,43 @@ ipcMain.on('get-projects', (event) => {
 
 let personalNotesLS
 let teamNotesLS
+function writeLog(message) {
+  const logDir = path.join(app.getPath('userData'), 'logs');
+
+  if (!fs.existsSync(logDir)) {
+    fs.mkdirSync(logDir, { recursive: true });
+  }
+
+  const logPath = path.join(logDir, 'app.log');
+  fs.appendFileSync(logPath, `[${new Date().toISOString()}] ${message}\n`);
+}
+
+(async () => {
+  try {
+    const isFirstLaunchFile = storeLS.get('first-launch');
+
+    if (!isFirstLaunchFile) {
+      const fakeEvent = {
+        sender: {
+          send: (channel, message) => {
+            writeLog(`Channel: ${channel}, Message: ${message}`);
+          }
+        }
+      };
+      const zipFilePath = path.join(process.resourcesPath, 'resources', 'default', 'project.zip');
+      if (fs.existsSync(zipFilePath)) {
+        await handleAddProject(zipFilePath, fakeEvent);
+        writeLog('handleAddProject finished successfully');
+      } else {
+        writeLog(`ZIP file not found: ${zipFilePath}`);
+      }
+      storeLS.set('first-launch', true);
+      writeLog('Set first-launch to true');
+    }
+  } catch (error) {
+    writeLog(`Error occurred: ${error.message}`);
+  }
+})();
 
 const getNotesWithType = (type) => {
   let notes
@@ -818,8 +856,7 @@ ipcMain.on('get-project', async (event, id) => {
   event.returnValue = config
   event.sender.send('notify', 'Project Loaded')
 })
-
-ipcMain.on('add-project', async (event, url) => {
+async function handleAddProject(url, event) {
   let tempDir = null
   const defaultProperties = {
     h: '',
@@ -870,25 +907,21 @@ ipcMain.on('add-project', async (event, url) => {
   }
 
   if (url) {
+
     try {
       const projects = storeProjects.get('projects') || []
       const id = uuid()
       const createdAt = Date.now()
       const project = { id, createdAt }
-      const decompress = require('decompress')
-
       tempDir = path.join(projectUrl, 'temp_' + id)
       await decompress(url, tempDir)
-
       validateProjectStructure(tempDir)
-
       const finalDir = path.join(projectUrl, id)
       await fs.promises.rename(tempDir, finalDir)
 
       const config = JSON.parse(
         await fs.promises.readFile(path.join(finalDir, 'config.json'), 'utf-8')
       )
-
       config.showIntro ??= true
 
       const configPath = path.join(finalDir, 'config.json')
@@ -898,7 +931,6 @@ ipcMain.on('add-project', async (event, url) => {
         console.error('Error writing config file:', error)
         throw new Error('Failed to write config file')
       }
-
       project.book = { ...config.book }
       project.name = config.project.title
       project.method = config.method
@@ -908,7 +940,6 @@ ipcMain.on('add-project', async (event, url) => {
       projects.push(project)
       storeProjects.set('projects', projects)
       event.sender.send('notify', 'Created')
-
       const updatedProjects = storeProjects.get('projects') || []
       event.sender.send('project-added', id, project, updatedProjects)
     } catch (error) {
@@ -921,9 +952,16 @@ ipcMain.on('add-project', async (event, url) => {
       event.sender.send('project-add-error', error.message)
     }
   } else {
+    console.error('Url not set')
     event.sender.send('notify', 'Url not set')
   }
+}
+
+ipcMain.on('add-project', async (event, url) => {
+  await handleAddProject(url, event)
 })
+
+
 
 ipcMain.on('get-properties', (event, projectId) => {
   const propertiesPath = path.join(projectUrl, projectId, 'properties.json')
@@ -1013,3 +1051,5 @@ ipcMain.on('delete-project', (event, projectId) => {
 
 ipcMain.handle('dialog:openFile', handleFileOpen)
 ipcMain.handle('dialog:openConfig', handleConfigOpen)
+
+

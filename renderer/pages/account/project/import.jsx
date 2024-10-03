@@ -1,7 +1,7 @@
 import Head from 'next/head'
 
-import { useTranslation } from '@/next-i18next'
 import ImportProject from '@/components/ImportProject'
+import { useTranslation } from '@/next-i18next'
 
 function Project() {
   const { t } = useTranslation(['common', 'projects'])
@@ -9,9 +9,9 @@ function Project() {
   return (
     <>
       <Head>
-        <title>{t('V-CANA')}</title>
+        <title>{t('LEVEL')}</title>
       </Head>
-      <div className="py-4 mb-10 max-w-xs md:max-w-2xl xl:max-w-5xl 2xl:max-w-7xl mx-auto">
+      <div className="mx-auto mb-10 max-w-xs py-4 md:max-w-2xl xl:max-w-5xl 2xl:max-w-7xl">
         <ImportProject />
       </div>
     </>

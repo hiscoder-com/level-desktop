@@ -1,9 +1,10 @@
 import { useState } from 'react'
+
 import Head from 'next/head'
 import Link from 'next/link'
 
-import { useTranslation } from '@/next-i18next'
 import { books } from '@/helpers/books'
+import { useTranslation } from '@/next-i18next'
 
 function Create() {
   const { t } = useTranslation()
@@ -26,18 +27,18 @@ function Create() {
   return (
     <>
       <Head>
-        <title>{t('V-CANA')}</title>
+        <title>{t('LEVEL')}</title>
       </Head>
-      <div className="text-lg w-full p-4">
+      <div className="w-full p-4 text-lg">
         <Link href={`home`} legacyBehavior>
-          <a className="border py-2 px-3 rounded-md bg-slate-300">{t('Back')}</a>
+          <a className="rounded-md border bg-slate-300 px-3 py-2">{t('Back')}</a>
         </Link>
         <br />
-        <h2 className="text-2xl mt-3 mb-4">{t('CreateBP')}</h2>
+        <h2 className="mb-4 mt-3 text-2xl">{t('CreateBP')}</h2>
         <p>{t('CreationRules')}</p>
         <form onSubmit={onSubmit}>
           <button
-            className="border border-green-700 bg-green-600 hover:bg-green-700 active:bg-green-800 shadow-md hover:border-green-800 rounded-md text-white px-3 py-2 text-base mt-3"
+            className="mt-3 rounded-md border border-green-700 bg-green-600 px-3 py-2 text-base text-white shadow-md hover:border-green-800 hover:bg-green-700 active:bg-green-800"
             onClick={async (e) => {
               e.preventDefault()
               const { url, resources } = await window.electronAPI.openConfig()
@@ -69,7 +70,7 @@ function Create() {
           </select>
 
           <input
-            className="btn-primary text-base mt-3"
+            className="btn-primary mt-3 text-base"
             type="submit"
             value={t('Create')}
           />

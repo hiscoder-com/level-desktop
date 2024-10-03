@@ -1,11 +1,12 @@
 import Link from 'next/link'
 
 import { stepConfigState } from 'helpers/atoms'
-import VcanaLogo from 'public/icons/vcana-logo.svg'
 import { useRecoilValue } from 'recoil'
 
 import Dropdown from './Dropdown'
 import Timer from './Timer'
+
+import LevelLogo from 'public/icons/level-logo.svg'
 
 export default function AppBar({ isStep = false, isShowAppBar = false }) {
   const stepConfig = useRecoilValue(stepConfigState)
@@ -17,7 +18,7 @@ export default function AppBar({ isStep = false, isShowAppBar = false }) {
             <div className="absolute left-0 top-0 w-full bg-th-primary-100">
               <div className="appbar">
                 <Link href="/account" className="">
-                  <VcanaLogo className="h-6 fill-th-text-secondary-100" />
+                  <LevelLogo className="h-11 fill-th-text-secondary-100" />
                 </Link>
 
                 <div className="block flex-col text-center text-th-text-secondary-100 md:flex">
@@ -37,7 +38,7 @@ export default function AppBar({ isStep = false, isShowAppBar = false }) {
           ) : (
             <div className="fixed left-0 top-0 flex h-16 w-full items-center bg-th-primary-100">
               <Link href={'/account'}>
-                <VcanaLogo className="ml-14 h-6 fill-th-text-secondary-100" />
+                <LevelLogo className="ml-14 h-11 fill-th-text-secondary-100" />
               </Link>
             </div>
           )}

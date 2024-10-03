@@ -3,9 +3,10 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 
 import { useTranslation } from '@/next-i18next'
-import VcanaLogo from 'public/icons/vcana-logo-color.svg'
 
 import LanguageSwitcher from './LanguageSwitcher'
+
+import LevelLogo from 'public/icons/level-logo-color.svg'
 
 export default function StartPage() {
   const router = useRouter()
@@ -27,7 +28,7 @@ export default function StartPage() {
       <div className="flex w-3/5 items-center justify-center bg-th-primary-100">
         <Image
           src="/icons/start-page.svg"
-          alt="Vcana Logo"
+          alt="Level Logo"
           width={500}
           height={500}
           className="w-5/6"
@@ -36,8 +37,8 @@ export default function StartPage() {
 
       <div className="relative flex w-2/5 items-center justify-center">
         <div className="flex flex-col gap-2.5">
-          <div className="flex items-center justify-center rounded-3xl bg-th-secondary-10 px-7 py-10">
-            <VcanaLogo className="w-[14.5rem]" />
+          <div className="flex items-center justify-center rounded-3xl bg-th-secondary-10 px-2 py-4">
+            <LevelLogo className="w-[17.5rem]" />
           </div>
           <div className="z-10 flex flex-grow items-center justify-between rounded-3xl bg-th-secondary-10 px-7 py-4">
             <p className="text-xl">{t('projects:Language')}</p>
@@ -52,11 +53,11 @@ export default function StartPage() {
         </div>
 
         <Link
-          href="https://v-cana.com"
+          href="https://level.bible"
           className="absolute bottom-10 left-1/2 -translate-x-1/2 text-sm uppercase text-th-primary-100"
           target="_blank"
         >
-          v-cana.com
+          level.bible
         </Link>
       </div>
     </div>

@@ -1,7 +1,6 @@
 import Head from 'next/head'
 
 import StartPage from '@/components/StartPage'
-
 import { useTranslation } from '@/next-i18next'
 
 export default function Home() {
@@ -9,9 +8,9 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>{t('V-CANA')}</title>
+        <title>{t('LEVEL')}</title>
       </Head>
-      <div className="text-2xl w-full">
+      <div className="w-full text-2xl">
         <StartPage />
       </div>
     </>
