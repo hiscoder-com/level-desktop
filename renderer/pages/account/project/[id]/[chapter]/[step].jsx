@@ -112,7 +112,7 @@ function StepPage() {
   }
 
   return (
-    <div className="w-full pt-4">
+    <div className="w-full px-2 pt-4">
       <div className="layout-step mt-32 md:mt-0">
         {project?.steps?.[step] &&
           project.steps[step].cards.map((el, columnIndex) => (

@@ -287,17 +287,17 @@ function ProjectsList({ projectsList, setProjectsList }) {
               onClick={() => router.push(`/account/project/${project.id}`)}
             >
               <td className="py-4 pl-8">
-                <span className="rounded bg-th-secondary-100 px-3 py-2">
+                <span className="line-clamp-none w-fit rounded bg-th-secondary-100 px-3 py-2">
                   {project.book.name}
                 </span>
               </td>
               <td className="py-4 pl-8">
-                <span className="rounded bg-th-secondary-100 px-3 py-2">
+                <span className="line-clamp-none w-fit rounded bg-th-secondary-100 px-3 py-2">
                   {project.name}
                 </span>
               </td>
               <td className="py-4 pl-8">
-                <span className="rounded bg-th-secondary-100 px-3 py-2">
+                <span className="line-clamp-none w-fit rounded bg-th-secondary-100 px-3 py-2">
                   {new Date(project.createdAt).toLocaleDateString()}
                 </span>
               </td>
