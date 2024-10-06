@@ -126,7 +126,7 @@ function ChapterList({ id, chapters, steps, mutate, book, project }) {
               onClick={() => goToStep({ chapter, step })}
             >
               <td className="w-2/12 cursor-pointer py-4 pl-8">
-                <span className="break-words rounded bg-th-secondary-100 px-3 py-2">
+                <span className="line-clamp-none w-fit rounded bg-th-secondary-100 px-3 py-2">
                   {t('projects:Chapter')} {chapter}
                 </span>
               </td>
@@ -136,7 +136,7 @@ function ChapterList({ id, chapters, steps, mutate, book, project }) {
                 </span>
               </td>
               <td className="w-4/12 cursor-pointer break-words py-4 pl-8">
-                <span className="rounded bg-th-secondary-100 px-3 py-2">
+                <span className="line-clamp-none w-fit rounded bg-th-secondary-100 px-3 py-2">
                   {steps[step].title}
                 </span>
               </td>

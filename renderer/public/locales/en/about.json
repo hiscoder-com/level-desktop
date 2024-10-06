@@ -1,12 +1,12 @@
 {
   "AboutPlatform": "About platform",
   "AboutPlatformContent": {
-    "p1": "V-CANA is a contemporary Bible translation platform utilizing a variety of reference materials from our partners. The platform adapts to the unique translation methods of each mission and organization. ",
-    "p2": "V-CANA is available in three versions: online, intranet, and desktop. ",
-    "p3": "V-CANA provides a step-by-step translation process that produces clear, accurate and natural text in the target language. At each step, only the tools and materials needed for that stage of translation are available. This approach makes the translation process efficient and convenient. ",
-    "p4": "V-CANA is your trusted tool in creating quality and church-centered translations."
+    "p1": "LEVEL is a contemporary Bible translation platform utilizing a variety of reference materials from our partners. The platform adapts to the unique translation methods of each mission and organization. ",
+    "p2": "LEVEL is available in three versions: online, intranet, and desktop. ",
+    "p3": "LEVEL provides a step-by-step translation process that produces clear, accurate and natural text in the target language. At each step, only the tools and materials needed for that stage of translation are available. This approach makes the translation process efficient and convenient. ",
+    "p4": "LEVEL is your trusted tool in creating quality and church-centered translations."
   },
-  "WouldLike": "Would you like to know more about V-CANA?",
+  "WouldLike": "Would you like to know more about LEVEL?",
   "WouldLikeContent": {
     "li1": "the problems you have encountered while using the platform;",
     "li2": "your suggestions for improving the platform and your requests for new features;",
@@ -17,6 +17,6 @@
     "li1": "describe the problem;",
     "li2": "if possible, attach a screenshot."
   },
-  "ThankYou": "Thank you for using the V-CANA plaftorm!",
-  "MadeByTranslators": "V-CANA - made by translators for translators!"
+  "ThankYou": "Thank you for using the LEVEL plaftorm!",
+  "MadeByTranslators": "LEVEL - made by translators for translators!"
 }

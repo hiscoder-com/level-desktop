@@ -1,23 +1,23 @@
 {
   "private": true,
-  "name": "v-cana-offline",
+  "name": "level",
   "description": "App for step-by-step Bible translation",
-  "version": "0.3.2",
-  "author": "Glogas",
+  "version": "0.4.0",
+  "author": {
+    "name": "Glokas",
+    "email": "your.email@example.com"
+  },
   "main": "app/background.js",
   "scripts": {
     "dev": "nextron",
-    "build": "nextron build",
+    "build": "nextron build && yarn build:linux && yarn build:win",
     "start": "yarn clear && yarn dev",
     "postinstall": "electron-builder install-app-deps",
     "clear": "rm -rf ./app ./dist ./renderer/.next",
-    "dist:win": "electron-builder --win --x64 --ia32",
-    "dist:linux": "electron-builder --linux",
-    "build:mac": "nextron build --mac",
-    "build:mac:universal": "nextron build --mac --universal",
-    "build:linux": "nextron build --linux",
-    "build:win32": "nextron build --win --ia32",
-    "build:win64": "nextron build --win --x64"
+    "build:linux": "electron-builder --linux AppImage deb",
+    "build:win32": "electron-builder --win --ia32",
+    "build:win64": "electron-builder --win --x64",
+    "build:win": "yarn build:win32 && yarn build:win64"
   },
   "dependencies": {
     "@headlessui/react": "2.1.5",
@@ -65,5 +65,36 @@
   },
   "resolutions": {
     "braces": "3.0.3"
+  },
+  "build": {
+    "appId": "com.example.yourapp",
+    "productName": "LEVEL",
+    "extraResources": [
+      {
+        "from": "resources/default/project.zip",
+        "to": "resources/default/project.zip"
+      }
+    ],
+    "linux": {
+      "target": [
+        "deb"
+      ],
+      "category": "Utility",
+      "icon": "resources",
+      "artifactName": "${productName}_${version}.${ext}"
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "zip"
+      ],
+      "icon": "resources/icon.ico",
+      "artifactName": "${productName}-win-${arch}-${version}.${ext}"
+    },
+    "files": [
+      "app/**/*",
+      "resources/**/*"
+    ],
+    "icon": "resources/icon.ico"
   }
 }

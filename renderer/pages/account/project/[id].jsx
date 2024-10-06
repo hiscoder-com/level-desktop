@@ -4,7 +4,6 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 
 import ChapterList from '@/components/ChaptersList'
-
 import { useTranslation } from '@/next-i18next'
 
 function Project() {
@@ -29,9 +28,9 @@ function Project() {
   return (
     <>
       <Head>
-        <title>{t('V-CANA')}</title>
+        <title>{t('LEVEL')}</title>
       </Head>
-      <div className="py-4 mb-10 max-w-xs md:max-w-2xl xl:max-w-5xl 2xl:max-w-7xl mx-auto">
+      <div className="mx-auto mb-10 max-w-xs py-4 md:max-w-2xl xl:max-w-5xl 2xl:max-w-7xl">
         {project ? (
           <ChapterList
             id={id}

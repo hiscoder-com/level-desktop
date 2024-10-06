@@ -62,7 +62,7 @@ export default function IntroPage() {
   return (
     <div className="layout-appbar">
       <Head>
-        <title>{t('V-CANA')}</title>
+        <title>{t('LEVEL')}</title>
       </Head>
 
       <div className="f-screen-appbar mb-4 w-full max-w-3xl pt-4">

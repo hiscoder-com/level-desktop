@@ -1,12 +1,12 @@
 {
   "AboutPlatform": "Acerca de la plataforma",
   "AboutPlatformContent": {
-    "p1": "V-CANA es una plataforma contemporánea de traducción de la Biblia que utiliza una variedad de materiales de referencia de nuestros socios. La plataforma se adapta a los métodos de traducción únicos de cada misión y organización.",
-    "p2": "V-CANA está disponible en tres versiones: en línea, intranet y de escritorio.",
-    "p3": "V-CANA proporciona un proceso de traducción paso a paso que produce un texto claro, preciso y natural en el idioma objetivo. En cada etapa, solo están disponibles las herramientas y materiales necesarios para esa fase de la traducción. Este enfoque hace que el proceso de traducción sea eficiente y conveniente.",
-    "p4": "V-CANA es tu herramienta de confianza para crear traducciones de calidad y centradas en la iglesia."
+    "p1": "LEVEL es una plataforma contemporánea de traducción de la Biblia que utiliza una variedad de materiales de referencia de nuestros socios. La plataforma se adapta a los métodos de traducción únicos de cada misión y organización.",
+    "p2": "LEVEL está disponible en tres versiones: en línea, intranet y de escritorio.",
+    "p3": "LEVEL proporciona un proceso de traducción paso a paso que produce un texto claro, preciso y natural en el idioma objetivo. En cada etapa, solo están disponibles las herramientas y materiales necesarios para esa fase de la traducción. Este enfoque hace que el proceso de traducción sea eficiente y conveniente.",
+    "p4": "LEVEL es tu herramienta de confianza para crear traducciones de calidad y centradas en la iglesia."
   },
-  "WouldLike": "¿Te gustaría saber más sobre V-CANA?",
+  "WouldLike": "¿Te gustaría saber más sobre LEVEL?",
   "WouldLikeContent": {
     "li1": "los problemas que has encontrado al usar la plataforma;",
     "li2": "tus sugerencias para mejorar la plataforma y tus solicitudes de nuevas funciones;",
@@ -17,6 +17,6 @@
     "li1": "describe el problema;",
     "li2": "si es posible, adjunta una captura de pantalla."
   },
-  "ThankYou": "¡Gracias por usar la plataforma V-CANA!",
-  "MadeByTranslators": "¡V-CANA - hecho por traductores para traductores!"
+  "ThankYou": "¡Gracias por usar la plataforma LEVEL!",
+  "MadeByTranslators": "¡LEVEL - hecho por traductores para traductores!"
 }

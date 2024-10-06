@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
+
 import Head from 'next/head'
-import { useTranslation } from '@/next-i18next'
+
 import ProjectsList from '@/components/ProjectsList'
+import { useTranslation } from '@/next-i18next'
 
 export default function Account() {
   const { t } = useTranslation(['common', 'projects'])
@@ -24,11 +26,11 @@ export default function Account() {
   return (
     <>
       <Head>
-        <title>{t('V-CANA')}</title>
+        <title>{t('LEVEL')}</title>
       </Head>
 
-      <div className="text-2xl w-full">
-        <div className=" fidex py-4 mb-10 max-w-xs md:max-w-2xl xl:max-w-5xl 2xl:max-w-7xl mx-auto">
+      <div className="w-full text-2xl">
+        <div className="fidex mx-auto mb-10 max-w-xs py-4 md:max-w-2xl xl:max-w-5xl 2xl:max-w-7xl">
           <ProjectsList projectsList={projectsList} setProjectsList={setProjectsList} />
         </div>
       </div>
