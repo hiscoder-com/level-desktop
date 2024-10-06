@@ -68,7 +68,7 @@
   },
   "build": {
     "appId": "com.example.yourapp",
-    "productName": "level",
+    "productName": "LEVEL",
     "extraResources": [
       {
         "from": "resources/default/project.zip",
