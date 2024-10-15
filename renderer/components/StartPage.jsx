@@ -37,8 +37,8 @@ export default function StartPage() {
 
       <div className="relative flex w-2/5 items-center justify-center">
         <div className="flex flex-col gap-2.5">
-          <div className="flex items-center justify-center rounded-3xl bg-th-secondary-10 px-2 py-4">
-            <LevelLogo className="w-[17.5rem]" />
+          <div className="flex items-center justify-center rounded-3xl bg-th-secondary-10 p-6">
+            <LevelLogo className="w-[16rem]" />
           </div>
           <div className="z-10 flex flex-grow items-center justify-between rounded-3xl bg-th-secondary-10 px-7 py-4">
             <p className="text-xl">{t('projects:Language')}</p>
