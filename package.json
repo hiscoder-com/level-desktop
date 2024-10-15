@@ -2,7 +2,7 @@
   "private": true,
   "name": "level",
   "description": "App for step-by-step Bible translation",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "author": {
     "name": "Glokas",
     "email": "your.email@example.com"

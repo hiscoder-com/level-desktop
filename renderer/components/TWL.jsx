@@ -228,12 +228,17 @@ const fetchFileFromServer = async ({ id, resource, chapter }) => {
 const getFileFromZip = async ({ id, resource }) => {
   let file
   const uriZip = id + '/' + resource
-  const zipBlob = await zipStore.getItem(uriZip)
-  if (zipBlob) {
-    const zip = await jszip.loadAsync(zipBlob)
-    file = zip
+  try {
+    const zipBlob = await zipStore.getItem(uriZip)
+    if (zipBlob) {
+      const zip = await jszip.loadAsync(zipBlob)
+      file = zip
+    }
+    return file
+  } catch (error) {
+    console.log('Error accessing storage:', error)
+    return null
   }
-  return file
 }
 
 const getFile = async ({ id, resource, chapter }) => {
