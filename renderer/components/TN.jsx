@@ -16,21 +16,17 @@ const TNotes = dynamic(() => import('@texttree/v-cana-rcl').then((mod) => mod.TN
 })
 
 function filterNotes(newNote, verse, notes) {
-  if (Array.isArray(verse)) {
-    verse.forEach((el) => {
-      if (!notes[el]) {
-        notes[el] = [newNote]
-      } else {
-        notes[el].push(newNote)
-      }
-    })
-  } else {
-    if (!notes[verse]) {
-      notes[verse] = [newNote]
-    } else {
-      notes[verse].push(newNote)
-    }
+  if (!Array.isArray(verse)) {
+    verse = [verse]
   }
+
+  verse.forEach((el) => {
+    if (!notes[el]) {
+      notes[el] = [newNote]
+    } else {
+      notes[el].push(newNote)
+    }
+  })
 }
 
 function TN({
@@ -49,15 +45,11 @@ function TN({
 
   useEffect(() => {
     if (data) {
-      const _data = []
-      for (const el of data) {
-        filterNotes(el, el.verse, _data)
-      }
-      const result = {}
-      _data.forEach((array) => {
-        result[array[0].verse[0]] = array
+      const notes = {}
+      data.forEach((el) => {
+        filterNotes(el, el.verse, notes)
       })
-      setTnotes(result) //TODO переписать -очень много переборов
+      setTnotes(notes)
     }
   }, [data])
 

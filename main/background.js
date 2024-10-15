@@ -663,13 +663,12 @@ ipcMain.on('get-tn', (event, id, resource, mainResource, chapter) => {
   })
   const target = toJSON(targetUsfm).chapters[chapter]
   const data = jsonData?.filter((el) => {
-    // пропускаем, если это не наша глава или это введение
     return el.chapter === chapter && !el.verse.includes('intro')
   })
   data.map((selectedTn) => {
     const selections = selectionsFromQuoteAndVerseObjects({
       quote: selectedTn.Quote,
-      verseObjects: greek[selectedTn.verse].verseObjects,
+      verseObjects: greek[selectedTn.verse]?.verseObjects || [],
       occurrence: selectedTn.Occurrence,
       chapter: chapter,
       verses: [selectedTn.verse],
@@ -684,7 +683,7 @@ ipcMain.on('get-tn', (event, id, resource, mainResource, chapter) => {
 
     const res = formatToString(result)
     selectedTn.origQuote = selectedTn.Quote
-    selectedTn.Quote = res
+    selectedTn.Quote = res || "General Information"
     return selectedTn
   })
   event.returnValue = data
