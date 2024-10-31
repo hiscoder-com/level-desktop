@@ -99,7 +99,8 @@ export default function StartPage() {
             <>
               <div className="rounded-3xl bg-th-primary-100" onClick={checkAgreements}>
                 <p className="green-two-layers cursor-pointer rounded-3xl px-7 py-8 text-xl text-th-secondary-10 after:rounded-3xl">
-                  {t('users:SignIn')} без регистрации
+                  {t('users:SignIn')}
+                  {t('users:WithoutRegistration')}
                 </p>
               </div>
 
@@ -108,7 +109,8 @@ export default function StartPage() {
                 onClick={() => isAuthorization()}
               >
                 <p className="green-two-layers cursor-pointer rounded-3xl px-7 py-8 text-xl text-th-secondary-10 after:rounded-3xl">
-                  {t('users:SignIn')} по регистрации
+                  {t('users:SignIn')}
+                  {t('users:ByRegistration')}
                 </p>
               </div>
             </>
