@@ -28,9 +28,6 @@ export default function StartPage() {
   const passwordRef = useRef(null)
   const loginRef = useRef(null)
 
-  const { user, loading } = useCurrentUser()
-  console.log(user, 31)
-
   useEffect(() => {
     window.electronAPI.setItem('isNeedAutorized', false)
   }, [])

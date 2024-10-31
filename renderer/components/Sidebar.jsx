@@ -33,7 +33,6 @@ export default function Sidebar() {
   const handleMouseLeave = () => setIsHovered(false)
 
   useEffect(() => {
-    console.log(user, 36)
     setIsNeedAuthorized(JSON.parse(window.electronAPI.getItem('isNeedAutorized')))
   }, [])
 

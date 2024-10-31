@@ -8,8 +8,14 @@ export const UserContextProvider = (props) => {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
 
+  if (typeof window !== 'undefined') {
+    supabaseClient.auth.setSession({
+      persistSession: false, 
+      storage: window.sessionStorage, 
+    })
+  }
+
   const getUser = useCallback(async () => {
-    console.log(12)
     if (session === false) return
     if (!session?.user?.id) {
       setUser(null)
@@ -26,7 +32,6 @@ export const UserContextProvider = (props) => {
       if (error) throw error
       setUser(user)
     } catch (error) {
-      console.log(error)
       setUser(null)
     } finally {
       setLoading(false)
@@ -39,6 +44,7 @@ export const UserContextProvider = (props) => {
       setSession(session)
     }
     getSession()
+
     const { data: authListener } = supabaseClient.auth.onAuthStateChange(
       async (event, session) => {
         setSession(session)
@@ -61,6 +67,7 @@ export const UserContextProvider = (props) => {
     loading,
     getUser,
   }
+
   return <UserContext.Provider value={value} {...props} />
 }
 
