@@ -5,7 +5,6 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 
 import { useTranslation } from '@/next-i18next'
-import useSupabaseClient from 'utils/supabaseClient'
 
 import LanguageSwitcher from './LanguageSwitcher'
 import Login from './Login'
@@ -14,7 +13,6 @@ import LevelLogo from 'public/icons/level-logo-color.svg'
 
 export default function StartPage() {
   const router = useRouter()
-  const supabase = useSupabaseClient()
   const { t } = useTranslation(['projects', 'users'])
 
   const [isLoginFormVisible, setIsLoginFormVisible] = useState(false)
