@@ -4,6 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
+import { useCurrentUser } from '@/lib/UserContext'
 import { useTranslation } from '@/next-i18next'
 import useSupabaseClient from 'utils/supabaseClient'
 
@@ -27,6 +28,13 @@ export default function StartPage() {
   const passwordRef = useRef(null)
   const loginRef = useRef(null)
 
+  const { user, loading } = useCurrentUser()
+  console.log(user, 31)
+
+  useEffect(() => {
+    window.electronAPI.setItem('isNeedAutorized', false)
+  }, [])
+
   const handleLogin = async (e) => {
     e.preventDefault()
     setIsLoadingLogin(true)
@@ -34,6 +42,8 @@ export default function StartPage() {
       const { error } = await supabase.auth.signInWithPassword({ email: login, password })
       if (error) throw error
       setIsError(false)
+
+      router.push('/account')
     } catch (error) {
       console.log(error)
       setIsError(true)
@@ -57,6 +67,13 @@ export default function StartPage() {
     const allAgreed = agreementsObj.userAgreement && agreementsObj.confession
 
     router.push(allAgreed ? `/account` : `/agreements`)
+  }
+
+  const isAuthorization = () => {
+    window.electronAPI.setItem('isNeedAutorized', true)
+
+    setIsLoadingLogin(false)
+    setIsLoginFormVisible(true)
   }
 
   return (
@@ -91,10 +108,10 @@ export default function StartPage() {
 
               <div
                 className="rounded-3xl bg-th-primary-100"
-                onClick={() => setIsLoginFormVisible(true)}
+                onClick={() => isAuthorization()}
               >
                 <p className="green-two-layers cursor-pointer rounded-3xl px-7 py-8 text-xl text-th-secondary-10 after:rounded-3xl">
-                  {t('users:SignIn')} с регистрацией
+                  {t('users:SignIn')} по регистрации
                 </p>
               </div>
             </>
@@ -129,12 +146,12 @@ export default function StartPage() {
                 isLoading={isLoadingLogin}
                 className="btn-primary"
               >
-                {t('SignIn')}
+                {t('users:SignIn')}
               </ButtonLoading>
               <button
                 type="button"
                 onClick={() => setIsLoginFormVisible(false)}
-                className="mt-2 text-center text-sm text-black text-th-secondary-10 underline"
+                className="text-primary mt-2 text-center text-sm underline"
               >
                 Вернуться к выбору входа
               </button>

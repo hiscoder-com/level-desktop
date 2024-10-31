@@ -1,28 +1,41 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { useRouter } from 'next/router'
 
+import { useCurrentUser } from '@/lib/UserContext'
 import { useTranslation } from '@/next-i18next'
 
 import About from './About'
 import LanguageSwitcher from './LanguageSwitcher'
 import Modal from './Modal'
+import SignOut from './SignOut'
 
 import AboutIcon from 'public/icons/about.svg'
+import Account from 'public/icons/account.svg'
 import Folder from 'public/icons/folder.svg'
 import Localization from 'public/icons/localization.svg'
 import Merger from 'public/icons/merger.svg'
 import Upload from 'public/icons/upload.svg'
 
+const activeIconClass =
+  'stroke-th-text-primary lg:stroke-th-secondary-300 group-hover:stroke-th-text-primary'
+
 export default function Sidebar() {
+  const { user } = useCurrentUser()
   const { t } = useTranslation(['projects'])
   const router = useRouter()
 
   const [isHovered, setIsHovered] = useState(false)
   const [isOpenAbout, setIsOpenAbout] = useState(false)
+  const [isNeedAuthorized, setIsNeedAuthorized] = useState(false)
 
   const handleMouseEnter = () => !isOpenAbout && setIsHovered(true)
   const handleMouseLeave = () => setIsHovered(false)
+
+  useEffect(() => {
+    console.log(user, 36)
+    setIsNeedAuthorized(JSON.parse(window.electronAPI.getItem('isNeedAutorized')))
+  }, [])
 
   return (
     <div
@@ -34,6 +47,32 @@ export default function Sidebar() {
     >
       <div className="flex h-full flex-col justify-between text-sm">
         <div className="flex flex-col">
+          {isNeedAuthorized && (
+            <div
+              className={`flex cursor-pointer items-center ${
+                router.pathname === '/account' ? 'bg-th-secondary-200' : ''
+              } py-3 hover:bg-th-secondary-200`}
+              onClick={() => router.push('/account')}
+            >
+              <div className="ml-4 rounded-[23rem]">
+                <Account className={`ml-0.5 w-4 ${activeIconClass}`} />
+              </div>
+              <div
+                className={`ml-2 ${
+                  isHovered && !isOpenAbout
+                    ? 'opacity-100'
+                    : 'pointer-events-none opacity-0'
+                } w-0`}
+              >
+                <div>
+                  <div className="text-2xl font-bold lg:text-base lg:font-medium">
+                    {user?.login}
+                  </div>
+                  <div className="lg:text-xs">{user?.email}</div>
+                </div>
+              </div>
+            </div>
+          )}
           <div
             className={`flex cursor-pointer items-center ${
               router.pathname === '/account' ? 'bg-th-secondary-200' : ''
@@ -163,6 +202,8 @@ export default function Sidebar() {
           >
             <About />
           </Modal>
+
+          <SignOut collapsed={!isHovered} />
         </div>
       </div>
     </div>
