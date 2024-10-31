@@ -73,7 +73,7 @@ export default function Login({ onClose }) {
         onClick={onClose}
         className="text-primary mt-2 text-center text-sm underline"
       >
-        Вернуться к выбору входа
+        {t('users:ReturnToLogin')}
       </button>
     </form>
   )
