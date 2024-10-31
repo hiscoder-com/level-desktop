@@ -14,10 +14,13 @@ export default function SignOut({ collapsed }) {
   const router = useRouter()
 
   const handleLogout = async () => {
+    const isNeedAutorized = window.electronAPI.getItem('isNeedAutorized')
     try {
       setLoading(true)
-      const { error } = await supabaseClient.auth.signOut()
-      if (error) throw error
+      if (isNeedAutorized) {
+        const { error } = await supabaseClient.auth.signOut()
+        if (error) throw error
+      }
     } catch (error) {
       alert(error.error_description || error.message)
     } finally {
