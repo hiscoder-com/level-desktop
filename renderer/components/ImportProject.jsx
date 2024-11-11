@@ -9,6 +9,8 @@ import toast from 'react-hot-toast'
 function ImportProject() {
   const { t } = useTranslation(['common', 'projects'])
   const [fileUrl, setFileUrl] = useState(false)
+  const [projectList, setProjectList] = useState([]) 
+
   const onSubmit = async (e) => {
     e.preventDefault()
     try {
@@ -17,6 +19,16 @@ function ImportProject() {
     } catch (error) {
       console.error('Failed to add project:', error)
       toast.error(t('projects:FailedAddProject'))
+    }
+  }
+
+  const fetchProjectList = async () => {
+    try {
+      const projects = await window.electronAPI.getProjectList() 
+      setProjectList(projects)
+    } catch (error) {
+      console.error('Failed to fetch projects:', error)
+      toast.error(t('projects:FailedFetchProjects'))
     }
   }
 
@@ -54,6 +66,27 @@ function ImportProject() {
             />
           </div>
         </form>
+      </div>
+
+      <div className="mt-6 rounded-lg border border-th-secondary-200 bg-th-secondary-10 px-8 py-8 text-lg">
+        <button
+          className="btn-primary mb-4 w-fit text-base"
+          onClick={fetchProjectList}
+        >
+          Получить список проектов
+        </button>
+
+        {projectList.length > 0 ? (
+          <ul className="space-y-2">
+            {projectList.map((project, index) => (
+              <li key={index} className="text-th-secondary-300">
+                {project.name}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-center opacity-40">{t('projects:NoProjectsAvailable')}</p>
+        )}
       </div>
     </>
   )
