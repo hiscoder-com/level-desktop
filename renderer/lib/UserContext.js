@@ -8,16 +8,8 @@ export const UserContextProvider = (props) => {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
 
-  if (typeof window !== 'undefined') {
-    supabaseClient.auth.setSession({
-      persistSession: false, 
-      storage: window.sessionStorage, 
-    })
-  }
-
   const getUser = useCallback(async () => {
-    if (session === false) return
-    if (!session?.user?.id) {
+    if (!session || !session.user?.id) {
       setUser(null)
       setLoading(false)
       return
@@ -40,22 +32,21 @@ export const UserContextProvider = (props) => {
 
   useEffect(() => {
     const getSession = async () => {
-      const { data: session } = await supabaseClient.auth.getSession()
-      setSession(session)
+      const { data: sessionData } = await supabaseClient.auth.getSession()
+      setSession(sessionData)
     }
     getSession()
 
     const { data: authListener } = supabaseClient.auth.onAuthStateChange(
-      async (event, session) => {
-        setSession(session)
+      async (event, sessionData) => {
+        setSession(sessionData)
       }
     )
 
     return () => {
-      authListener.subscription.unsubscribe()
+      authListener?.subscription?.unsubscribe()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [supabaseClient])
 
   useEffect(() => {
     getUser()
