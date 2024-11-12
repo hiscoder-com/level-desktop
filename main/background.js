@@ -1,23 +1,25 @@
-import { app, ipcMain, dialog } from 'electron'
-import serve from 'electron-serve'
-import Store from 'electron-store'
-import { createWindow } from './helpers'
-import { v4 as uuid } from 'uuid'
 import path from 'path'
-import { toJSON } from 'usfm-js'
-import { markRepeatedWords } from '@texttree/translation-words-helpers'
-const fs = require('fs')
-import i18next from '../next-i18next.config.js'
-import { localeStore } from './helpers/user-store'
-import decompress from 'decompress'
 
 import {
   formatToString,
-  tsvToJSON,
-  selectionsFromQuoteAndVerseObjects,
   parseVerseObjects,
+  selectionsFromQuoteAndVerseObjects,
+  tsvToJSON,
 } from '@texttree/tn-quote-helpers'
+import { markRepeatedWords } from '@texttree/translation-words-helpers'
+import decompress from 'decompress'
+import { app, dialog, ipcMain } from 'electron'
+import serve from 'electron-serve'
+import Store from 'electron-store'
+import { toJSON } from 'usfm-js'
+import { v4 as uuid } from 'uuid'
 
+import i18next from '../next-i18next.config.js'
+import supabaseApi from '../renderer/utils/supabaseServer.js'
+import { createWindow } from './helpers'
+import { localeStore } from './helpers/user-store'
+
+const fs = require('fs')
 const isProd = process.env.NODE_ENV === 'production'
 
 if (isProd) {
@@ -55,7 +57,7 @@ async function handleConfigOpen() {
   }
 }
 
-; (async () => {
+;(async () => {
   await app.whenReady()
 
   const mainWindow = createWindow('main', {
@@ -93,42 +95,47 @@ ipcMain.on('get-projects', (event) => {
 let personalNotesLS
 let teamNotesLS
 function writeLog(message) {
-  const logDir = path.join(app.getPath('userData'), 'logs');
+  const logDir = path.join(app.getPath('userData'), 'logs')
 
   if (!fs.existsSync(logDir)) {
-    fs.mkdirSync(logDir, { recursive: true });
+    fs.mkdirSync(logDir, { recursive: true })
   }
 
-  const logPath = path.join(logDir, 'app.log');
-  fs.appendFileSync(logPath, `[${new Date().toISOString()}] ${message}\n`);
+  const logPath = path.join(logDir, 'app.log')
+  fs.appendFileSync(logPath, `[${new Date().toISOString()}] ${message}\n`)
 }
 
-(async () => {
+;(async () => {
   try {
-    const isFirstLaunchFile = storeLS.get('first-launch');
+    const isFirstLaunchFile = storeLS.get('first-launch')
 
     if (!isFirstLaunchFile) {
       const fakeEvent = {
         sender: {
           send: (channel, message) => {
-            writeLog(`Channel: ${channel}, Message: ${message}`);
-          }
-        }
-      };
-      const zipFilePath = path.join(process.resourcesPath, 'resources', 'default', 'project.zip');
-      if (fs.existsSync(zipFilePath)) {
-        await handleAddProject(zipFilePath, fakeEvent);
-        writeLog('handleAddProject finished successfully');
-      } else {
-        writeLog(`ZIP file not found: ${zipFilePath}`);
+            writeLog(`Channel: ${channel}, Message: ${message}`)
+          },
+        },
       }
-      storeLS.set('first-launch', true);
-      writeLog('Set first-launch to true');
+      const zipFilePath = path.join(
+        process.resourcesPath,
+        'resources',
+        'default',
+        'project.zip'
+      )
+      if (fs.existsSync(zipFilePath)) {
+        await handleAddProject(zipFilePath, fakeEvent)
+        writeLog('handleAddProject finished successfully')
+      } else {
+        writeLog(`ZIP file not found: ${zipFilePath}`)
+      }
+      storeLS.set('first-launch', true)
+      writeLog('Set first-launch to true')
     }
   } catch (error) {
-    writeLog(`Error occurred: ${error.message}`);
+    writeLog(`Error occurred: ${error.message}`)
   }
-})();
+})()
 
 const getNotesWithType = (type) => {
   let notes
@@ -557,7 +564,9 @@ ipcMain.on('divide-verse', (event, projectid, chapter, verse, enabled) => {
     })
   )
   chapterData[verse].enabled = enabled
-  if (!enabled) { chapterData[verse].text = '' }
+  if (!enabled) {
+    chapterData[verse].text = ''
+  }
 
   fs.writeFileSync(
     path.join(projectUrl, projectid, 'chapters', chapter + '.json'),
@@ -683,7 +692,7 @@ ipcMain.on('get-tn', (event, id, resource, mainResource, chapter) => {
 
     const res = formatToString(result)
     selectedTn.origQuote = selectedTn.Quote
-    selectedTn.Quote = res || "General Information"
+    selectedTn.Quote = res || 'General Information'
     return selectedTn
   })
   event.returnValue = data
@@ -906,7 +915,6 @@ async function handleAddProject(url, event) {
   }
 
   if (url) {
-
     try {
       const projects = storeProjects.get('projects') || []
       const id = uuid()
@@ -959,8 +967,6 @@ async function handleAddProject(url, event) {
 ipcMain.on('add-project', async (event, url) => {
   await handleAddProject(url, event)
 })
-
-
 
 ipcMain.on('get-properties', (event, projectId) => {
   const propertiesPath = path.join(projectUrl, projectId, 'properties.json')
@@ -1051,4 +1057,26 @@ ipcMain.on('delete-project', (event, projectId) => {
 ipcMain.handle('dialog:openFile', handleFileOpen)
 ipcMain.handle('dialog:openConfig', handleConfigOpen)
 
+ipcMain.handle('getTranslatorProjects', async (event, userId) => {
+  try {
+    const supabaseServerApi = await supabaseApi({ req: {}, res: {} })
+    const { data, error } = await supabaseServerApi
+      .from('translator_projects')
+      .select('*')
+      .eq('user_id', userId)
 
+    if (error) {
+      console.error('Error when getting projects from the view:', error)
+      throw error
+    }
+
+    console.log(data)
+
+    if (error) throw error
+
+    return data
+  } catch (err) {
+    console.error('Error when receiving projects:', err)
+    throw err
+  }
+})
