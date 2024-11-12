@@ -1,27 +1,21 @@
-import { createPagesServerClient } from '@supabase/auth-helpers-nextjs'
+import { createClient } from '@supabase/supabase-js'
 
-const supabaseApi = async ({ req, res }) => {
-  let supabaseServerApi
+const supabaseApi = async () => {
+  const supabaseServerApi = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  )
+
   try {
-    supabaseServerApi = createPagesServerClient(
-      { req, res },
-      {
-        supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-        supabaseUrl: process.env.SUPABASE_URL,
-        cookieOptions: {
-          name: process.env.NEXT_PUBLIC_COOKIE_NAME ?? 'sb-level-cookies',
-        },
-      }
-    )
-    const {
-      data: { session },
-    } = await supabaseServerApi.auth.getSession()
-    if (!session) {
-      throw Error('Access denied!')
+    const { data: session, error } = await supabaseServerApi.auth.getSession()
+    if (error || !session) {
+      throw new Error('Access denied!')
     }
   } catch (error) {
+    console.error('Ошибка при проверке сессии:', error)
     throw error
   }
+
   return supabaseServerApi
 }
 
