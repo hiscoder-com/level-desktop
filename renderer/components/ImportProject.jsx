@@ -2,14 +2,17 @@ import { useState } from 'react'
 
 import Link from 'next/link'
 
+import { useCurrentUser } from '@/lib/UserContext'
 import { useTranslation } from '@/next-i18next'
-import Left from 'public/icons/left.svg'
 import toast from 'react-hot-toast'
+
+import Left from 'public/icons/left.svg'
 
 function ImportProject() {
   const { t } = useTranslation(['common', 'projects'])
   const [fileUrl, setFileUrl] = useState(false)
-  const [projectList, setProjectList] = useState([]) 
+  const [projectList, setProjectList] = useState([])
+  const { user } = useCurrentUser()
 
   const onSubmit = async (e) => {
     e.preventDefault()
@@ -24,7 +27,7 @@ function ImportProject() {
 
   const fetchProjectList = async () => {
     try {
-      const projects = await window.electronAPI.getProjectList() 
+      const projects = await window.electronAPI.getTranslatorProjects(user?.id)
       setProjectList(projects)
     } catch (error) {
       console.error('Failed to fetch projects:', error)
@@ -69,18 +72,15 @@ function ImportProject() {
       </div>
 
       <div className="mt-6 rounded-lg border border-th-secondary-200 bg-th-secondary-10 px-8 py-8 text-lg">
-        <button
-          className="btn-primary mb-4 w-fit text-base"
-          onClick={fetchProjectList}
-        >
-          Получить список проектов
+        <button className="btn-primary mb-4 w-fit text-base" onClick={fetchProjectList}>
+          {t('projects:FetchProjects')}
         </button>
 
-        {projectList.length > 0 ? (
+        {projectList?.length > 0 ? (
           <ul className="space-y-2">
             {projectList.map((project, index) => (
               <li key={index} className="text-th-secondary-300">
-                {project.name}
+                {project.title}
               </li>
             ))}
           </ul>
