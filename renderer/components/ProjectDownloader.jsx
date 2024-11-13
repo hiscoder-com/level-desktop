@@ -7,7 +7,7 @@ import JSZip from 'jszip'
 import { useTranslation } from 'next-i18next'
 import toast from 'react-hot-toast'
 
-function ProjectDownloader({ project, bookCode }) {
+function ProjectDownloader({ project, bookCode, bookProperties }) {
   const { t } = useTranslation(['common', 'projects', 'books'])
 
   const createProjectFiles = (zip) => {
@@ -150,7 +150,7 @@ function ProjectDownloader({ project, bookCode }) {
     }
 
     const { data: methodsData, error } = await supabase
-      .from('methods')
+      .from('methods_view')
       .select('*')
       .eq('title', project.method)
     if (error) {
@@ -164,21 +164,8 @@ function ProjectDownloader({ project, bookCode }) {
     //   return null
     // }
 
-    const code = project.code
-    const { data: book, error: errorBook } = await supabase
-      .from('books')
-      .select('properties, projects(code)')
-      .eq('projects.code', code)
-      .eq('code', bookCode)
-      .single()
-
-    if (errorBook) {
-      console.error('Error receiving data from Supabase:', errorBook)
-      return null
-    }
-
     const bookName =
-      book.properties.scripture.toc2 || t('books:' + bookCode, { lng: 'en' })
+      bookProperties.scripture.toc2 || t('books:' + bookCode, { lng: 'en' })
 
     const config = {
       steps: method.offline_steps,
@@ -283,7 +270,10 @@ function ProjectDownloader({ project, bookCode }) {
   }
 
   return (
-    <button className="btn-secondary flex-1" onClick={createAndDownloadArchive}>
+    <button
+      className="btn-primary mb-4 w-fit text-base"
+      onClick={createAndDownloadArchive}
+    >
       {t('Download')}
     </button>
   )

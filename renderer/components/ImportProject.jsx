@@ -90,6 +90,7 @@ function ImportProject() {
                       <ProjectDownloader
                         project={project}
                         bookCode={book.book_code}
+                        bookProperties={book.book_properties}
                         isBook
                       />
                     </li>
