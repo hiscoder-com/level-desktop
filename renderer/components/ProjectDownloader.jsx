@@ -265,13 +265,22 @@ function ProjectDownloader({ project, bookCode, bookProperties }) {
 
   const createAndDownloadArchive = async () => {
     try {
+      const downloadingToast = toast.loading(t('DownloadingProject'), {
+        position: 'top-center',
+        duration: Infinity,
+      })
+
       const archive = await createOfflineProject(project, bookCode)
       if (!archive) throw new Error('Archive not created')
 
       const content = await archive.generateAsync({ type: 'blob' })
       const fileName = `${project.code}_${bookCode}.zip`
+
       saveAs(content, fileName)
+
+      toast.success(t('DownloadComplete'), { id: downloadingToast, duration: 7000 })
     } catch (error) {
+      toast.dismiss(downloadingToast)
       toast.error(t('DownloadError'))
       console.error('Error downloading archive:', error)
     }
