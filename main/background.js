@@ -1070,8 +1070,6 @@ ipcMain.handle('getTranslatorProjects', async (event, userId) => {
       throw error
     }
 
-    console.log(data)
-
     if (error) throw error
 
     return data
