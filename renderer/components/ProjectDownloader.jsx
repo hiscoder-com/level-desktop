@@ -274,7 +274,7 @@ function ProjectDownloader({ project, bookCode, bookProperties }) {
       className="btn-primary mb-4 w-fit text-base"
       onClick={createAndDownloadArchive}
     >
-      {t('Download')}
+      {t('common:Download')}
     </button>
   )
 }
