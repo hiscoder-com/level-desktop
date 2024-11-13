@@ -29,10 +29,18 @@ function ProjectDownloader({ project, bookCode, bookProperties }) {
     for (const resource in resources) {
       if (Object.hasOwnProperty.call(resources, resource)) {
         const { owner, repo, commit, manifest } = resources[resource]
-        const bookPath = manifest.projects.find((el) => el.identifier === bookCode)?.path
-        const url = ` ${
-          process.env.NEXT_PUBLIC_NODE_HOST ?? 'https://git.door43.org'
-        }/${owner}/${repo}/raw/commit/${commit}/${bookPath.replace(/^\.\//, '')}`
+
+        const bookPath = manifest?.projects?.find(
+          (el) => el.identifier === bookCode
+        )?.path
+
+        if (!bookPath) {
+          console.error(`bookPath not found for resource: ${resource}`)
+          //TODO решить стоит продолжать
+          continue
+        }
+
+        const url = `${process.env.NEXT_PUBLIC_NODE_HOST ?? 'https://git.door43.org'}/${owner}/${repo}/raw/commit/${commit}/${bookPath.replace(/^\.\//, '')}`
         urls[resource] = url
       }
     }
@@ -159,10 +167,10 @@ function ProjectDownloader({ project, bookCode, bookProperties }) {
     }
 
     const method = methodsData?.[0]
-    //TODO вернуть в итоговый код
-    // if (!method?.offline_steps) {
-    //   return null
-    // }
+    //TODO уточнить, актуально ли
+    if (!method?.offline_steps) {
+      return null
+    }
 
     const bookName =
       bookProperties.scripture.toc2 || t('books:' + bookCode, { lng: 'en' })
