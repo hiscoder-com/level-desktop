@@ -12,7 +12,7 @@ const supabaseApi = async () => {
       throw new Error('Access denied!')
     }
   } catch (error) {
-    console.error('Ошибка при проверке сессии:', error)
+    console.error('Error checking the session', error)
     throw error
   }
 

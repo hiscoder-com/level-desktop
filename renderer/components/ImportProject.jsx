@@ -6,6 +6,8 @@ import { useCurrentUser } from '@/lib/UserContext'
 import { useTranslation } from '@/next-i18next'
 import toast from 'react-hot-toast'
 
+import ProjectDownloader from './ProjectDownloader'
+
 import Left from 'public/icons/left.svg'
 
 function ImportProject() {
@@ -78,9 +80,21 @@ function ImportProject() {
 
         {projectList?.length > 0 ? (
           <ul className="space-y-2">
-            {projectList.map((project, index) => (
-              <li key={index} className="text-th-secondary-300">
-                {project.title}
+            {projectList.map((project) => (
+              <li key={project.project_id} className="flex flex-col space-y-4">
+                <span>{project.title}</span>
+                <ul className="ml-4 space-y-2">
+                  {project.books.map((book) => (
+                    <li key={book.book_id} className="flex items-center justify-between">
+                      <span>{book.book_code}</span>
+                      <ProjectDownloader
+                        project={project}
+                        bookCode={book.book_code}
+                        isBook
+                      />
+                    </li>
+                  ))}
+                </ul>
               </li>
             ))}
           </ul>
