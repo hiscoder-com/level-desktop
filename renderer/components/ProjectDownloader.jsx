@@ -29,6 +29,10 @@ function ProjectDownloader({ project, bookCode, bookProperties }) {
     for (const resource in resources) {
       if (Object.hasOwnProperty.call(resources, resource)) {
         const { owner, repo, commit, manifest } = resources[resource]
+        //TODO- продумать другое решение
+        if (resource === 'tAcademy') {
+          continue
+        }
 
         const bookPath = manifest?.projects?.find(
           (el) => el.identifier === bookCode
@@ -73,8 +77,9 @@ function ProjectDownloader({ project, bookCode, bookProperties }) {
     try {
       const parts = url.split('/')
       const baseUrl = parts.slice(0, 3).join('/')
-      //TODO уточнить почему обрезали      const repo = parts[4].slice(0, -1)
-      const repo = parts[4]
+      //TODO уточнить почему обрезаем
+      const repo = parts[4].slice(0, -1)
+
       const owner = parts[3]
 
       const newUrl = `${baseUrl}/${owner}/${repo}/archive/master.zip`
@@ -169,6 +174,7 @@ function ProjectDownloader({ project, bookCode, bookProperties }) {
     const method = methodsData?.[0]
     //TODO уточнить, актуально ли
     if (!method?.offline_steps) {
+      console.error('This method is not supported offline:', project.method)
       return null
     }
 
@@ -264,8 +270,10 @@ function ProjectDownloader({ project, bookCode, bookProperties }) {
   }
 
   const createAndDownloadArchive = async () => {
+    let downloadingToast
+
     try {
-      const downloadingToast = toast.loading(t('DownloadingProject'), {
+      downloadingToast = toast.loading(t('DownloadingProject'), {
         position: 'top-center',
         duration: Infinity,
       })
@@ -280,7 +288,9 @@ function ProjectDownloader({ project, bookCode, bookProperties }) {
 
       toast.success(t('DownloadComplete'), { id: downloadingToast, duration: 7000 })
     } catch (error) {
-      toast.dismiss(downloadingToast)
+      if (downloadingToast) {
+        toast.dismiss(downloadingToast)
+      }
       toast.error(t('DownloadError'))
       console.error('Error downloading archive:', error)
     }
