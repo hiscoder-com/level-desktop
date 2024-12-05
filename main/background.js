@@ -897,6 +897,10 @@ async function handleAddProject(url, event) {
     }
 
     const configContent = fs.readFileSync(path.join(projectPath, configFile), 'utf-8')
+    if (!configContent.trim()) {
+      throw new Error('config.json is empty!')
+    }
+
     const config = JSON.parse(configContent)
     if (
       !config.book ||
