@@ -21,11 +21,14 @@ export default function StartPage() {
     window.electronAPI.setItem('isNeedAutorized', false)
   }, [])
 
-  const checkAgreements = () => {
+  const checkAgreements = async () => {
+    await window.electronAPI.resetCurrentUser()
+
     const agreements = window.electronAPI.getItem('agreements')
     if (!agreements) {
       return router.push(`/agreements`)
     }
+
     const agreementsObj = JSON.parse(agreements)
     const allAgreed = agreementsObj.userAgreement && agreementsObj.confession
 

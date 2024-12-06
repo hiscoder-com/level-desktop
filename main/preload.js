@@ -126,6 +126,8 @@ process.once('loaded', () => {
 
     getTranslatorProjects: (userId) =>
       ipcRenderer.invoke('getTranslatorProjects', userId),
+
+    resetCurrentUser: () => ipcRenderer.invoke('reset-current-user'),
   })
 
   const handler = {
@@ -146,4 +148,9 @@ process.once('loaded', () => {
   }
 
   contextBridge.exposeInMainWorld('ipc', handler)
+
+  contextBridge.exposeInMainWorld('electron', {
+    initCurrentUser: (userId, email) =>
+      ipcRenderer.invoke('init-current-user', userId, email),
+  })
 })

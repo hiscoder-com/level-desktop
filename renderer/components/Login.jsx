@@ -24,13 +24,33 @@ export default function Login({ onClose }) {
   const handleLogin = async (e) => {
     e.preventDefault()
     setIsLoadingLogin(true)
+
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email: login, password })
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: login,
+        password,
+      })
+
       if (error) throw error
+
       setIsError(false)
-      router.push('/account')
-    } catch (error) {
-      console.error(error)
+
+      try {
+        const response = await window.electron.initCurrentUser(
+          data.user.id,
+          data.user.email
+        )
+
+        if (response?.success) {
+          router.push('/account')
+        } else {
+          console.error('Error when adding a user:', response?.error || 'Unknown error')
+        }
+      } catch (initError) {
+        console.error('Error initializing the current user:', initError)
+      }
+    } catch (authError) {
+      console.error('Authorization error:', authError)
       setIsError(true)
     } finally {
       setIsLoadingLogin(false)

@@ -86,8 +86,29 @@ const storeProjects = new Store({ name: 'projects' })
 
 const storeLS = new Store({ name: 'localStorage' })
 
+const storeUsers = new Store()
+
+ipcMain.handle('reset-current-user', () => {
+  const currentUser = storeUsers.get('currentUser')
+
+  if (currentUser) {
+    storeUsers.delete('currentUser')
+  } else {
+  }
+})
+
 ipcMain.on('get-projects', (event) => {
-  const projects = storeProjects.get('projects') || []
+  let projects = []
+
+  const currentUser = storeUsers.get('currentUser')
+
+  if (currentUser && currentUser.id) {
+    const user = storeUsers.get(`users.${currentUser.id}`)
+    projects = user?.projects || []
+  } else {
+    projects = storeProjects.get('projects') || []
+  }
+
   event.returnValue = projects
   event.sender.send('notify', 'Loaded')
 })
@@ -920,7 +941,6 @@ async function handleAddProject(url, event) {
 
   if (url) {
     try {
-      const projects = storeProjects.get('projects') || []
       const id = uuid()
       const createdAt = Date.now()
       const project = { id, createdAt }
@@ -930,28 +950,37 @@ async function handleAddProject(url, event) {
       const finalDir = path.join(projectUrl, id)
       await fs.promises.rename(tempDir, finalDir)
 
-      const config = JSON.parse(
-        await fs.promises.readFile(path.join(finalDir, 'config.json'), 'utf-8')
-      )
+      const configPath = path.join(finalDir, 'config.json')
+      const config = JSON.parse(await fs.promises.readFile(configPath, 'utf-8'))
       config.showIntro ??= true
 
-      const configPath = path.join(finalDir, 'config.json')
-      try {
-        await fs.promises.writeFile(configPath, JSON.stringify(config, null, 2))
-      } catch (error) {
-        console.error('Error writing config file:', error)
-        throw new Error('Failed to write config file')
-      }
+      await fs.promises.writeFile(configPath, JSON.stringify(config, null, 2))
+
       project.book = { ...config.book }
       project.name = config.project.title
       project.method = config.method
 
       await createPropertiesFile(id, defaultProperties)
 
-      projects.push(project)
-      storeProjects.set('projects', projects)
+      const currentUser = storeUsers.get('currentUser')
+      let updatedProjects
+
+      if (currentUser?.id) {
+        const userFromStore = storeUsers.get(`users.${currentUser.id}`) || {}
+        updatedProjects = [...(userFromStore.projects || []), project]
+
+        const updatedUser = {
+          ...userFromStore,
+          projects: updatedProjects,
+        }
+        storeUsers.set(`users.${currentUser.id}`, updatedUser)
+      } else {
+        updatedProjects = storeProjects.get('projects') || []
+        updatedProjects.push(project)
+        storeProjects.set('projects', updatedProjects)
+      }
+
       event.sender.send('notify', 'Created')
-      const updatedProjects = storeProjects.get('projects') || []
       event.sender.send('project-added', id, project, updatedProjects)
     } catch (error) {
       console.error('Error adding project:', error)
@@ -1080,5 +1109,30 @@ ipcMain.handle('getTranslatorProjects', async (event, userId) => {
   } catch (err) {
     console.error('Error when receiving projects:', err)
     throw err
+  }
+})
+
+ipcMain.handle('init-current-user', async (event, userId, email) => {
+  try {
+    const users = storeUsers.get('users') || {}
+    const currentUser = storeUsers.get('currentUser')
+
+    if (users[userId]) {
+      if (!currentUser || currentUser.id !== userId) {
+        storeUsers.set('currentUser', { id: userId, email })
+        return { success: true, message: 'Current user updated' }
+      }
+
+      return { success: true, message: 'User already exists' }
+    }
+
+    storeUsers.set(`users.${userId}`, { id: userId, email })
+
+    storeUsers.set('currentUser', { id: userId, email })
+
+    return { success: true, message: 'User added successfully' }
+  } catch (error) {
+    console.error('Error:', error)
+    return { success: false, message: 'Error adding user' }
   }
 })
