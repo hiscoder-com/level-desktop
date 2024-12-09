@@ -1,3 +1,4 @@
+import os from 'os'
 import path from 'path'
 
 import {
@@ -1094,9 +1095,11 @@ ipcMain.handle('getTranslatorProjects', async (event, userId) => {
   try {
     const supabaseServerApi = await supabaseApi({ req: {}, res: {} })
     const { data, error } = await supabaseServerApi
-      .from('translator_projects')
+      .from('translator_projects_books')
       .select('*')
       .eq('user_id', userId)
+
+    // console.log(data,11)
 
     if (error) {
       console.error('Error when getting projects from the view:', error)
@@ -1134,5 +1137,25 @@ ipcMain.handle('init-current-user', async (event, userId, email) => {
   } catch (error) {
     console.error('Error:', error)
     return { success: false, message: 'Error adding user' }
+  }
+})
+
+ipcMain.handle('save-file', async (event, content, fileName) => {
+  try {
+    const bufferContent = Buffer.isBuffer(content)
+      ? content
+      : Buffer.from(content, 'base64')
+    if (!Buffer.isBuffer(bufferContent)) {
+      throw new Error('Content is not a valid Buffer')
+    }
+
+    const tempDir = os.tmpdir()
+    const tempFilePath = path.join(tempDir, fileName)
+
+    await fs.promises.writeFile(tempFilePath, bufferContent)
+    return tempFilePath
+  } catch (error) {
+    console.error('Error saving file to disk:', error)
+    throw error
   }
 })

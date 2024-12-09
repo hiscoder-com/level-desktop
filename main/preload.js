@@ -128,6 +128,10 @@ process.once('loaded', () => {
       ipcRenderer.invoke('getTranslatorProjects', userId),
 
     resetCurrentUser: () => ipcRenderer.invoke('reset-current-user'),
+
+    saveFile: async (content, fileName) => {
+      return ipcRenderer.invoke('save-file', content, fileName)
+    },
   })
 
   const handler = {

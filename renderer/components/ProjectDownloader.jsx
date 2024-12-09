@@ -296,12 +296,52 @@ function ProjectDownloader({ project, bookCode, bookProperties }) {
     }
   }
 
+  const saveToTemporaryFile = async (content, fileName) => {
+    try {
+      if (!(content instanceof Uint8Array)) {
+        throw new Error('Content must be a Uint8Array')
+      }
+
+      const buffer = Buffer.from(content)
+      if (!(buffer instanceof Buffer)) {
+        throw new Error('Buffer conversion failed')
+      }
+      console.log('Buffer content:', content, 'FileName:', fileName)
+      const serializedContent = buffer.toString('base64')
+      const fileUrl = await window.electronAPI.saveFile(serializedContent, fileName)
+      console.log('File saved at:', fileUrl)
+      return fileUrl
+    } catch (error) {
+      console.error('Error saving file:', error)
+      throw error
+    }
+  }
+
+  const handleImportProject = async () => {
+    try {
+      const archive = await createOfflineProject(project, bookCode)
+      if (!archive) throw new Error('Failed to create archive')
+
+      const content = await archive.generateAsync({ type: 'uint8array' })
+
+      const bufferContent = Buffer.from(content)
+
+      const fileName = `${project.project_code}_${bookCode}.zip`
+
+      const fileUrl = await saveToTemporaryFile(bufferContent, fileName)
+      console.log(fileUrl, 341)
+      await window.electronAPI.addProject(fileUrl)
+
+      toast.success(t('projects:SuccessfullyAddedProject'))
+    } catch (error) {
+      console.error('Error importing project:', error)
+      toast.error(t('projects:FailedAddProject'))
+    }
+  }
+
   return (
-    <button
-      className="btn-primary mb-4 w-fit text-base"
-      onClick={createAndDownloadArchive}
-    >
-      {t('common:Download')}
+    <button className="btn-primary mb-4 w-fit text-base" onClick={handleImportProject}>
+      {t('projects:ImportProject')}
     </button>
   )
 }

@@ -82,7 +82,7 @@ function ImportProject() {
           <ul className="space-y-2">
             {projectList.map((project) => (
               <li key={project.project_id} className="flex flex-col space-y-4">
-                <span>{project.title}</span>
+                <span>{project.project_title}</span>
                 <ul className="ml-4 space-y-2">
                   {project.books.map((book) => (
                     <li key={book.book_id} className="flex items-center justify-between">

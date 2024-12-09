@@ -13,8 +13,8 @@ export default function Login({ onClose }) {
   const supabase = useSupabaseClient()
   const { t } = useTranslation(['users'])
 
-  const [login, setLogin] = useState('')
-  const [password, setPassword] = useState('')
+  const [login, setLogin] = useState('admin@mail.com')
+  const [password, setPassword] = useState('123456')
   const [isLoadingLogin, setIsLoadingLogin] = useState(false)
   const [isError, setIsError] = useState(false)
 
