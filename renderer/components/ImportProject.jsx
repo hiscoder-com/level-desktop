@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import Link from 'next/link'
 
@@ -16,6 +16,22 @@ function ImportProject() {
   const [projectList, setProjectList] = useState([])
   const { user } = useCurrentUser()
 
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const projects = await window.electronAPI.getTranslatorProjects(user?.id)
+        setProjectList(projects)
+      } catch (error) {
+        console.error('Failed to fetch projects:', error)
+        toast.error(t('projects:FailedFetchProjects'))
+      }
+    }
+
+    if (user?.id) {
+      fetchProjects()
+    }
+  }, [user?.id])
+
   const onSubmit = async (e) => {
     e.preventDefault()
     try {
@@ -24,16 +40,6 @@ function ImportProject() {
     } catch (error) {
       console.error('Failed to add project:', error)
       toast.error(t('projects:FailedAddProject'))
-    }
-  }
-
-  const fetchProjectList = async () => {
-    try {
-      const projects = await window.electronAPI.getTranslatorProjects(user?.id)
-      setProjectList(projects)
-    } catch (error) {
-      console.error('Failed to fetch projects:', error)
-      toast.error(t('projects:FailedFetchProjects'))
     }
   }
 
@@ -74,10 +80,6 @@ function ImportProject() {
       </div>
 
       <div className="mt-6 rounded-lg border border-th-secondary-200 bg-th-secondary-10 px-8 py-8 text-lg">
-        <button className="btn-primary mb-4 w-fit text-base" onClick={fetchProjectList}>
-          {t('projects:FetchProjects')}
-        </button>
-
         {projectList?.length > 0 ? (
           <ul className="space-y-2">
             {projectList.map((project) => (
