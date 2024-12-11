@@ -184,7 +184,7 @@ function ProjectDownloader({ project, bookCode, bookProperties }) {
     const config = {
       steps: method.offline_steps,
       method: method.title,
-      project: { code: project.code, title: project.title },
+      project: { code: project.project_code, title: project.project_title },
       chapters: initChapters,
       book: { code: bookCode, name: bookName },
       resources: addResourceName(project.resources),
@@ -282,7 +282,7 @@ function ProjectDownloader({ project, bookCode, bookProperties }) {
       if (!archive) throw new Error('Archive not created')
 
       const content = await archive.generateAsync({ type: 'blob' })
-      const fileName = `${project.code}_${bookCode}.zip`
+      const fileName = `${project.project_code}_${bookCode}.zip`
 
       saveAs(content, fileName)
 

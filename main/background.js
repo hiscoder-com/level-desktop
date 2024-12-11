@@ -932,7 +932,7 @@ async function handleAddProject(url, event) {
     ) {
       throw new Error('Invalid book structure in config.json')
     }
-    if (!config.project || typeof config.project.code !== 'string') {
+    if (!config.project) {
       throw new Error('Invalid project in config.json')
     }
     if (!config.method || typeof config.method !== 'string') {
@@ -958,7 +958,7 @@ async function handleAddProject(url, event) {
       await fs.promises.writeFile(configPath, JSON.stringify(config, null, 2))
 
       project.book = { ...config.book }
-      project.name = config.project.title
+      project.title = config.project.title
       project.method = config.method
 
       await createPropertiesFile(id, defaultProperties)

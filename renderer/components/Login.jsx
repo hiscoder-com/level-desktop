@@ -14,7 +14,7 @@ export default function Login({ onClose }) {
   const { t } = useTranslation(['users'])
 
   const [login, setLogin] = useState('admin@mail.com')
-  const [password, setPassword] = useState('123456')
+  const [password, setPassword] = useState('F8vo2A')
   const [isLoadingLogin, setIsLoadingLogin] = useState(false)
   const [isError, setIsError] = useState(false)
 
