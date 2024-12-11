@@ -87,7 +87,7 @@ const storeProjects = new Store({ name: 'projects' })
 
 const storeLS = new Store({ name: 'localStorage' })
 
-const storeUsers = new Store()
+const storeUsers = new Store({ name: 'users' })
 
 ipcMain.handle('reset-current-user', () => {
   const currentUser = storeUsers.get('currentUser')
@@ -1065,27 +1065,60 @@ ipcMain.on('update-project-name', (event, projectId, newName) => {
   event.sender.send('project-name-updated', projectId, newName)
 })
 
-ipcMain.on('delete-project', (event, projectId) => {
-  const projectsFilePath = path.join(app.getPath('userData'), 'projects.json')
-  const projectsData = JSON.parse(fs.readFileSync(projectsFilePath, 'utf8'))
+ipcMain.on('delete-project', async (event, projectId) => {
+  try {
+    const projectsFilePath = path.join(app.getPath('userData'), 'projects.json')
+    const usersFilePath = path.join(app.getPath('userData'), 'users.json')
+    const currentUser = storeUsers.get('currentUser')
+    let usersData
+    if (currentUser?.id) {
+      usersData = JSON.parse(fs.readFileSync(usersFilePath, 'utf8'))
 
-  projectsData.projects = projectsData.projects.filter(
-    (project) => project.id !== projectId
-  )
+      const userFromStore = usersData.users[currentUser.id]
 
-  fs.writeFileSync(projectsFilePath, JSON.stringify(projectsData, null, 2))
+      if (!userFromStore) {
+        throw new Error('The user has not been found!')
+      }
 
-  const projectDirPath = path.join(projectUrl, projectId)
-  fs.rm(projectDirPath, { recursive: true }, (err) => {
-    if (err) {
-      console.error(`Error when deleting project folder: ${err}`)
-      event.sender.send('notify', 'Error deleting project')
-      return
+      const projectIndex = userFromStore.projects?.findIndex(
+        (project) => project.id === projectId
+      )
+      if (projectIndex === -1) {
+        throw new Error('The project was not found by the current user!')
+      }
+
+      userFromStore.projects.splice(projectIndex, 1)
+
+      fs.writeFileSync(usersFilePath, JSON.stringify(usersData, null, 2))
+    } else {
+      const projectsData = JSON.parse(fs.readFileSync(projectsFilePath, 'utf8'))
+
+      const projectIndex = projectsData.projects?.findIndex(
+        (project) => project.id === projectId
+      )
+      if (projectIndex === -1) {
+        throw new Error('The project was not found!')
+      }
+
+      projectsData.projects.splice(projectIndex, 1)
+
+      fs.writeFileSync(projectsFilePath, JSON.stringify(projectsData, null, 2))
     }
+
+    const projectDirPath = path.join(projectUrl, projectId)
+    await fs.promises.rm(projectDirPath, { recursive: true })
+
     event.sender.send('notify', 'Project deleted')
 
-    event.sender.send('projects-updated', projectsData.projects)
-  })
+    const updatedProjects = currentUser?.id
+      ? usersData.users[currentUser.id]?.projects
+      : JSON.parse(fs.readFileSync(projectsFilePath, 'utf8')).projects
+
+    event.sender.send('projects-updated', updatedProjects)
+  } catch (error) {
+    console.error('Error deleting project:', error)
+    event.sender.send('notify', `Error: ${error.message}`)
+  }
 })
 
 ipcMain.handle('dialog:openFile', handleFileOpen)
@@ -1098,8 +1131,6 @@ ipcMain.handle('getTranslatorProjects', async (event, userId) => {
       .from('translator_projects_books')
       .select('*')
       .eq('user_id', userId)
-
-    // console.log(data,11)
 
     if (error) {
       console.error('Error when getting projects from the view:', error)
