@@ -269,33 +269,6 @@ function ProjectDownloader({ project, bookCode, bookProperties }) {
     return chapters
   }
 
-  const createAndDownloadArchive = async () => {
-    let downloadingToast
-
-    try {
-      downloadingToast = toast.loading(t('DownloadingProject'), {
-        position: 'top-center',
-        duration: Infinity,
-      })
-
-      const archive = await createOfflineProject(project, bookCode)
-      if (!archive) throw new Error('Archive not created')
-
-      const content = await archive.generateAsync({ type: 'blob' })
-      const fileName = `${project.project_code}_${bookCode}.zip`
-
-      saveAs(content, fileName)
-
-      toast.success(t('DownloadComplete'), { id: downloadingToast, duration: 7000 })
-    } catch (error) {
-      if (downloadingToast) {
-        toast.dismiss(downloadingToast)
-      }
-      toast.error(t('DownloadError'))
-      console.error('Error downloading archive:', error)
-    }
-  }
-
   const saveToTemporaryFile = async (content, fileName) => {
     try {
       if (!(content instanceof Uint8Array)) {
@@ -318,7 +291,14 @@ function ProjectDownloader({ project, bookCode, bookProperties }) {
   }
 
   const handleImportProject = async () => {
+    let importingToast
+
     try {
+      importingToast = toast.loading(t('projects:ImportingProject'), {
+        position: 'top-center',
+        duration: Infinity,
+      })
+
       const archive = await createOfflineProject(project, bookCode)
       if (!archive) throw new Error('Failed to create archive')
 
@@ -329,13 +309,18 @@ function ProjectDownloader({ project, bookCode, bookProperties }) {
       const fileName = `${project.project_code}_${bookCode}.zip`
 
       const fileUrl = await saveToTemporaryFile(bufferContent, fileName)
-      console.log(fileUrl, 341)
       await window.electronAPI.addProject(fileUrl)
 
-      toast.success(t('projects:SuccessfullyAddedProject'))
+      toast.success(t('projects:SuccessfullyAddedProject'), {
+        id: importingToast,
+        duration: 3000,
+      })
     } catch (error) {
-      console.error('Error importing project:', error)
+      if (importingToast) {
+        toast.dismiss(importingToast)
+      }
       toast.error(t('projects:FailedAddProject'))
+      console.error('Error importing project:', error)
     }
   }
 
