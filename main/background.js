@@ -1048,21 +1048,62 @@ ipcMain.on('change-time-step', (event, projectId, step, time) => {
 })
 
 ipcMain.on('update-project-name', (event, projectId, newName) => {
-  const projects = storeProjects.get('projects') || []
-  const updatedProjects = projects.map((project) => {
-    if (project.id === projectId) {
-      return {
-        ...project,
+  const currentUser = storeUsers.get('currentUser')
+  const projectsFilePath = path.join(app.getPath('userData'), 'projects.json')
+  const usersFilePath = path.join(app.getPath('userData'), 'users.json')
+
+  try {
+    if (currentUser?.id) {
+      const usersData = JSON.parse(fs.readFileSync(usersFilePath, 'utf8'))
+
+      const userFromStore = usersData.users[currentUser.id]
+
+      if (!userFromStore) {
+        throw new Error('User not found!')
+      }
+
+      const projectIndex = userFromStore.projects.findIndex(
+        (project) => project.id === projectId
+      )
+      if (projectIndex === -1) {
+        throw new Error('Project not found for the current user!')
+      }
+
+      userFromStore.projects[projectIndex] = {
+        ...userFromStore.projects[projectIndex],
         book: {
-          ...project.book,
+          ...userFromStore.projects[projectIndex].book,
           name: newName,
         },
       }
+
+      fs.writeFileSync(usersFilePath, JSON.stringify(usersData, null, 2))
+    } else {
+      const projectsData = JSON.parse(fs.readFileSync(projectsFilePath, 'utf8'))
+
+      const projectIndex = projectsData.projects.findIndex(
+        (project) => project.id === projectId
+      )
+      if (projectIndex === -1) {
+        throw new Error('Project not found!')
+      }
+
+      projectsData.projects[projectIndex] = {
+        ...projectsData.projects[projectIndex],
+        book: {
+          ...projectsData.projects[projectIndex].book,
+          name: newName,
+        },
+      }
+
+      fs.writeFileSync(projectsFilePath, JSON.stringify(projectsData, null, 2))
     }
-    return project
-  })
-  storeProjects.set('projects', updatedProjects)
-  event.sender.send('project-name-updated', projectId, newName)
+
+    event.sender.send('project-name-updated', projectId, newName)
+  } catch (error) {
+    console.error('Error updating project name:', error)
+    event.sender.send('notify', `Error: ${error.message}`)
+  }
 })
 
 ipcMain.on('delete-project', async (event, projectId) => {
