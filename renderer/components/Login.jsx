@@ -3,6 +3,7 @@ import { useRef, useState } from 'react'
 import { useRouter } from 'next/router'
 
 import { useTranslation } from '@/next-i18next'
+import toast from 'react-hot-toast'
 import useSupabaseClient from 'utils/supabaseClient'
 
 import ButtonLoading from './ButtonLoading'
@@ -16,7 +17,6 @@ export default function Login({ onClose }) {
   const [login, setLogin] = useState('admin@mail.com')
   const [password, setPassword] = useState('F8vo2A')
   const [isLoadingLogin, setIsLoadingLogin] = useState(false)
-  const [isError, setIsError] = useState(false)
 
   const loginRef = useRef(null)
   const passwordRef = useRef(null)
@@ -33,7 +33,7 @@ export default function Login({ onClose }) {
 
       if (error) throw error
 
-      setIsError(false)
+      toast.success(t('users:LoginSuccess'))
 
       try {
         const response = await window.electron.initCurrentUser(
@@ -51,7 +51,7 @@ export default function Login({ onClose }) {
       }
     } catch (authError) {
       console.error('Authorization error:', authError)
-      setIsError(true)
+      toast.error(t('users:InvalidCredentials'))
     } finally {
       setIsLoadingLogin(false)
     }
@@ -65,7 +65,7 @@ export default function Login({ onClose }) {
         name="floating_email"
         id="floating_email"
         value={login}
-        isError={isError && !login}
+        isError={!login}
         label={t('Login')}
         onChange={(event) => setLogin(event.target.value)}
         className="input-base-label"
@@ -76,7 +76,7 @@ export default function Login({ onClose }) {
         name="floating_password"
         id="floating_password"
         value={password}
-        isError={isError && !password}
+        isError={!password}
         label={t('Password')}
         onChange={(event) => setPassword(event.target.value)}
         className="input-password"
