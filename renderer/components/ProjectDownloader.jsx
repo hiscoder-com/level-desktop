@@ -10,6 +10,27 @@ import toast from 'react-hot-toast'
 function ProjectDownloader({ project, bookCode, bookProperties }) {
   const { t } = useTranslation(['common', 'projects', 'books'])
 
+  const checkIfProjectExists = async (fileName) => {
+    try {
+      const fileExists = await window.electronAPI.checkFileExists(fileName)
+      return fileExists
+    } catch (error) {
+      console.error('Error checking the file:', error)
+      return false
+    }
+  }
+
+  const checkIfProjectAlreadyAdded = async (fileName) => {
+    try {
+      const projectExists = await window.electronAPI.checkProjectExists(fileName)
+      console.log(projectExists, 26)
+      return projectExists
+    } catch (error) {
+      console.error('Error checking the project:', error)
+      return false
+    }
+  }
+
   const createProjectFiles = (zip) => {
     const files = ['personal-notes.json', 'dictionary.json', 'team-notes.json']
     const folders = ['personal-notes', 'dictionary', 'team-notes', 'chapters']
@@ -282,7 +303,6 @@ function ProjectDownloader({ project, bookCode, bookProperties }) {
       console.log('Buffer content:', content, 'FileName:', fileName)
       const serializedContent = buffer.toString('base64')
       const fileUrl = await window.electronAPI.saveFile(serializedContent, fileName)
-      console.log('File saved at:', fileUrl)
       return fileUrl
     } catch (error) {
       console.error('Error saving file:', error)
@@ -294,6 +314,22 @@ function ProjectDownloader({ project, bookCode, bookProperties }) {
     let importingToast
 
     try {
+      const fileName = `${project.project_code}_${bookCode}.zip`
+
+      const projectAlreadyAdded = await checkIfProjectAlreadyAdded(fileName)
+      if (projectAlreadyAdded) {
+        toast.error(t('projects:ProjectAlreadyAdded'))
+        return
+      }
+      console.log(projectAlreadyAdded, 323)
+      const projectExists = await checkIfProjectExists(fileName)
+      if (projectExists) {
+        await window.electronAPI.addProject(fileName)
+        toast.success(t('projects:SuccessfullyAddedProject'))
+        return
+      }
+      console.log(projectExists, 330)
+
       importingToast = toast.loading(t('projects:ImportingProject'), {
         position: 'top-center',
         duration: Infinity,
@@ -303,10 +339,7 @@ function ProjectDownloader({ project, bookCode, bookProperties }) {
       if (!archive) throw new Error('Failed to create archive')
 
       const content = await archive.generateAsync({ type: 'uint8array' })
-
       const bufferContent = Buffer.from(content)
-
-      const fileName = `${project.project_code}_${bookCode}.zip`
 
       const fileUrl = await saveToTemporaryFile(bufferContent, fileName)
       await window.electronAPI.addProject(fileUrl)

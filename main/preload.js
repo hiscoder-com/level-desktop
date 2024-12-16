@@ -132,6 +132,14 @@ process.once('loaded', () => {
     saveFile: async (content, fileName) => {
       return ipcRenderer.invoke('save-file', content, fileName)
     },
+
+    checkFileExists: async (fileName) => {
+      return ipcRenderer.invoke('check-file-exists', fileName)
+    },
+
+    checkProjectExists: async (fileName) => {
+      return ipcRenderer.invoke('check-project-exists', fileName)
+    },
   })
 
   const handler = {

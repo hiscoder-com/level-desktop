@@ -114,6 +114,23 @@ ipcMain.on('get-projects', (event) => {
   event.sender.send('notify', 'Loaded')
 })
 
+ipcMain.handle('check-project-exists', (event, fileName) => {
+  const currentUser = storeUsers.get('currentUser')
+  let projects = []
+
+  if (currentUser && currentUser.id) {
+    const user = storeUsers.get(`users.${currentUser.id}`)
+    projects = user?.projects || []
+  } else {
+    projects = storeProjects.get('projects') || []
+  }
+
+  const projectExists = projects.some((project) => project.fileName === fileName)
+  console.log(projectExists, 130)
+
+  event.returnValue = projectExists
+})
+
 let personalNotesLS
 let teamNotesLS
 function writeLog(message) {
@@ -1221,13 +1238,36 @@ ipcMain.handle('save-file', async (event, content, fileName) => {
       throw new Error('Content is not a valid Buffer')
     }
 
-    const tempDir = os.tmpdir()
-    const tempFilePath = path.join(tempDir, fileName)
+    const zipDir = path.join(__dirname, '..', '.AppData', 'zip')
 
-    await fs.promises.writeFile(tempFilePath, bufferContent)
-    return tempFilePath
+    await fs.promises.mkdir(zipDir, { recursive: true })
+
+    const filePath = path.join(zipDir, fileName)
+
+    await fs.promises.writeFile(filePath, bufferContent)
+    return filePath
   } catch (error) {
     console.error('Error saving file to disk:', error)
     throw error
   }
 })
+
+ipcMain.handle('check-file-exists', async (event, fileName) => {
+  return checkFileExists(fileName)
+})
+
+const checkFileExists = (fileName) => {
+  return new Promise((resolve, reject) => {
+    const zipDir = path.join(__dirname, '..', '.AppData', 'zip')
+
+    const filePath = path.join(zipDir, fileName)
+
+    fs.access(filePath, fs.constants.F_OK, (err) => {
+      if (err) {
+        resolve(false)
+      } else {
+        resolve(true)
+      }
+    })
+  })
+}
