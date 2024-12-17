@@ -326,7 +326,9 @@ function ProjectDownloader({ project, bookCode, bookProperties }) {
 
         await window.electronAPI.addProject(filePath)
 
-        toast.success(t('projects:SuccessfullyAddedProject'))
+        toast.success(t('projects:SuccessfullyAddedProject'), {
+          duration: 3000,
+        })
         return
       }
 

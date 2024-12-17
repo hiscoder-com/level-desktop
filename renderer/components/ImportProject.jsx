@@ -36,7 +36,9 @@ function ImportProject() {
     e.preventDefault()
     try {
       await window.electronAPI.addProject(fileUrl)
-      toast.success(t('projects:SuccessfullyAddedProject'))
+      toast.success(t('projects:SuccessfullyAddedProject'), {
+        duration: 3000,
+      })
     } catch (error) {
       console.error('Failed to add project:', error)
       toast.error(t('projects:FailedAddProject'))
