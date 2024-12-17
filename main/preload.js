@@ -137,8 +137,11 @@ process.once('loaded', () => {
       return ipcRenderer.invoke('check-file-exists', fileName)
     },
 
-    checkProjectExists: async (fileName) => {
-      return ipcRenderer.invoke('check-project-exists', fileName)
+    checkProjectExists: (fileName) =>
+      ipcRenderer.sendSync('check-project-exists', fileName),
+
+    getPathFile: async (fileName) => {
+      return ipcRenderer.invoke('get-path-file', fileName)
     },
   })
 

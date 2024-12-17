@@ -3,14 +3,13 @@ import { newTestamentList, usfmFileNames } from '@/utils/config'
 import { getCountChaptersAndVerses } from '@/utils/helper'
 import supabaseApi from '@/utils/supabaseServer'
 import axios from 'axios'
-import { saveAs } from 'file-saver'
 import JSZip from 'jszip'
 import toast from 'react-hot-toast'
 
 function ProjectDownloader({ project, bookCode, bookProperties }) {
   const { t } = useTranslation(['common', 'projects', 'books'])
 
-  const checkIfProjectExists = async (fileName) => {
+  const checkIfFileExists = async (fileName) => {
     try {
       const fileExists = await window.electronAPI.checkFileExists(fileName)
       return fileExists
@@ -20,10 +19,9 @@ function ProjectDownloader({ project, bookCode, bookProperties }) {
     }
   }
 
-  const checkIfProjectAlreadyAdded = async (fileName) => {
+  const checkIfProjectExists = async (fileName) => {
     try {
       const projectExists = await window.electronAPI.checkProjectExists(fileName)
-      console.log(projectExists, 26)
       return projectExists
     } catch (error) {
       console.error('Error checking the project:', error)
@@ -300,7 +298,6 @@ function ProjectDownloader({ project, bookCode, bookProperties }) {
       if (!(buffer instanceof Buffer)) {
         throw new Error('Buffer conversion failed')
       }
-      console.log('Buffer content:', content, 'FileName:', fileName)
       const serializedContent = buffer.toString('base64')
       const fileUrl = await window.electronAPI.saveFile(serializedContent, fileName)
       return fileUrl
@@ -316,19 +313,22 @@ function ProjectDownloader({ project, bookCode, bookProperties }) {
     try {
       const fileName = `${project.project_code}_${bookCode}.zip`
 
-      const projectAlreadyAdded = await checkIfProjectAlreadyAdded(fileName)
+      const projectAlreadyAdded = await checkIfProjectExists(fileName)
       if (projectAlreadyAdded) {
         toast.error(t('projects:ProjectAlreadyAdded'))
         return
       }
-      console.log(projectAlreadyAdded, 323)
-      const projectExists = await checkIfProjectExists(fileName)
+
+      const projectExists = await checkIfFileExists(fileName)
+
       if (projectExists) {
-        await window.electronAPI.addProject(fileName)
+        const filePath = await window.electronAPI.getPathFile(fileName)
+
+        await window.electronAPI.addProject(filePath)
+
         toast.success(t('projects:SuccessfullyAddedProject'))
         return
       }
-      console.log(projectExists, 330)
 
       importingToast = toast.loading(t('projects:ImportingProject'), {
         position: 'top-center',

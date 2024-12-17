@@ -114,19 +114,18 @@ ipcMain.on('get-projects', (event) => {
   event.sender.send('notify', 'Loaded')
 })
 
-ipcMain.handle('check-project-exists', (event, fileName) => {
-  const currentUser = storeUsers.get('currentUser')
+ipcMain.on('check-project-exists', (event, fileName) => {
   let projects = []
+  const currentUser = storeUsers.get('currentUser')
 
-  if (currentUser && currentUser.id) {
+  if (currentUser?.id) {
     const user = storeUsers.get(`users.${currentUser.id}`)
     projects = user?.projects || []
   } else {
     projects = storeProjects.get('projects') || []
   }
 
-  const projectExists = projects.some((project) => project.fileName === fileName)
-  console.log(projectExists, 130)
+  const projectExists = projects.some((project) => project?.fileName === fileName)
 
   event.returnValue = projectExists
 })
@@ -967,7 +966,7 @@ async function handleAddProject(url, event) {
       validateProjectStructure(tempDir)
       const finalDir = path.join(projectUrl, id)
       await fs.promises.rename(tempDir, finalDir)
-
+      const fileName = path.basename(url)
       const configPath = path.join(finalDir, 'config.json')
       const config = JSON.parse(await fs.promises.readFile(configPath, 'utf-8'))
       config.showIntro ??= true
@@ -977,6 +976,7 @@ async function handleAddProject(url, event) {
       project.book = { ...config.book }
       project.title = config.project.title
       project.method = config.method
+      project.fileName = fileName
 
       await createPropertiesFile(id, defaultProperties)
 
@@ -1245,6 +1245,19 @@ ipcMain.handle('save-file', async (event, content, fileName) => {
     const filePath = path.join(zipDir, fileName)
 
     await fs.promises.writeFile(filePath, bufferContent)
+    return filePath
+  } catch (error) {
+    console.error('Error saving file to disk:', error)
+    throw error
+  }
+})
+
+ipcMain.handle('get-path-file', async (event,  fileName) => {
+  try {
+   
+    const zipDir = path.join(__dirname, '..', '.AppData', 'zip')
+    const filePath = path.join(zipDir, fileName)
+
     return filePath
   } catch (error) {
     console.error('Error saving file to disk:', error)
