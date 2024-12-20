@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/router'
 
 import { useTranslation } from '@/next-i18next'
+import toast from 'react-hot-toast'
 import useSupabaseClient from 'utils/supabaseClient'
 
 import LogOut from 'public/icons/logout.svg'
@@ -22,7 +23,7 @@ export default function SignOut({ collapsed }) {
         if (error) throw error
       }
     } catch (error) {
-      alert(error.error_description || error.message)
+      toast.error(error.error_description || error.message)
     } finally {
       setLoading(false)
       router.push('/home')

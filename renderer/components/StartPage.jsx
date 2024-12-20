@@ -38,7 +38,7 @@ export default function StartPage() {
   }
 
   return (
-    <div className="absolute flex h-screen">
+    <div className="flex h-screen">
       <div className="flex w-3/5 items-center justify-center bg-th-primary-100">
         <Image
           src="/icons/start-page.svg"
