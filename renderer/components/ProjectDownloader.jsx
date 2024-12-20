@@ -264,8 +264,10 @@ function ProjectDownloader({ project, bookCode, bookProperties }) {
   }
 
   const createAndDownloadArchive = async () => {
+    let downloadingToast
+
     try {
-      const downloadingToast = toast.loading(t('DownloadingProject'), {
+      downloadingToast = toast.loading(t('DownloadingProject'), {
         position: 'top-center',
         duration: Infinity,
       })
@@ -280,7 +282,9 @@ function ProjectDownloader({ project, bookCode, bookProperties }) {
 
       toast.success(t('DownloadComplete'), { id: downloadingToast, duration: 7000 })
     } catch (error) {
-      toast.dismiss(downloadingToast)
+      if (downloadingToast) {
+        toast.dismiss(downloadingToast)
+      }
       toast.error(t('DownloadError'))
       console.error('Error downloading archive:', error)
     }
