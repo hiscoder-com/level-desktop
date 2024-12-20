@@ -46,7 +46,7 @@ function ProjectDownloader({ project, bookCode, bookProperties }) {
     if (!resources) return null
     const urls = {}
     for (const resource in resources) {
-      if (Object.hasOwnProperty.call(resources, resource)) {
+      if (resources.hasOwnProperty(resource)) {
         const { owner, repo, commit, manifest } = resources[resource]
         //TODO- продумать другое решение
         if (resource === 'tAcademy') {
@@ -71,14 +71,12 @@ function ProjectDownloader({ project, bookCode, bookProperties }) {
   }
 
   const downloadResources = async (resourcesUrls, zip) => {
-    for (const resource in resourcesUrls) {
-      if (Object.hasOwnProperty.call(resourcesUrls, resource)) {
-        const url = resourcesUrls[resource]
+    const resourcePromises = Object.entries(resourcesUrls).map(
+      async ([resource, url]) => {
         try {
           const response = await axios.get(url)
           if (response.status === 200) {
-            const content = response.data
-            zip.file(`${resource}.${url.split('.').pop()}`, content)
+            zip.file(`${resource}.${url.split('.').pop()}`, response.data)
           } else {
             throw new Error(`Failed to fetch resource: ${url}`)
           }
@@ -86,7 +84,9 @@ function ProjectDownloader({ project, bookCode, bookProperties }) {
           console.error(`Error loading: ${url}`, error)
         }
       }
-    }
+    )
+
+    await Promise.all(resourcePromises)
   }
 
   const getTwords = async (url) => {
