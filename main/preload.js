@@ -123,6 +123,9 @@ process.once('loaded', () => {
     deleteProject: (projectId) => ipcRenderer.send('delete-project', projectId),
     changeTimeStep: (id, step, time) =>
       ipcRenderer.send('change-time-step', id, step, time),
+
+    getTranslatorProjects: (userId) =>
+      ipcRenderer.invoke('getTranslatorProjects', userId),
   })
 
   const handler = {

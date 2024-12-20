@@ -17,8 +17,8 @@ export const UserContextProvider = (props) => {
     try {
       setLoading(true)
       const { data: user, error } = await supabaseClient
-        .from('users')
-        .select('id, login, email, blocked, agreement, confession, is_admin, avatar_url')
+        .from('users_view')
+        .select('*')
         .eq('id', session.user.id)
         .single()
       if (error) throw error
