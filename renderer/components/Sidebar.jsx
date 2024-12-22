@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 
 import { useCurrentUser } from '@/lib/UserContext'
@@ -13,6 +14,7 @@ import SignOut from './SignOut'
 import AboutIcon from 'public/icons/about.svg'
 import Account from 'public/icons/account.svg'
 import Folder from 'public/icons/folder.svg'
+import Hiscoder from 'public/icons/hiscoder-mini.svg'
 import Localization from 'public/icons/localization.svg'
 import Merger from 'public/icons/merger.svg'
 import Upload from 'public/icons/upload.svg'
@@ -203,6 +205,13 @@ export default function Sidebar() {
           </Modal>
 
           <SignOut collapsed={!isHovered} />
+
+          <Link className="flex gap-2" href="https://hiscoder.com" target="_blank">
+            <Hiscoder
+              className={`${isHovered ? 'text-th-text-primary' : 'text-th-secondary-300'} ml-4 w-5`}
+            />
+            {isHovered && <span>Powered by HisCoder.com</span>}
+          </Link>
         </div>
       </div>
     </div>

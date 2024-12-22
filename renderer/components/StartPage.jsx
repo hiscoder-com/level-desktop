@@ -9,6 +9,7 @@ import { useTranslation } from '@/next-i18next'
 import LanguageSwitcher from './LanguageSwitcher'
 import Login from './Login'
 
+import Hiscoder from 'public/icons/hiscoder.svg'
 import LevelLogo from 'public/icons/level-logo-color.svg'
 
 export default function StartPage() {
@@ -83,13 +84,23 @@ export default function StartPage() {
           {isLoginFormVisible && <Login onClose={() => setIsLoginFormVisible(false)} />}
         </div>
 
-        <Link
-          href="https://level.bible"
-          className="absolute bottom-10 left-1/2 -translate-x-1/2 text-sm uppercase text-th-primary-100"
-          target="_blank"
-        >
-          level.bible
-        </Link>
+        <div className="absolute bottom-10 left-1/2 flex -translate-x-1/2 flex-col items-center justify-center gap-8">
+          <Link
+            href="https://level.bible"
+            className="text-base uppercase text-th-primary-100"
+            target="_blank"
+          >
+            level.bible
+          </Link>
+
+          <Link
+            href="https://hiscoder.com"
+            className="flex gap-4 p-2 text-base"
+            target="_blank"
+          >
+            <span className="text-[#CACACA]">Powered by</span> <Hiscoder />
+          </Link>
+        </div>
       </div>
     </div>
   )
