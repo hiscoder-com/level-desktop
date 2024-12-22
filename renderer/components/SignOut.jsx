@@ -34,18 +34,18 @@ export default function SignOut({ collapsed }) {
     <button
       disabled={loading}
       onClick={handleLogout}
-      className={`flex w-full cursor-pointer items-center gap-2 px-4 py-3 ${
+      className={`text-th-text-primary-100 flex w-full cursor-pointer items-center gap-2 px-4 py-3 ${
         loading ? 'opacity-70' : ''
       }`}
     >
       <LogOut
-        className={`w-5 stroke-th-text-primary group-hover:stroke-th-text-primary group-hover:opacity-70 lg:stroke-th-secondary-300 ${
-          collapsed ? 'opacity-70' : ''
+        className={`w-5 group-hover:stroke-th-text-primary group-hover:opacity-70 ${
+          collapsed ? 'stroke-th-secondary-300' : 'stroke-th-text-primary'
         }`}
       />
 
       <p
-        className={`opacity-70 lg:text-th-secondary-300 ${
+        className={`lg:text-th-text-primary-100 opacity-70 ${
           collapsed ? 'lg:hidden' : ''
         } group-hover:text-th-text-primary group-hover:opacity-70`}
       >

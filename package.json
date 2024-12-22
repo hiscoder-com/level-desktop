@@ -2,10 +2,10 @@
   "private": true,
   "name": "level",
   "description": "App for step-by-step Bible translation",
-  "version": "0.4.2",
+  "version": "0.5.0",
   "author": {
-    "name": "Glokas",
-    "email": "your.email@example.com"
+    "name": "Hiscoder",
+    "email": "info@hiscoder.com"
   },
   "main": "app/background.js",
   "scripts": {
