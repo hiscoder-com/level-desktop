@@ -167,6 +167,7 @@ function Tool({ config, toolName, isSingleTab, resourceTitle }) {
             config={config}
             toolName={toolName}
             resourceTitle={resourceTitle}
+            wholeChapter={config.wholeChapter}
           />
         </div>
       </div>

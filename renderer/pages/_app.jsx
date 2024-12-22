@@ -1,12 +1,16 @@
 import { useEffect } from 'react'
 
-import { RecoilRoot } from 'recoil'
-
 import Layout from '@/components/Layout'
+import { RecoilRoot } from 'recoil'
 
 import '@/styles/globals.css'
 
+import useSupabaseClient from '@/utils/supabaseClient'
+import { UserContextProvider } from '@/lib/UserContext'
+
 function MyApp({ Component, pageProps }) {
+  const supabaseClient = useSupabaseClient()
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const savedTheme = localStorage.getItem('theme') || 'default'
@@ -15,11 +19,13 @@ function MyApp({ Component, pageProps }) {
   }, [])
   return (
     <>
-      <RecoilRoot>
-        <Layout>
-          <Component {...pageProps} />
-        </Layout>
-      </RecoilRoot>
+      <UserContextProvider supabaseClient={supabaseClient}>
+        <RecoilRoot>
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        </RecoilRoot>
+      </UserContextProvider>
     </>
   )
 }

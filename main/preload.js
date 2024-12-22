@@ -123,6 +123,26 @@ process.once('loaded', () => {
     deleteProject: (projectId) => ipcRenderer.send('delete-project', projectId),
     changeTimeStep: (id, step, time) =>
       ipcRenderer.send('change-time-step', id, step, time),
+
+    getTranslatorProjects: (userId) =>
+      ipcRenderer.invoke('getTranslatorProjects', userId),
+
+    resetCurrentUser: () => ipcRenderer.invoke('reset-current-user'),
+
+    saveFile: async (content, fileName) => {
+      return ipcRenderer.invoke('save-file', content, fileName)
+    },
+
+    checkFileExists: async (fileName) => {
+      return ipcRenderer.invoke('check-file-exists', fileName)
+    },
+
+    checkProjectExists: (fileName) =>
+      ipcRenderer.sendSync('check-project-exists', fileName),
+
+    getPathFile: async (fileName) => {
+      return ipcRenderer.invoke('get-path-file', fileName)
+    },
   })
 
   const handler = {
@@ -143,4 +163,9 @@ process.once('loaded', () => {
   }
 
   contextBridge.exposeInMainWorld('ipc', handler)
+
+  contextBridge.exposeInMainWorld('electron', {
+    initCurrentUser: (userId, email) =>
+      ipcRenderer.invoke('init-current-user', userId, email),
+  })
 })
