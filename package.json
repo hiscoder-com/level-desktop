@@ -10,14 +10,14 @@
   "main": "app/background.js",
   "scripts": {
     "dev": "nextron",
-    "build": "nextron build && yarn build:linux && yarn build:win",
+    "build": "nextron build && yarn build:win",
     "start": "yarn clear && yarn dev",
     "postinstall": "electron-builder install-app-deps",
     "clear": "rm -rf ./app ./dist ./renderer/.next",
     "build:linux": "electron-builder --linux AppImage deb",
     "build:win32": "electron-builder --win --ia32",
     "build:win64": "electron-builder --win --x64",
-    "build:win": "yarn build:win32 && yarn build:win64"
+    "build:win": "yarn build:win64"
   },
   "dependencies": {
     "@headlessui/react": "2.1.5",

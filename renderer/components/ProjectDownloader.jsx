@@ -3,12 +3,31 @@ import { newTestamentList, usfmFileNames } from '@/utils/config'
 import { getCountChaptersAndVerses } from '@/utils/helper'
 import supabaseApi from '@/utils/supabaseServer'
 import axios from 'axios'
-import { saveAs } from 'file-saver'
 import JSZip from 'jszip'
 import toast from 'react-hot-toast'
 
 function ProjectDownloader({ project, bookCode, bookProperties }) {
   const { t } = useTranslation(['common', 'projects', 'books'])
+
+  const checkIfFileExists = async (fileName) => {
+    try {
+      const fileExists = await window.electronAPI.checkFileExists(fileName)
+      return fileExists
+    } catch (error) {
+      console.error('Error checking the file:', error)
+      return false
+    }
+  }
+
+  const checkIfProjectExists = async (fileName) => {
+    try {
+      const projectExists = await window.electronAPI.checkProjectExists(fileName)
+      return projectExists
+    } catch (error) {
+      console.error('Error checking the project:', error)
+      return false
+    }
+  }
 
   const createProjectFiles = (zip) => {
     const files = ['personal-notes.json', 'dictionary.json', 'team-notes.json']
@@ -27,8 +46,12 @@ function ProjectDownloader({ project, bookCode, bookProperties }) {
     if (!resources) return null
     const urls = {}
     for (const resource in resources) {
-      if (Object.hasOwnProperty(resource)) {
+      if (resources.hasOwnProperty(resource)) {
         const { owner, repo, commit, manifest } = resources[resource]
+        //TODO- продумать другое решение
+        if (resource === 'tAcademy') {
+          continue
+        }
 
         const bookPath = manifest?.projects?.find(
           (el) => el.identifier === bookCode
@@ -73,8 +96,9 @@ function ProjectDownloader({ project, bookCode, bookProperties }) {
     try {
       const parts = url.split('/')
       const baseUrl = parts.slice(0, 3).join('/')
-      //TODO уточнить почему обрезали      const repo = parts[4].slice(0, -1)
-      const repo = parts[4]
+      //TODO уточнить почему обрезаем
+      const repo = parts[4].slice(0, -1)
+
       const owner = parts[3]
 
       const newUrl = `${baseUrl}/${owner}/${repo}/archive/master.zip`
@@ -169,6 +193,7 @@ function ProjectDownloader({ project, bookCode, bookProperties }) {
     const method = methodsData?.[0]
     //TODO уточнить, актуально ли
     if (!method?.offline_steps) {
+      console.error('This method is not supported offline:', project.method)
       return null
     }
 
@@ -178,7 +203,7 @@ function ProjectDownloader({ project, bookCode, bookProperties }) {
     const config = {
       steps: method.offline_steps,
       method: method.title,
-      project: { code: project.code, title: project.title },
+      project: { code: project.project_code, title: project.project_title },
       chapters: initChapters,
       book: { code: bookCode, name: bookName },
       resources: addResourceName(project.resources),
@@ -263,39 +288,80 @@ function ProjectDownloader({ project, bookCode, bookProperties }) {
     return chapters
   }
 
-  const createAndDownloadArchive = async () => {
-    let downloadingToast
+  const saveToTemporaryFile = async (content, fileName) => {
+    try {
+      if (!(content instanceof Uint8Array)) {
+        throw new Error('Content must be a Uint8Array')
+      }
+
+      const buffer = Buffer.from(content)
+      if (!(buffer instanceof Buffer)) {
+        throw new Error('Buffer conversion failed')
+      }
+      const serializedContent = buffer.toString('base64')
+      const fileUrl = await window.electronAPI.saveFile(serializedContent, fileName)
+      return fileUrl
+    } catch (error) {
+      console.error('Error saving file:', error)
+      throw error
+    }
+  }
+
+  const handleImportProject = async () => {
+    let importingToast
 
     try {
-      downloadingToast = toast.loading(t('DownloadingProject'), {
+      const fileName = `${project.project_code}_${bookCode}.zip`
+
+      const projectAlreadyAdded = await checkIfProjectExists(fileName)
+      if (projectAlreadyAdded) {
+        toast.error(t('projects:ProjectAlreadyAdded'))
+        return
+      }
+
+      const projectExists = await checkIfFileExists(fileName)
+
+      if (projectExists) {
+        const filePath = await window.electronAPI.getPathFile(fileName)
+
+        await window.electronAPI.addProject(filePath)
+
+        toast.success(t('projects:SuccessfullyAddedProject'), {
+          duration: 3000,
+        })
+        return
+      }
+
+      importingToast = toast.loading(t('projects:ImportingProject'), {
         position: 'top-center',
         duration: Infinity,
       })
 
       const archive = await createOfflineProject(project, bookCode)
-      if (!archive) throw new Error('Archive not created')
+      if (!archive) throw new Error('Failed to create archive')
 
-      const content = await archive.generateAsync({ type: 'blob' })
-      const fileName = `${project.code}_${bookCode}.zip`
+      const content = await archive.generateAsync({ type: 'uint8array' })
+      const bufferContent = Buffer.from(content)
 
-      saveAs(content, fileName)
+      const fileUrl = await saveToTemporaryFile(bufferContent, fileName)
+      await window.electronAPI.addProject(fileUrl)
 
-      toast.success(t('DownloadComplete'), { id: downloadingToast, duration: 7000 })
+      toast.success(t('projects:SuccessfullyAddedProject'), {
+        id: importingToast,
+        duration: 3000,
+      })
     } catch (error) {
-      if (downloadingToast) {
-        toast.dismiss(downloadingToast)
+      if (importingToast) {
+        toast.dismiss(importingToast)
       }
-      toast.error(t('DownloadError'))
-      console.error('Error downloading archive:', error)
+      toast.error(t('projects:FailedAddProject'))
+      console.error('Error importing project:', error)
     }
   }
 
   return (
-    <button
-      className="btn-primary mb-4 w-fit text-base"
-      onClick={createAndDownloadArchive}
-    >
-      {t('common:Download')}
+    <button className="btn-primary mb-4 w-fit text-base" onClick={handleImportProject}>
+      {t('projects:ImportProject')}
     </button>
   )
 }

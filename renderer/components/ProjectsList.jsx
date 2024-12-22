@@ -293,7 +293,7 @@ function ProjectsList({ projectsList, setProjectsList }) {
               </td>
               <td className="py-4 pl-8">
                 <span className="line-clamp-none w-fit rounded bg-th-secondary-100 px-3 py-2">
-                  {project.name}
+                  {project.title}
                 </span>
               </td>
               <td className="py-4 pl-8">

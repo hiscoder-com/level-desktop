@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import Link from 'next/link'
 
@@ -16,24 +16,38 @@ function ImportProject() {
   const [projectList, setProjectList] = useState([])
   const { user } = useCurrentUser()
 
+  const [isNeedAuthorized, setIsNeedAuthorized] = useState(false)
+
+  useEffect(() => {
+    setIsNeedAuthorized(JSON.parse(window.electronAPI.getItem('isNeedAutorized')))
+  }, [])
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const projects = await window.electronAPI.getTranslatorProjects(user?.id)
+        setProjectList(projects)
+      } catch (error) {
+        console.error('Failed to fetch projects:', error)
+        toast.error(t('projects:FailedFetchProjects'))
+      }
+    }
+
+    if (user?.id) {
+      fetchProjects()
+    }
+  }, [user?.id])
+
   const onSubmit = async (e) => {
     e.preventDefault()
     try {
       await window.electronAPI.addProject(fileUrl)
-      toast.success(t('projects:SuccessfullyAddedProject'))
+      toast.success(t('projects:SuccessfullyAddedProject'), {
+        duration: 3000,
+      })
     } catch (error) {
       console.error('Failed to add project:', error)
       toast.error(t('projects:FailedAddProject'))
-    }
-  }
-
-  const fetchProjectList = async () => {
-    try {
-      const projects = await window.electronAPI.getTranslatorProjects(user?.id)
-      setProjectList(projects)
-    } catch (error) {
-      console.error('Failed to fetch projects:', error)
-      toast.error(t('projects:FailedFetchProjects'))
     }
   }
 
@@ -73,36 +87,37 @@ function ImportProject() {
         </form>
       </div>
 
-      <div className="mt-6 rounded-lg border border-th-secondary-200 bg-th-secondary-10 px-8 py-8 text-lg">
-        <button className="btn-primary mb-4 w-fit text-base" onClick={fetchProjectList}>
-          {t('projects:FetchProjects')}
-        </button>
-
-        {projectList?.length > 0 ? (
-          <ul className="space-y-2">
-            {projectList.map((project) => (
-              <li key={project.project_id} className="flex flex-col space-y-4">
-                <span>{project.title}</span>
-                <ul className="ml-4 space-y-2">
-                  {project.books.map((book) => (
-                    <li key={book.book_id} className="flex items-center justify-between">
-                      <span>{book.book_code}</span>
-                      <ProjectDownloader
-                        project={project}
-                        bookCode={book.book_code}
-                        bookProperties={book.book_properties}
-                        isBook
-                      />
-                    </li>
-                  ))}
-                </ul>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-center opacity-40">{t('projects:NoProjectsAvailable')}</p>
-        )}
-      </div>
+      {isNeedAuthorized && (
+        <div className="mt-6 rounded-lg border border-th-secondary-200 bg-th-secondary-10 px-8 py-8 text-lg">
+          {projectList?.length > 0 ? (
+            <ul className="space-y-2">
+              {projectList.map((project) => (
+                <li key={project.project_id} className="flex flex-col space-y-4">
+                  <span>{project.project_title}</span>
+                  <ul className="ml-4 space-y-2">
+                    {project.books.map((book) => (
+                      <li
+                        key={book.book_id}
+                        className="flex items-center justify-between"
+                      >
+                        <span>{book.book_code}</span>
+                        <ProjectDownloader
+                          project={project}
+                          bookCode={book.book_code}
+                          bookProperties={book.book_properties}
+                          isBook
+                        />
+                      </li>
+                    ))}
+                  </ul>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-center opacity-40">{t('projects:NoProjectsAvailable')}</p>
+          )}
+        </div>
+      )}
     </>
   )
 }

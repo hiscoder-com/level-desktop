@@ -3,6 +3,7 @@ import { useRef, useState } from 'react'
 import { useRouter } from 'next/router'
 
 import { useTranslation } from '@/next-i18next'
+import toast from 'react-hot-toast'
 import useSupabaseClient from 'utils/supabaseClient'
 
 import ButtonLoading from './ButtonLoading'
@@ -16,7 +17,6 @@ export default function Login({ onClose }) {
   const [login, setLogin] = useState('')
   const [password, setPassword] = useState('')
   const [isLoadingLogin, setIsLoadingLogin] = useState(false)
-  const [isError, setIsError] = useState(false)
 
   const loginRef = useRef(null)
   const passwordRef = useRef(null)
@@ -24,14 +24,34 @@ export default function Login({ onClose }) {
   const handleLogin = async (e) => {
     e.preventDefault()
     setIsLoadingLogin(true)
+
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email: login, password })
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: login,
+        password,
+      })
+
       if (error) throw error
-      setIsError(false)
-      router.push('/account')
-    } catch (error) {
-      console.error(error)
-      setIsError(true)
+
+      toast.success(t('users:LoginSuccess'))
+
+      try {
+        const response = await window.electron.initCurrentUser(
+          data.user.id,
+          data.user.email
+        )
+
+        if (response?.success) {
+          router.push('/account')
+        } else {
+          console.error('Error when adding a user:', response?.error || 'Unknown error')
+        }
+      } catch (initError) {
+        console.error('Error initializing the current user:', initError)
+      }
+    } catch (authError) {
+      console.error('Authorization error:', authError)
+      toast.error(t('users:InvalidCredentials'))
     } finally {
       setIsLoadingLogin(false)
     }
@@ -45,7 +65,7 @@ export default function Login({ onClose }) {
         name="floating_email"
         id="floating_email"
         value={login}
-        isError={isError && !login}
+        isError={!login}
         label={t('Login')}
         onChange={(event) => setLogin(event.target.value)}
         className="input-base-label"
@@ -56,7 +76,7 @@ export default function Login({ onClose }) {
         name="floating_password"
         id="floating_password"
         value={password}
-        isError={isError && !password}
+        isError={!password}
         label={t('Password')}
         onChange={(event) => setPassword(event.target.value)}
         className="input-password"

@@ -1,3 +1,4 @@
+import os from 'os'
 import path from 'path'
 
 import {
@@ -86,10 +87,47 @@ const storeProjects = new Store({ name: 'projects' })
 
 const storeLS = new Store({ name: 'localStorage' })
 
+const storeUsers = new Store({ name: 'users' })
+
+ipcMain.handle('reset-current-user', () => {
+  const currentUser = storeUsers.get('currentUser')
+
+  if (currentUser) {
+    storeUsers.delete('currentUser')
+  } else {
+  }
+})
+
 ipcMain.on('get-projects', (event) => {
-  const projects = storeProjects.get('projects') || []
+  let projects = []
+
+  const currentUser = storeUsers.get('currentUser')
+
+  if (currentUser && currentUser.id) {
+    const user = storeUsers.get(`users.${currentUser.id}`)
+    projects = user?.projects || []
+  } else {
+    projects = storeProjects.get('projects') || []
+  }
+
   event.returnValue = projects
   event.sender.send('notify', 'Loaded')
+})
+
+ipcMain.on('check-project-exists', (event, fileName) => {
+  let projects = []
+  const currentUser = storeUsers.get('currentUser')
+
+  if (currentUser?.id) {
+    const user = storeUsers.get(`users.${currentUser.id}`)
+    projects = user?.projects || []
+  } else {
+    projects = storeProjects.get('projects') || []
+  }
+
+  const projectExists = projects.some((project) => project?.fileName === fileName)
+
+  event.returnValue = projectExists
 })
 
 let personalNotesLS
@@ -897,6 +935,10 @@ async function handleAddProject(url, event) {
     }
 
     const configContent = fs.readFileSync(path.join(projectPath, configFile), 'utf-8')
+    if (!configContent.trim()) {
+      throw new Error('config.json is empty!')
+    }
+
     const config = JSON.parse(configContent)
     if (
       !config.book ||
@@ -906,7 +948,7 @@ async function handleAddProject(url, event) {
     ) {
       throw new Error('Invalid book structure in config.json')
     }
-    if (!config.project || typeof config.project.code !== 'string') {
+    if (!config.project) {
       throw new Error('Invalid project in config.json')
     }
     if (!config.method || typeof config.method !== 'string') {
@@ -916,7 +958,6 @@ async function handleAddProject(url, event) {
 
   if (url) {
     try {
-      const projects = storeProjects.get('projects') || []
       const id = uuid()
       const createdAt = Date.now()
       const project = { id, createdAt }
@@ -925,29 +966,39 @@ async function handleAddProject(url, event) {
       validateProjectStructure(tempDir)
       const finalDir = path.join(projectUrl, id)
       await fs.promises.rename(tempDir, finalDir)
-
-      const config = JSON.parse(
-        await fs.promises.readFile(path.join(finalDir, 'config.json'), 'utf-8')
-      )
+      const fileName = path.basename(url)
+      const configPath = path.join(finalDir, 'config.json')
+      const config = JSON.parse(await fs.promises.readFile(configPath, 'utf-8'))
       config.showIntro ??= true
 
-      const configPath = path.join(finalDir, 'config.json')
-      try {
-        await fs.promises.writeFile(configPath, JSON.stringify(config, null, 2))
-      } catch (error) {
-        console.error('Error writing config file:', error)
-        throw new Error('Failed to write config file')
-      }
+      await fs.promises.writeFile(configPath, JSON.stringify(config, null, 2))
+
       project.book = { ...config.book }
-      project.name = config.project.title
+      project.title = config.project.title
       project.method = config.method
+      project.fileName = fileName
 
       await createPropertiesFile(id, defaultProperties)
 
-      projects.push(project)
-      storeProjects.set('projects', projects)
+      const currentUser = storeUsers.get('currentUser')
+      let updatedProjects
+
+      if (currentUser?.id) {
+        const userFromStore = storeUsers.get(`users.${currentUser.id}`) || {}
+        updatedProjects = [...(userFromStore.projects || []), project]
+
+        const updatedUser = {
+          ...userFromStore,
+          projects: updatedProjects,
+        }
+        storeUsers.set(`users.${currentUser.id}`, updatedUser)
+      } else {
+        updatedProjects = storeProjects.get('projects') || []
+        updatedProjects.push(project)
+        storeProjects.set('projects', updatedProjects)
+      }
+
       event.sender.send('notify', 'Created')
-      const updatedProjects = storeProjects.get('projects') || []
       event.sender.send('project-added', id, project, updatedProjects)
     } catch (error) {
       console.error('Error adding project:', error)
@@ -1014,44 +1065,118 @@ ipcMain.on('change-time-step', (event, projectId, step, time) => {
 })
 
 ipcMain.on('update-project-name', (event, projectId, newName) => {
-  const projects = storeProjects.get('projects') || []
-  const updatedProjects = projects.map((project) => {
-    if (project.id === projectId) {
-      return {
-        ...project,
+  const currentUser = storeUsers.get('currentUser')
+  const projectsFilePath = path.join(app.getPath('userData'), 'projects.json')
+  const usersFilePath = path.join(app.getPath('userData'), 'users.json')
+
+  try {
+    if (currentUser?.id) {
+      const usersData = JSON.parse(fs.readFileSync(usersFilePath, 'utf8'))
+
+      const userFromStore = usersData.users[currentUser.id]
+
+      if (!userFromStore) {
+        throw new Error('User not found!')
+      }
+
+      const projectIndex = userFromStore.projects.findIndex(
+        (project) => project.id === projectId
+      )
+      if (projectIndex === -1) {
+        throw new Error('Project not found for the current user!')
+      }
+
+      userFromStore.projects[projectIndex] = {
+        ...userFromStore.projects[projectIndex],
         book: {
-          ...project.book,
+          ...userFromStore.projects[projectIndex].book,
           name: newName,
         },
       }
+
+      fs.writeFileSync(usersFilePath, JSON.stringify(usersData, null, 2))
+    } else {
+      const projectsData = JSON.parse(fs.readFileSync(projectsFilePath, 'utf8'))
+
+      const projectIndex = projectsData.projects.findIndex(
+        (project) => project.id === projectId
+      )
+      if (projectIndex === -1) {
+        throw new Error('Project not found!')
+      }
+
+      projectsData.projects[projectIndex] = {
+        ...projectsData.projects[projectIndex],
+        book: {
+          ...projectsData.projects[projectIndex].book,
+          name: newName,
+        },
+      }
+
+      fs.writeFileSync(projectsFilePath, JSON.stringify(projectsData, null, 2))
     }
-    return project
-  })
-  storeProjects.set('projects', updatedProjects)
-  event.sender.send('project-name-updated', projectId, newName)
+
+    event.sender.send('project-name-updated', projectId, newName)
+  } catch (error) {
+    console.error('Error updating project name:', error)
+    event.sender.send('notify', `Error: ${error.message}`)
+  }
 })
 
-ipcMain.on('delete-project', (event, projectId) => {
-  const projectsFilePath = path.join(app.getPath('userData'), 'projects.json')
-  const projectsData = JSON.parse(fs.readFileSync(projectsFilePath, 'utf8'))
+ipcMain.on('delete-project', async (event, projectId) => {
+  try {
+    const projectsFilePath = path.join(app.getPath('userData'), 'projects.json')
+    const usersFilePath = path.join(app.getPath('userData'), 'users.json')
+    const currentUser = storeUsers.get('currentUser')
+    let usersData
+    if (currentUser?.id) {
+      usersData = JSON.parse(fs.readFileSync(usersFilePath, 'utf8'))
 
-  projectsData.projects = projectsData.projects.filter(
-    (project) => project.id !== projectId
-  )
+      const userFromStore = usersData.users[currentUser.id]
 
-  fs.writeFileSync(projectsFilePath, JSON.stringify(projectsData, null, 2))
+      if (!userFromStore) {
+        throw new Error('The user has not been found!')
+      }
 
-  const projectDirPath = path.join(projectUrl, projectId)
-  fs.rm(projectDirPath, { recursive: true }, (err) => {
-    if (err) {
-      console.error(`Error when deleting project folder: ${err}`)
-      event.sender.send('notify', 'Error deleting project')
-      return
+      const projectIndex = userFromStore.projects?.findIndex(
+        (project) => project.id === projectId
+      )
+      if (projectIndex === -1) {
+        throw new Error('The project was not found by the current user!')
+      }
+
+      userFromStore.projects.splice(projectIndex, 1)
+
+      fs.writeFileSync(usersFilePath, JSON.stringify(usersData, null, 2))
+    } else {
+      const projectsData = JSON.parse(fs.readFileSync(projectsFilePath, 'utf8'))
+
+      const projectIndex = projectsData.projects?.findIndex(
+        (project) => project.id === projectId
+      )
+      if (projectIndex === -1) {
+        throw new Error('The project was not found!')
+      }
+
+      projectsData.projects.splice(projectIndex, 1)
+
+      fs.writeFileSync(projectsFilePath, JSON.stringify(projectsData, null, 2))
     }
+
+    const projectDirPath = path.join(projectUrl, projectId)
+    await fs.promises.rm(projectDirPath, { recursive: true })
+
     event.sender.send('notify', 'Project deleted')
 
-    event.sender.send('projects-updated', projectsData.projects)
-  })
+    const updatedProjects = currentUser?.id
+      ? usersData.users[currentUser.id]?.projects
+      : JSON.parse(fs.readFileSync(projectsFilePath, 'utf8')).projects
+
+    event.sender.send('projects-updated', updatedProjects)
+  } catch (error) {
+    console.error('Error deleting project:', error)
+    event.sender.send('notify', `Error: ${error.message}`)
+  }
 })
 
 ipcMain.handle('dialog:openFile', handleFileOpen)
@@ -1061,7 +1186,7 @@ ipcMain.handle('getTranslatorProjects', async (event, userId) => {
   try {
     const supabaseServerApi = await supabaseApi({ req: {}, res: {} })
     const { data, error } = await supabaseServerApi
-      .from('translator_projects')
+      .from('translator_projects_books')
       .select('*')
       .eq('user_id', userId)
 
@@ -1078,3 +1203,84 @@ ipcMain.handle('getTranslatorProjects', async (event, userId) => {
     throw err
   }
 })
+
+ipcMain.handle('init-current-user', async (event, userId, email) => {
+  try {
+    const users = storeUsers.get('users') || {}
+    const currentUser = storeUsers.get('currentUser')
+
+    if (users[userId]) {
+      if (!currentUser || currentUser.id !== userId) {
+        storeUsers.set('currentUser', { id: userId, email })
+        return { success: true, message: 'Current user updated' }
+      }
+
+      return { success: true, message: 'User already exists' }
+    }
+
+    storeUsers.set(`users.${userId}`, { id: userId, email })
+
+    storeUsers.set('currentUser', { id: userId, email })
+
+    return { success: true, message: 'User added successfully' }
+  } catch (error) {
+    console.error('Error:', error)
+    return { success: false, message: 'Error adding user' }
+  }
+})
+
+ipcMain.handle('save-file', async (event, content, fileName) => {
+  try {
+    const bufferContent = Buffer.isBuffer(content)
+      ? content
+      : Buffer.from(content, 'base64')
+    if (!Buffer.isBuffer(bufferContent)) {
+      throw new Error('Content is not a valid Buffer')
+    }
+
+    const zipDir = path.join(__dirname, '..', '.AppData', 'zip')
+
+    await fs.promises.mkdir(zipDir, { recursive: true })
+
+    const filePath = path.join(zipDir, fileName)
+
+    await fs.promises.writeFile(filePath, bufferContent)
+    return filePath
+  } catch (error) {
+    console.error('Error saving file to disk:', error)
+    throw error
+  }
+})
+
+ipcMain.handle('get-path-file', async (event,  fileName) => {
+  try {
+   
+    const zipDir = path.join(__dirname, '..', '.AppData', 'zip')
+    const filePath = path.join(zipDir, fileName)
+
+    return filePath
+  } catch (error) {
+    console.error('Error saving file to disk:', error)
+    throw error
+  }
+})
+
+ipcMain.handle('check-file-exists', async (event, fileName) => {
+  return checkFileExists(fileName)
+})
+
+const checkFileExists = (fileName) => {
+  return new Promise((resolve, reject) => {
+    const zipDir = path.join(__dirname, '..', '.AppData', 'zip')
+
+    const filePath = path.join(zipDir, fileName)
+
+    fs.access(filePath, fs.constants.F_OK, (err) => {
+      if (err) {
+        resolve(false)
+      } else {
+        resolve(true)
+      }
+    })
+  })
+}
