@@ -10,7 +10,7 @@
   "main": "app/background.js",
   "scripts": {
     "dev": "nextron",
-    "build": "nextron build && yarn build:win",
+    "build": "nextron build && yarn build:linux",
     "start": "yarn clear && yarn dev",
     "postinstall": "electron-builder install-app-deps",
     "clear": "rm -rf ./app ./dist ./renderer/.next",

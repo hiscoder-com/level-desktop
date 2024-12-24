@@ -33,7 +33,7 @@ jobs:
             - name: package
               id: package
               run: |
-                  yarn build:linux
+                  yarn build
 
             - name: Cleanup artifacts
               run: |
