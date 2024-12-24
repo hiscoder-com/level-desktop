@@ -9,8 +9,12 @@ jobs:
     build:
         runs-on: ubuntu-latest
         env:
-            CI: true
             NODE_OPTIONS: --max-old-space-size=4096
+            SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+            SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+            NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+            NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+
         strategy:
             matrix:
                 node-version: [18.20.3]
@@ -24,8 +28,8 @@ jobs:
             - run: |
                   node --version
                   yarn --version
-            - name: set @bitregistry translation-help
-              run: yarn config set '@bit:registry' https://node.bit.dev
+            # - name: set @bitregistry translation-help
+            #   run: yarn config set '@bit:registry' https://node.bit.dev
 
             - name: yarn install
               run: yarn install
