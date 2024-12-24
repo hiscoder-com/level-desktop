@@ -1,63 +1,49 @@
-
-name: Test CI
+name: build CI
 
 on:
     push:
-        branches: [testbuild]
+        branches:
+            - testbuild
 
 jobs:
-    test:
+    build:
         runs-on: ubuntu-latest
+        env:
+            CI: true
+            NODE_OPTIONS: --max-old-space-size=4096
+        strategy:
+            matrix:
+                node-version: [18.20.3]
+
         steps:
             - uses: actions/checkout@v2
-            - run: echo "GitHub Actions работает!"
-            
-# name: build CI
+            - name: Use Node.js 18.20.3
+              uses: actions/setup-node@v1
+              with:
+                  node-version: 18.20.3
+            - run: |
+                  node --version
+                  yarn --version
+            - name: set @bitregistry translation-help
+              run: yarn config set '@bit:registry' https://node.bit.dev
 
-# on:
-#     push:
-#         branches:
-#             - testbuild
+            - name: yarn install
+              run: yarn install
 
-# jobs:
-#     build:
-#         runs-on: ubuntu-latest
-#         env:
-#             CI: true
-#             NODE_OPTIONS: --max-old-space-size=4096
-#         strategy:
-#             matrix:
-#                 node-version: [18.20.3]
+            - name: package
+              id: package
+              run: |
+                  yarn build:linux
 
-#         steps:
-#             - uses: actions/checkout@v2
-#             - name: Use Node.js 18.20.3
-#               uses: actions/setup-node@v1
-#               with:
-#                   node-version: 18.20.3
-#             - run: |
-#                   node --version
-#                   yarn --version
-            # - name: set @bitregistry translation-help
-            #   run: yarn config set '@bit:registry' https://node.bit.dev
-
-            # - name: yarn install
-            #   run: yarn install
-
-            # - name: package
-            #   id: package
-            #   run: |
-            #       yarn build:linux
-
-            # - name: Cleanup artifacts
-            #   run: |
-            #       npx rimraf "dist/!(*.deb|*.AppImage|*.dmg|*.exe)"
-            # - name: Upload artifacts
-            #   uses: actions/upload-artifact@v4
-            #   with:
-            #     name: LEVEL-${{ github.run_id }}-${{ github.sha }}
-            #     path: dist
-            #     overwrite: true
+            - name: Cleanup artifacts
+              run: |
+                  npx rimraf "dist/!(*.deb|*.AppImage|*.dmg|*.exe)"
+            - name: Upload artifacts
+              uses: actions/upload-artifact@v4
+              with:
+                name: LEVEL-${{ github.run_id }}-${{ github.sha }}
+                path: dist
+                overwrite: true
 
     # build-windows:
     #     runs-on: ubuntu-latest
