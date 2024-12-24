@@ -40,7 +40,7 @@ jobs:
             - name: Upload artifacts
               uses: actions/upload-artifact@v4
               with:
-                name: level-${{ github.run_id }}-${{ github.sha }}
+                name: LEVEL-${{ github.run_id }}-${{ github.sha }}
                 path: dist
                 overwrite: true
 
