@@ -170,6 +170,7 @@ function BlindEditor({ config: { id, mainResource, chapter = false }, toolName }
               <div className="mx-4">{obsCheckAdditionalVerses(verseObject.num)}</div>
               {isTranslating ? (
                 <RtlTextArea
+                  className="focus:inline-none w-full resize-none focus:outline-none"
                   ref={(el) => (textAreaRef.current[0] = el)}
                   value={verseObject.verse ?? ''}
                   onChange={(newText) => updateVerse(index, newText)}

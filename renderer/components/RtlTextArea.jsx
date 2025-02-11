@@ -31,7 +31,7 @@ function RtlTextArea({ value, onChange, autoFocus = false, className = '' }) {
       ref={textAreaRef}
       autoFocus={autoFocus}
       rows={1}
-      className={`focus:inline-none w-full resize-none focus:outline-none ${className}`}
+      className={className}
       value={inputValue}
       onChange={handleInputChange}
       dir={direction}
