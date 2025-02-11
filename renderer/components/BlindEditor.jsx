@@ -2,12 +2,14 @@ import { useEffect, useRef, useState } from 'react'
 
 import { checkedVersesBibleState } from '@/helpers/atoms'
 import { useTranslation } from '@/next-i18next'
-import Check from 'public/icons/check.svg'
-import Pencil from 'public/icons/pencil.svg'
 import { useSetRecoilState } from 'recoil'
 
 import { obsCheckAdditionalVerses } from './Bible'
 import Modal from './Modal'
+import RtlTextArea from './RtlTextArea'
+
+import Check from 'public/icons/check.svg'
+import Pencil from 'public/icons/pencil.svg'
 
 function BlindEditor({ config: { id, mainResource, chapter = false }, toolName }) {
   const { t } = useTranslation()
@@ -167,23 +169,10 @@ function BlindEditor({ config: { id, mainResource, chapter = false }, toolName }
 
               <div className="mx-4">{obsCheckAdditionalVerses(verseObject.num)}</div>
               {isTranslating ? (
-                <textarea
-                  ref={(el) => (textAreaRef.current[index] = el)}
-                  autoFocus
-                  rows={1}
-                  className="focus:inline-none w-full resize-none focus:outline-none"
-                  onChange={(e) => {
-                    e.target.style.height = 'inherit'
-                    e.target.style.height = `${e.target.scrollHeight}px`
-                    updateVerse(
-                      index,
-                      e.target.value
-                        .replace(/  +/g, ' ')
-                        .replace(/ +([\.\,\)\!\?\;\:])/g, '$1')
-                        .trim()
-                    )
-                  }}
-                  defaultValue={verseObject.verse ?? ''}
+                <RtlTextArea
+                  ref={(el) => (textAreaRef.current[0] = el)}
+                  value={verseObject.verse ?? ''}
+                  onChange={(newText) => updateVerse(index, newText)}
                 />
               ) : (
                 <div className="whitespace-pre-line">{verseObject.verse}</div>
@@ -214,8 +203,8 @@ function BlindEditor({ config: { id, mainResource, chapter = false }, toolName }
                 setIsOpenModal(false)
                 saveVerse(firstStepRef)
                 setTimeout(() => {
-                  if (textAreaRef?.current) {
-                    textAreaRef?.current[0].focus()
+                  if (textAreaRef.current && textAreaRef.current[0]) {
+                    textAreaRef.current[0].focus()
                   }
                 }, 1000)
               }}
