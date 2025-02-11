@@ -1,5 +1,12 @@
 const webpack = require('webpack')
-require('dotenv').config({ path: './renderer/.env' })
+const dotenv = require('dotenv')
+const path = require('path')
+
+const ENV = process.env.NODE_ENV || 'local'
+
+const envPath = path.resolve(__dirname, `./renderer/.env.${ENV}`)
+dotenv.config({ path: envPath })
+
 module.exports = {
   webpack: (defaultConfig) => {
     defaultConfig.plugins.push(
