@@ -1,4 +1,14 @@
+import { useEffect } from 'react'
+
+import { useRtlInput } from '@/hooks/useRtlInput'
+
 function Alphabet({ alphabet, setCurrentPage, setSearchQuery, disabled }) {
+  const { setValue, direction } = useRtlInput(alphabet.join(''))
+
+  useEffect(() => {
+    setValue(alphabet.join(''))
+  }, [alphabet, setValue])
+
   const getAlphabetGroup = (char) => {
     const code = char.charCodeAt(0)
 
@@ -94,12 +104,17 @@ function Alphabet({ alphabet, setCurrentPage, setSearchQuery, disabled }) {
   }
 
   return (
-    <div className="flex w-full flex-wrap rounded-lg bg-th-secondary-100 px-4 py-3 font-bold">
+    <div
+      className="flex w-full flex-wrap rounded-lg bg-th-secondary-100 px-4 py-3 font-bold"
+      style={{ direction }}
+    >
       {alphabet.map((letter, index) => (
-        <div key={letter}>
+        <div key={letter} className="flex items-center">
           {index > 0 &&
             getAlphabetGroup(letter) !== getAlphabetGroup(alphabet[index - 1]) && (
-              <span key={`separator-${index}`}>|</span>
+              <span key={`separator-${index}`} className="mx-2">
+                |
+              </span>
             )}
           <button
             onClick={() => {

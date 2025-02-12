@@ -4,15 +4,16 @@ import { generateUniqueId } from '@/helpers/noteEditor'
 import { useGetDictionary } from '@/hooks/useGetDictionary'
 import { useTranslation } from '@/next-i18next'
 import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react'
-import Down from 'public/icons/arrow-down.svg'
-import LeftArrow from 'public/icons/left-arrow.svg'
-import RightArrow from 'public/icons/right-arrow.svg'
 import toast from 'react-hot-toast'
 
 import Alphabet from './Alphabet'
 import LoadingPage from './LoadingPage'
 import SearchAndAddWords from './SearchAndAddWords'
 import WordList from './WordList'
+
+import Down from 'public/icons/arrow-down.svg'
+import LeftArrow from 'public/icons/left-arrow.svg'
+import RightArrow from 'public/icons/right-arrow.svg'
 
 const countWordsOnPage = 10
 
