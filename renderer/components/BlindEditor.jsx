@@ -87,10 +87,14 @@ function BlindEditor({ config: { id, mainResource, chapter = false }, toolName }
   const saveVerse = (ref) => {
     const { index, currentNumVerse, nextNumVerse, prevNumVerse, isTranslating } = ref
     if ((index !== 0 && !verseObjects[index - 1].verse) || isTranslating) {
-      if (textAreaRef?.current?.[index - 1]) {
-        textAreaRef?.current[index - 1].focus()
+      const prevTextArea = textAreaRef?.current?.[index - 1]
+      if (prevTextArea) {
+        prevTextArea.focus()
       } else {
-        textAreaRef?.current[index].focus()
+        const currentTextArea = textAreaRef?.current?.[index]
+        if (currentTextArea) {
+          currentTextArea.focus()
+        }
       }
       return
     }
