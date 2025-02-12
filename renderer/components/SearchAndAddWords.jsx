@@ -79,7 +79,7 @@ function SearchAndAddWords({
     <div className="flex w-full items-center gap-2.5">
       <div className="relative flex w-full items-center">
         <RtlInput
-          className="input-primary"
+          className="input-primary w-full !pr-8"
           value={searchQuery}
           onChange={setSearchQuery}
           placeholder={t('Search')}
@@ -87,7 +87,7 @@ function SearchAndAddWords({
         />
         {searchQuery && (
           <Close
-            className="р-6 absolute right-2 z-10 w-6 cursor-pointer rtl:left-1"
+            className="absolute right-2 z-10 w-6 cursor-pointer rtl:left-1"
             onClick={() => (!activeWord ? setSearchQuery('') : null)}
           />
         )}

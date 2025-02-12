@@ -542,7 +542,7 @@ export default function TeamNotes({ config: { id } }) {
           />
           {term && (
             <Close
-              className="р-6 absolute right-2 z-10 w-6 cursor-pointer rtl:left-1"
+              className="absolute right-2 z-10 w-6 cursor-pointer rtl:left-1"
               onClick={() => !activeNote && setTerm('')}
             />
           )}
