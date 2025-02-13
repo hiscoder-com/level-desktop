@@ -41,6 +41,7 @@
     "localforage": "^1.10.0",
     "next-i18next": "^15.3.0",
     "prop-types": "^15.8.1",
+    "puppeteer": "^24.2.0",
     "react-hot-toast": "^2.4.1",
     "react-i18next": "^14.1.0",
     "react-markdown": "^9.0.1",
