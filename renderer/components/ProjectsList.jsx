@@ -5,26 +5,12 @@ import { useRouter } from 'next/router'
 import { convertBookChapters, convertToUsfm } from '@/helpers/usfm'
 import { useTranslation } from '@/next-i18next'
 import { Field, Label, Switch } from '@headlessui/react'
-import { JsonToPdf } from '@texttree/obs-format-convert-rcl'
 import toast from 'react-hot-toast'
 
 import Modal from './Modal'
 import Property from './Property'
 
 import Gear from 'public/icons/gear.svg'
-
-const styles = {
-  currentPage: {
-    fontSize: 16,
-    alignment: 'center',
-    bold: true,
-    margin: [0, 10, 0, 0],
-  },
-  chapterTitle: { fontSize: 20, bold: true, margin: [0, 26, 0, 15] },
-  verseNumber: { sup: true, bold: true, opacity: 0.8, margin: [0, 8, 8, 0] },
-  defaultPageHeader: { bold: true, width: '50%' },
-  text: { alignment: 'justify' },
-}
 
 function ProjectsList({ projectsList, setProjectsList }) {
   const { t } = useTranslation(['common', 'projects'])
@@ -109,45 +95,6 @@ function ProjectsList({ projectsList, setProjectsList }) {
     setShowIntro(config.showIntro)
   }, [currentProject])
 
-  const exportToPdf = (chapters, project) => {
-    try {
-      const formattedDate = new Date().toISOString().split('T')[0]
-      const fileName = `${project.name}_${project.book.code}_${formattedDate}`
-
-      const book = []
-      for (const chapterNum in chapters) {
-        if (Object.hasOwnProperty.call(chapters, chapterNum)) {
-          const chapter = Object.entries(chapters[chapterNum]).map(([k, v]) => ({
-            verse: k,
-            text: v.text,
-            enabled: v.enabled,
-          }))
-          book.push({
-            title: 'Chapter ' + chapterNum,
-            verseObjects: chapter,
-          })
-        }
-      }
-      JsonToPdf({
-        data: book,
-        styles,
-        fileName,
-        showImages: false,
-        showChapterTitlePage: false,
-        showVerseNumber: true,
-        showPageFooters: false,
-      })
-        .then(() => console.log('PDF creation completed'))
-        .catch((error) => {
-          console.error('PDF creation failed:', error)
-          toast.error(t('projects:FailedToCreatePDF'))
-        })
-    } catch (error) {
-      console.error('Error during PDF export:', error)
-      toast.error(t('projects:ErrorExportingPDF'))
-    }
-  }
-
   const exportToUsfm = (chapters, project) => {
     if (!project) {
       return
@@ -193,12 +140,29 @@ function ProjectsList({ projectsList, setProjectsList }) {
     }
   }
 
-  const download = (project, type) => {
+  const handleExport = async (chapters, project) => {
     try {
-      const chapters = window.electronAPI.getBook(project.id)
+      const filePath = await window.electron.exportToPdf(chapters, project) // исправил window.electron → window.electronAPI
+      if (!filePath) throw new Error('Failed to generate PDF')
+    } catch (error) {
+      toast.error(t('projects:FailedToCreatePDF'))
+    }
+  }
+
+  const download = async (project, type) => {
+    try {
+      if (!project || !project.id) {
+        throw new Error('Invalid project data')
+      }
+
+      const chapters = await window.electronAPI.getBook(project.id)
+
+      if (!chapters || Object.keys(chapters).length === 0) {
+        throw new Error('No chapters found for the project')
+      }
 
       if (type === 'pdf') {
-        exportToPdf(chapters, project)
+        await handleExport(chapters, project)
       } else if (type === 'usfm') {
         exportToUsfm(chapters, project)
       }
