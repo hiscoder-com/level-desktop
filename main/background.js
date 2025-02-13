@@ -12,6 +12,7 @@ import decompress from 'decompress'
 import { app, dialog, ipcMain } from 'electron'
 import serve from 'electron-serve'
 import Store from 'electron-store'
+import puppeteer from 'puppeteer'
 import { toJSON } from 'usfm-js'
 import { v4 as uuid } from 'uuid'
 
@@ -1252,9 +1253,8 @@ ipcMain.handle('save-file', async (event, content, fileName) => {
   }
 })
 
-ipcMain.handle('get-path-file', async (event,  fileName) => {
+ipcMain.handle('get-path-file', async (event, fileName) => {
   try {
-   
     const zipDir = path.join(__dirname, '..', '.AppData', 'zip')
     const filePath = path.join(zipDir, fileName)
 
@@ -1268,6 +1268,87 @@ ipcMain.handle('get-path-file', async (event,  fileName) => {
 ipcMain.handle('check-file-exists', async (event, fileName) => {
   return checkFileExists(fileName)
 })
+
+ipcMain.handle('export-to-pdf', async (_, chapters, project) => {
+  try {
+    if (!chapters || !project || !project.book?.code) {
+      throw new Error('Invalid project or chapters data')
+    }
+    project.name = project.title || project.name
+
+    const formattedDate = new Date().toISOString().split('T')[0]
+    const defaultFileName = `${project.name}_${project.book.code}_${formattedDate}.pdf`
+
+    const result = await dialog.showSaveDialog({
+      defaultPath: path.join(app.getPath('desktop'), defaultFileName),
+      filters: [{ name: 'PDF Files', extensions: ['pdf'] }],
+    })
+
+    if (result.canceled) {
+      return
+    }
+
+    const filePath = result.filePath
+
+    const htmlContent = generateHtmlContent(project, chapters)
+
+    const browser = await puppeteer.launch()
+    const page = await browser.newPage()
+    await page.setContent(htmlContent, { waitUntil: 'load' })
+    await page.pdf({ path: filePath, format: 'A4' })
+    await browser.close()
+
+    return filePath
+  } catch (error) {
+    throw error
+  }
+})
+
+const generateHtmlContent = (project, chapters) => {
+  const book = Object.entries(chapters).map(([chapterNum, verses]) => ({
+    title: `Chapter ${chapterNum}`,
+    verseObjects: Object.entries(verses).map(([verse, data]) => ({
+      verse,
+      text: data.text,
+      enabled: data.enabled,
+    })),
+  }))
+
+  return `
+    <html lang="ar" dir="rtl">
+    <head>
+      <meta charset="UTF-8">
+      <style>
+        body { font-family: 'Amiri', serif; direction: rtl; text-align: right; padding: 20px; }
+        h1 { font-size: 24px; margin-bottom: 10px; }
+        .chapter { margin-bottom: 20px; page-break-before: always; } 
+        .verse { font-size: 16px; margin-bottom: 5px; }
+      </style>
+    </head>
+    <body>
+      <h1>${project.name} - ${project.book.code}</h1>
+      ${book
+        .map(
+          (chapter) => `
+            <div class="chapter">
+              <h2>${chapter.title}</h2>
+              ${chapter.verseObjects
+                .map(
+                  (v) => `
+                    <p class="verse ${v.enabled ? 'enabled' : 'disabled'}">
+                      <strong>${v.verse}:</strong> ${v.text}
+                    </p>
+                  `
+                )
+                .join('')}
+            </div>
+          `
+        )
+        .join('')}
+    </body>
+    </html>
+  `
+}
 
 const checkFileExists = (fileName) => {
   return new Promise((resolve, reject) => {

@@ -167,5 +167,8 @@ process.once('loaded', () => {
   contextBridge.exposeInMainWorld('electron', {
     initCurrentUser: (userId, email) =>
       ipcRenderer.invoke('init-current-user', userId, email),
+
+    exportToPdf: (chapters, project) =>
+      ipcRenderer.invoke('export-to-pdf', chapters, project),
   })
 })
