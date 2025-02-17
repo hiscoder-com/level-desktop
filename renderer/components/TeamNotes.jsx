@@ -611,7 +611,7 @@ export default function TeamNotes({ config: { id } }) {
         ) : (
           <>
             <div
-              className="absolute flex w-fit cursor-pointer rounded-full bg-th-secondary-100 p-1 hover:opacity-70"
+              className="absolute top-4 flex w-fit cursor-pointer rounded-full bg-th-secondary-100 p-1 hover:opacity-70"
               onClick={() => {
                 saveNote()
                 setActiveNote(null)
