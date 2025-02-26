@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 
 import { obsCheckAdditionalVerses } from './Bible'
+import RtlTextArea from './RtlTextArea'
 
 function Editor({ config: { id, chapter = false, wholeChapter } }) {
   const [verseObjects, setVerseObjects] = useState([])
+
   useEffect(() => {
     const savedVerses = Object.entries(window.electronAPI.getChapter(id, chapter)).map(
       ([k, v]) => ({ num: k, verse: v.text, enabled: v.enabled })
@@ -19,15 +21,16 @@ function Editor({ config: { id, chapter = false, wholeChapter } }) {
       return [...prev]
     })
   }
+
   return (
     <div>
       {verseObjects.map((verseObject, idx) => (
         <div key={verseObject.num} className="my-3 flex">
           <div>{obsCheckAdditionalVerses(verseObject.num)}</div>
-          <AutoSizeTextArea
-            idx={idx}
-            verseObject={verseObject}
-            updateVerse={updateVerse}
+          <RtlTextArea
+            value={verseObject.verse}
+            onChange={(text) => updateVerse(idx, verseObject.num, text)}
+            className="mx-3 block w-full whitespace-pre-line focus:bg-th-secondary-10 focus:outline-none"
           />
         </div>
       ))}
@@ -37,36 +40,3 @@ function Editor({ config: { id, chapter = false, wholeChapter } }) {
 }
 
 export default Editor
-
-export function AutoSizeTextArea({ updateVerse, verseObject, idx }) {
-  const [startValue, setStartValue] = useState(false)
-
-  useEffect(() => {
-    if (startValue === false) {
-      setStartValue(verseObject.verse?.trim())
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [verseObject.verse])
-
-  return (
-    <div
-      key={idx}
-      contentEditable={true}
-      suppressContentEditableWarning={true}
-      onBlur={(el) => {
-        updateVerse(idx, verseObject.num, el.target.innerText.trim())
-      }}
-      onInput={(e) => {
-        if (['historyUndo', 'historyRedo'].includes(e.nativeEvent.inputType)) {
-          updateVerse(idx, verseObject.num, e.target.innerText.trim())
-        }
-      }}
-      className={`focus:inline-none mx-3 block w-full whitespace-pre-line focus:bg-th-secondary-10 focus:outline-none ${
-        verseObject.verse ? '' : 'bg-th-secondary-200'
-      }`}
-      // eslint-disable-next-line prettier/prettier
-    >
-      {startValue}
-    </div>
-  )
-}

@@ -13,6 +13,7 @@ import toast from 'react-hot-toast'
 
 import LoadingPage from './LoadingPage'
 import Modal from './Modal'
+import RtlInput from './RtlInput'
 
 import CloseFolder from 'public/icons/close-folder.svg'
 import Close from 'public/icons/close.svg'
@@ -525,16 +526,16 @@ export default function PersonalNotes({ config: { id }, config, toolName }) {
       <LoadingPage loadingPage={isLoading} />
       <div className="flex w-full items-center gap-2.5">
         <div className="relative flex w-full items-center">
-          <input
+          <RtlInput
             className="input-primary w-full !pr-8"
             value={term}
-            onChange={(event) => setTerm(event.target.value)}
+            onChange={setTerm}
             placeholder={t('Search')}
             readOnly={activeNote}
           />
           {term && (
             <Close
-              className="р-6 absolute right-2 z-10 w-6 cursor-pointer rtl:left-1"
+              className="absolute right-2 z-10 w-6 cursor-pointer rtl:left-1"
               onClick={() => !activeNote && setTerm('')}
             />
           )}
@@ -603,7 +604,7 @@ export default function PersonalNotes({ config: { id }, config, toolName }) {
         ) : (
           <>
             <div
-              className="absolute flex w-fit cursor-pointer rounded-full bg-th-secondary-100 p-1 hover:opacity-70"
+              className="absolute top-4 flex w-fit cursor-pointer rounded-full bg-th-secondary-100 p-1 hover:opacity-70"
               onClick={() => {
                 saveNote()
                 setActiveNote(null)

@@ -1,6 +1,9 @@
 import dynamic from 'next/dynamic'
 
 import { useTranslation } from '@/next-i18next'
+
+import RtlInput from './RtlInput'
+
 import Close from 'public/icons/close.svg'
 import Export from 'public/icons/export.svg'
 import Import from 'public/icons/import.svg'
@@ -75,16 +78,16 @@ function SearchAndAddWords({
   return (
     <div className="flex w-full items-center gap-2.5">
       <div className="relative flex w-full items-center">
-        <input
-          className="input-primary"
+        <RtlInput
+          className="input-primary w-full !pr-8"
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={setSearchQuery}
           placeholder={t('Search')}
           readOnly={activeWord}
         />
         {searchQuery && (
           <Close
-            className="р-6 absolute right-2 z-10 w-6 cursor-pointer rtl:left-1"
+            className="absolute right-2 z-10 w-6 cursor-pointer rtl:left-1"
             onClick={() => (!activeWord ? setSearchQuery('') : null)}
           />
         )}
