@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-export default function useGetObsResource({ chapter, verses }) {
+export default function useGetObsResource({ chapter }) {
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -8,10 +8,11 @@ export default function useGetObsResource({ chapter, verses }) {
   useEffect(() => {
     async function fetchObs() {
       try {
+        setLoading(true)
         if (!window.electron || !window.electron.readOBSZipFile) {
-          throw new Error('window.electron API недоступен')
+          throw new Error('The window.electron API is unavailable')
         }
-        const result = await window.electron.readOBSZipFile(chapter, verses)
+        const result = await window.electron.readOBSZipFile(chapter)
         setData(result)
         setLoading(false)
       } catch (err) {
@@ -21,7 +22,7 @@ export default function useGetObsResource({ chapter, verses }) {
     }
 
     fetchObs()
-  }, [chapter, verses])
+  }, [chapter])
 
   return { data, loading, error }
 }
