@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 
 import { checkedVersesBibleState } from '@/helpers/atoms'
+import useGetObsResource from '@/hooks/useGetObsResource'
 import { useGetUsfmResource } from '@/hooks/useGetUsfmResource'
 import { useScroll } from '@/hooks/useScroll'
 import ReactMarkdown from 'react-markdown'
@@ -14,18 +15,34 @@ export const obsCheckAdditionalVerses = (numVerse) => {
   }
   return String(numVerse)
 }
-
-function Bible({
-  config: { resource, id, chapter = false, isDraft = false, wholeChapter },
-  toolName,
-}) {
-  const { isLoading, data } = useGetUsfmResource({
-    id,
+function Bible({ config, toolName }) {
+  const {
     resource,
-    chapter,
+    id,
+    chapter = false,
+    isDraft = false,
     wholeChapter,
-  })
+    typeProject,
+  } = config
 
+  let isLoading, data
+
+  if (typeProject === 'OBS') {
+    const response = useGetObsResource({
+      chapter,
+    })
+    isLoading = response.isLoading
+    data = response.data
+  } else {
+    const response = useGetUsfmResource({
+      id,
+      resource,
+      chapter,
+      wholeChapter,
+    })
+    isLoading = response.isLoading
+    data = response.data
+  }
   const { handleSaveScroll, currentScrollVerse } = useScroll({
     toolName,
     idPrefix: 'id',
