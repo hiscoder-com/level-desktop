@@ -12,10 +12,12 @@ import decompress from 'decompress'
 import { app, dialog, ipcMain } from 'electron'
 import serve from 'electron-serve'
 import Store from 'electron-store'
+import JSZip from 'jszip'
 import { toJSON } from 'usfm-js'
 import { v4 as uuid } from 'uuid'
 
 import i18next from '../next-i18next.config.js'
+import { mdToJson } from '../renderer/utils/helper'
 import supabaseApi from '../renderer/utils/supabaseServer.js'
 import { createWindow } from './helpers'
 import { localeStore } from './helpers/user-store'
@@ -1252,9 +1254,8 @@ ipcMain.handle('save-file', async (event, content, fileName) => {
   }
 })
 
-ipcMain.handle('get-path-file', async (event,  fileName) => {
+ipcMain.handle('get-path-file', async (event, fileName) => {
   try {
-   
     const zipDir = path.join(__dirname, '..', '.AppData', 'zip')
     const filePath = path.join(zipDir, fileName)
 
@@ -1284,3 +1285,29 @@ const checkFileExists = (fileName) => {
     })
   })
 }
+
+ipcMain.handle('read-obs-zip', async (event, { chapter }) => {
+  try {
+    const fileName =
+      chapter === 'front' || chapter === 'back'
+        ? `${chapter}.md`
+        : `${String(chapter).padStart(2, '0')}.md`
+
+    const zipDir = path.join(__dirname, '..', '.AppData', 'zip')
+    const filePath = path.join(zipDir, 'en_obs.zip')
+
+    const zipBuffer = await fs.promises.readFile(filePath)
+    const zip = await JSZip.loadAsync(zipBuffer)
+    const zipFile = zip.file(`content/${fileName}`)
+    if (!zipFile) throw new Error(`File ${fileName} not found in the archive`)
+
+    const mdData = await zipFile.async('string')
+    const jsonData = mdToJson(mdData)
+    const { additionalVerses, verseObjects } = jsonData
+
+    return [...additionalVerses, ...verseObjects].sort((a, b) => a.verse - b.verse)
+  } catch (error) {
+    console.error('Error processing the archive:', error)
+    throw error
+  }
+})

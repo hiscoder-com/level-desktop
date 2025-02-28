@@ -167,5 +167,7 @@ process.once('loaded', () => {
   contextBridge.exposeInMainWorld('electron', {
     initCurrentUser: (userId, email) =>
       ipcRenderer.invoke('init-current-user', userId, email),
+    readOBSZipFile: (chapter, verses) =>
+      ipcRenderer.invoke('read-obs-zip', { chapter, verses }),
   })
 })
