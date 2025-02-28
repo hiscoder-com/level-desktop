@@ -10,6 +10,7 @@ import Editor from './Editor'
 import Info from './Info'
 import Merger from './Merger'
 import PersonalNotes from './PersonalNotes'
+import Questions from './Questions'
 import Retelling from './Retelling'
 import TeamNotes from './TeamNotes'
 import TN from './TN'
@@ -22,6 +23,10 @@ function Tool({ config, toolName, isSingleTab, resourceTitle }) {
   let title = toolName
 
   switch (toolName) {
+    case 'OBS':
+      CurrentTool = Bible
+      title = t('OBS')
+      break
     case 'bible':
       CurrentTool = Bible
       title = t('bible')
@@ -80,6 +85,26 @@ function Tool({ config, toolName, isSingleTab, resourceTitle }) {
     case 'info':
       CurrentTool = Info
       title = t('info')
+      break
+
+    case 'observationQuestions':
+      CurrentTool = Questions
+      title = t('observationQuestions')
+      break
+
+    case 'discourseQuestions':
+      CurrentTool = Questions
+      title = t('discourseQuestions')
+      break
+
+    case 'theologicalQuestions':
+      CurrentTool = Questions
+      title = t('theologicalQuestions')
+      break
+
+    case 'reflectionQuestions':
+      CurrentTool = Questions
+      title = t('reflectionQuestions')
       break
 
     default:

@@ -252,7 +252,7 @@ function Panel({
               </span>
             ) : (
               <p className={`${!isSingleTab ? 'truncate' : 'px-10 sm:px-20'} `}>
-                {toolNames[tool.config.resource].name}
+                {toolNames[tool.config.resource]?.name}
               </p>
             )}
           </Tab>
@@ -272,6 +272,7 @@ function Panel({
                     wholeChapter: stepConfig.whole_chapter,
                     book,
                     typeProject,
+                    config: tool.config,
                   }}
                   toolName={tool.name}
                   resourceTitle={toolNames[tool.config.resource]?.title || ''}
