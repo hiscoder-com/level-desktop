@@ -134,6 +134,7 @@ function StepPage() {
                 activeTabIndexes={activeTabIndexes}
                 setActiveTabIndexes={setActiveTabIndexes}
                 book={project.book}
+                typeProject={project?.typeProject || 'Bible'}
               />
             </div>
           ))}
@@ -192,6 +193,7 @@ function Panel({
   activeTabIndexes,
   setActiveTabIndexes,
   book,
+  typeProject,
 }) {
   const [isSingleTab, setIsSingleTab] = useState(false)
 
@@ -269,6 +271,7 @@ function Panel({
                     ...tool.config,
                     wholeChapter: stepConfig.whole_chapter,
                     book,
+                    typeProject,
                   }}
                   toolName={tool.name}
                   resourceTitle={toolNames[tool.config.resource]?.title || ''}
