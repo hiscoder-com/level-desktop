@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 
+import useGetObsResource from '@/hooks/useGetObsResource'
 import { useGetUsfmResource } from '@/hooks/useGetUsfmResource'
 import { useScroll } from '@/hooks/useScroll'
 import ReactMarkdown from 'react-markdown'
@@ -14,14 +15,29 @@ export const obsCheckAdditionalVerses = (numVerse) => {
   return String(numVerse)
 }
 
-function Divider({ config: { resource, id, chapter = false }, toolName, wholeChapter }) {
-  const { isLoading, data } = useGetUsfmResource({
-    id,
-    resource,
-    chapter,
-    wholeChapter,
-  })
+function Divider({
+  config: { resource, id, typeProject, chapter = false },
+  toolName,
+  wholeChapter,
+}) {
+  let isLoading, data
 
+  if (typeProject === 'OBS') {
+    const response = useGetObsResource({
+      chapter,
+    })
+    isLoading = response.isLoading
+    data = response.data
+  } else {
+    const response = useGetUsfmResource({
+      id,
+      resource,
+      chapter,
+      wholeChapter,
+    })
+    isLoading = response.isLoading
+    data = response.data
+  }
   const { handleSaveScroll, currentScrollVerse } = useScroll({
     toolName,
     idPrefix: 'id',
@@ -63,6 +79,8 @@ function Verses({ verseObjects, id, chapter, currentScrollVerse = 1 }) {
   }, [])
 
   const divideVerse = (verseNum, enabled) => {
+    console.log(verseNum, 82)
+    console.log(enabled, 83)
     window.electronAPI.divideVerse(id, chapter, verseNum.toString(), enabled)
     setVersesDivide((prev) => ({
       ...prev,
