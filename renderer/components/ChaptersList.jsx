@@ -44,8 +44,8 @@ function ChapterList({ id, chapters, steps, mutate, book, project }) {
     setVersesCount(_chapters)
   }, [])
 
-  const handleBackStep = (chapter, step) => {
-    const backStep = window.electronAPI.goToStep(id, chapter, step - 1)
+  const handleBackStep = (chapter, step, typeProject) => {
+    const backStep = window.electronAPI.goToStep(id, chapter, step - 1, typeProject)
     if (backStep !== step) {
       mutate()
     }
@@ -148,6 +148,7 @@ function ChapterList({ id, chapters, steps, mutate, book, project }) {
                   chapter={chapter}
                   isTech={steps[step].isTech}
                   stepsInfo={steps}
+                  typeProject={project.typeProject}
                 />
               </td>
               <td className="w-2/12 px-8 py-4">
@@ -179,6 +180,7 @@ const StepNavigator = ({
   handleBackStep,
   chapter,
   stepsInfo,
+  typeProject,
 }) => {
   const isTechSteps = stepsInfo.map((s) => s.isTech)
   const getStepNumbers = () => {
@@ -207,7 +209,7 @@ const StepNavigator = ({
         disabled={currentStep === 0}
         onClick={(e) => {
           e.stopPropagation()
-          handleBackStep(chapter, currentStep)
+          handleBackStep(chapter, currentStep, typeProject)
         }}
       >
         <Left className="h-5 w-5" />
