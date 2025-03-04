@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic'
 
 import { currentVerse } from '@/helpers/atoms'
 import { checkLSVal } from '@/helpers/checkls'
+import { useGetTwlObsResource } from '@/hooks/useGetTwlObsResource'
 import { useGetTwlResource } from '@/hooks/useGetTwlResource'
 import { useTranslation } from '@/next-i18next'
 import jszip from 'jszip'
@@ -66,19 +67,34 @@ function filterNotes(newNote, verse, notes) {
 }
 
 function TWL({
-  config: { resource, id, mainResource, chapter = false, wholeChapter },
+  config: { resource, id, typeProject, mainResource, chapter = false, wholeChapter },
   toolName,
 }) {
   const [currentScrollVerse, setCurrentScrollVerse] = useRecoilState(currentVerse)
   const [word, setWord] = useState(null)
   const [filter, setFilter] = useState('disabled')
-  const { isLoading, data } = useGetTwlResource({
-    id,
-    resource,
-    mainResource,
-    chapter,
-    wholeChapter,
-  })
+
+  let isLoading, data
+
+  if (typeProject === 'OBS') {
+    ;({ isLoading, data } = useGetTwlObsResource({
+      id,
+      typeProject,
+      resource,
+      mainResource,
+      chapter,
+      wholeChapter,
+    }))
+  } else {
+    ;({ isLoading, data } = useGetTwlResource({
+      id,
+      typeProject,
+      resource,
+      mainResource,
+      chapter,
+      wholeChapter,
+    }))
+  }
   const [wordObjects, setWordObjects] = useState({})
   const [isLoadingTW, setIsLoadingTW] = useState(false)
   useEffect(() => {
