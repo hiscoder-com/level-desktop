@@ -87,6 +87,16 @@ function Tool({ config, toolName, isSingleTab, resourceTitle }) {
       title = t('info')
       break
 
+    case 'studyQuestions':
+      CurrentTool = Questions
+      title = t('studyQuestions')
+      break
+
+    case 'translationQuestions':
+      CurrentTool = Questions
+      title = t('translationQuestions')
+      break
+
     case 'observationQuestions':
       CurrentTool = Questions
       title = t('observationQuestions')
