@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic'
 
 import { currentVerse } from '@/helpers/atoms'
 import { checkLSVal } from '@/helpers/checkls'
+import { useGetTnObsResource } from '@/hooks/useGetTnObsResource'
 import { useGetTnResource } from '@/hooks/useGetTnResource'
 import { useRecoilState } from 'recoil'
 
@@ -30,21 +31,52 @@ function filterNotes(newNote, verse, notes) {
 }
 
 function TN({
-  config: { resource, id, mainResource, chapter = false, wholeChapter },
+  config: { resource, id, mainResource, chapter = false, wholeChapter, typeProject },
   toolName,
 }) {
   const [currentScrollVerse, setCurrentScrollVerse] = useRecoilState(currentVerse)
   const [tnotes, setTnotes] = useState({})
-  const { isLoading, data } = useGetTnResource({
-    id,
-    resource,
-    mainResource,
-    chapter,
-    wholeChapter,
-  })
+  let isLoading, data
+  if (typeProject === 'OBS') {
+    ;({ isLoading, data } = useGetTnObsResource({
+      id,
+      resource,
+      mainResource,
+      chapter,
+      wholeChapter,
+      typeProject,
+    }))
+  } else {
+    ;({ isLoading, data } = useGetTnResource({
+      id,
+      resource,
+      mainResource,
+      chapter,
+      wholeChapter,
+      typeProject,
+    }))
+  }
 
   useEffect(() => {
-    if (data) {
+    if (typeProject === 'OBS' && data) {
+      const notesObj = {}
+      data.forEach((group, index) => {
+        const verseKey = String(index)
+        notesObj[verseKey] = group.map((note) => {
+          return {
+            ...note,
+            Quote: note.title,
+            Note: note.text,
+          }
+        })
+      })
+
+      setTnotes(notesObj)
+    }
+  }, [data])
+
+  useEffect(() => {
+    if (typeProject !== 'OBS' && data) {
       const notes = {}
       data.forEach((el) => {
         filterNotes(el, el.verse, notes)
