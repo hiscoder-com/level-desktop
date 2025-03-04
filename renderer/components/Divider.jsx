@@ -50,6 +50,7 @@ function Divider({
         <Placeholder />
       ) : (
         <Verses
+          typeProject={typeProject}
           verseObjects={data}
           handleSaveScroll={handleSaveScroll}
           currentScrollVerse={currentScrollVerse}
@@ -63,12 +64,12 @@ function Divider({
 
 export default Divider
 
-function Verses({ verseObjects, id, chapter, currentScrollVerse = 1 }) {
+function Verses({ typeProject, verseObjects, id, chapter, currentScrollVerse = 1 }) {
   const t = () => {}
   const [versesDivide, setVersesDivide] = useState({})
 
   useEffect(() => {
-    const verses = window.electronAPI.getChapter(id, chapter)
+    const verses = window.electronAPI.getChapter(id, typeProject, chapter)
     const versesEnabled = Object.keys(verses).reduce((acc, key) => {
       acc[key] = verses[key].enabled
 
@@ -79,9 +80,7 @@ function Verses({ verseObjects, id, chapter, currentScrollVerse = 1 }) {
   }, [])
 
   const divideVerse = (verseNum, enabled) => {
-    console.log(verseNum, 82)
-    console.log(enabled, 83)
-    window.electronAPI.divideVerse(id, chapter, verseNum.toString(), enabled)
+    window.electronAPI.divideVerse(id, typeProject, chapter, verseNum.toString(), enabled)
     setVersesDivide((prev) => ({
       ...prev,
       [verseNum]: enabled,
