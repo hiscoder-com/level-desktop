@@ -92,6 +92,8 @@ process.once('loaded', () => {
       ipcRenderer.sendSync('get-zip', id, resource, chapter),
     getTN: (id, resource, mainResource, chapter = false) =>
       ipcRenderer.sendSync('get-tn', id, resource, mainResource, chapter),
+    getTNObs: (id, resource, mainResource, chapter = false) =>
+      ipcRenderer.sendSync('get-tn-obs', id, resource, mainResource, chapter),
     getInfo: (id, resource, mainResource, chapter = false) =>
       ipcRenderer.sendSync('get-info', id, resource, mainResource, chapter),
     getTQ: (id, resource, mainResource, chapter = false) =>

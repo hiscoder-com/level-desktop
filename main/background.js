@@ -788,14 +788,56 @@ ipcMain.on('get-tn', (event, id, resource, mainResource, chapter) => {
     )
 
     const res = formatToString(result)
-    console.log(799)
     selectedTn.origQuote = selectedTn.Quote
     selectedTn.Quote = res || 'General Information'
-    console.log(selectedTn, 802)
 
     return selectedTn
   })
   event.returnValue = data
+  event.sender.send('notify', 'Loaded')
+})
+ipcMain.on('get-tn-obs', (event, id, resource, mainResource, chapter) => {
+  const fileName = resource + '.tsv'
+  const filePath = path.join(projectUrl, id, fileName)
+  const _data = fs.readFileSync(filePath, {
+    encoding: 'utf-8',
+  })
+
+  const jsonData = tsvToJson(_data)
+  const wholeChapter = {}
+  const dividedChapter = {}
+  let verses
+
+  jsonData?.forEach((el) => {
+    const [chapterNote, verseNote] = el.Reference.split(':')
+
+    if (chapterNote !== chapter) {
+      return
+    }
+
+    const newNote = {
+      id: el.ID,
+      text: el.Note,
+      title: el.Quote,
+    }
+
+    if (verses && verses.length > 0 && verses.includes(verseNote)) {
+      if (!dividedChapter[verseNote]) {
+        dividedChapter[verseNote] = []
+      }
+      dividedChapter[verseNote].push(newNote)
+    } else {
+      if (!wholeChapter[verseNote]) {
+        wholeChapter[verseNote] = []
+      }
+      wholeChapter[verseNote].push(newNote)
+    }
+  })
+
+  const data = verses && verses.length > 0 ? dividedChapter : wholeChapter
+  const dataArray = Object.values(data)
+
+  event.returnValue = dataArray
   event.sender.send('notify', 'Loaded')
 })
 
