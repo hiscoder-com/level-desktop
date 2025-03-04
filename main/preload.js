@@ -34,10 +34,10 @@ process.once('loaded', () => {
     },
     updateProjectConfig: (id, updatedConfig) =>
       ipcRenderer.send('update-project-config', id, updatedConfig),
-    goToStep: (id, chapter, step) =>
-      ipcRenderer.sendSync('go-to-step', id, chapter, step),
-    getChapter: (projectid, chapter) =>
-      ipcRenderer.sendSync('get-chapter', projectid, chapter),
+    goToStep: (id, chapter, step, typeProject) =>
+      ipcRenderer.sendSync('go-to-step', id, chapter, step, typeProject),
+    getChapter: (projectid, typeProject, chapter) =>
+      ipcRenderer.sendSync('get-chapter', projectid, typeProject, chapter),
     getBook: (projectid) => ipcRenderer.sendSync('get-book', projectid),
     updateChapter: (projectid, chapter, data) =>
       ipcRenderer.sendSync('update-chapter', projectid, chapter, data),
@@ -48,8 +48,8 @@ process.once('loaded', () => {
     removeUpdateChapterListener: (callback) => {
       ipcRenderer.removeListener('notify', callback)
     },
-    divideVerse: (projectid, chapter, verse, enabled) =>
-      ipcRenderer.send('divide-verse', projectid, chapter, verse, enabled),
+    divideVerse: (projectid, typeProject, chapter, verse, enabled) =>
+      ipcRenderer.send('divide-verse', projectid, typeProject, chapter, verse, enabled),
     updateVerse: (projectid, chapter, verse, text) =>
       ipcRenderer.send('update-verse', projectid, chapter, verse, text),
     getItem: (key) => ipcRenderer.sendSync('get-item', key),

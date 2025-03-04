@@ -542,21 +542,43 @@ ipcMain.on('get-book', (event, projectid) => {
   event.sender.send('notify', 'Loaded')
 })
 
-ipcMain.on('get-chapter', (event, projectid, chapter) => {
-  const data = fs.readFileSync(
-    path.join(projectUrl, projectid, 'chapters', chapter + '.json'),
-    { encoding: 'utf-8' }
+ipcMain.on('get-chapter', (event, projectid, typeProject, chapter) => {
+  let chapterFileName = chapter
+  if (typeProject === 'OBS') {
+    chapterFileName = chapter.toString().padStart(2, '0')
+  }
+
+  const jsonFileName = path.join(
+    projectUrl,
+    projectid,
+    'chapters',
+    chapterFileName + '.json'
   )
+
+  const data = fs.readFileSync(jsonFileName, {
+    encoding: 'utf-8',
+  })
+
   event.returnValue = JSON.parse(data)
   event.sender.send('notify', 'Loaded')
 })
 
-ipcMain.on('update-chapter', (event, projectid, chapter, data) => {
-  const localChapterData = JSON.parse(
-    fs.readFileSync(path.join(projectUrl, projectid, 'chapters', chapter + '.json'), {
-      encoding: 'utf-8',
-    })
+ipcMain.on('update-chapter', (event, projectid, chapter, data, typeProject) => {
+  let chapterFileName = chapter
+  if (typeProject === 'OBS') {
+    chapterFileName = chapter.toString().padStart(2, '0')
+  }
+
+  const jsonFileName = path.join(
+    projectUrl,
+    projectid,
+    'chapters',
+    chapterFileName + '.json'
   )
+  const localChapterData = fs.readFileSync(jsonFileName, {
+    encoding: 'utf-8',
+  })
+
   const compareEqualArrays = (arr1, arr2) => {
     if (arr1.length !== arr2.length) {
       return false
@@ -572,47 +594,82 @@ ipcMain.on('update-chapter', (event, projectid, chapter, data) => {
         localChapterData[verse].text = data[verse].text
       }
     }
-    fs.writeFileSync(
-      path.join(projectUrl, projectid, 'chapters', chapter + '.json'),
-      JSON.stringify(localChapterData, null, 2),
-      { encoding: 'utf-8' }
+
+    let chapterFileName = chapter
+    if (typeProject === 'OBS') {
+      chapterFileName = chapter.toString().padStart(2, '0')
+    }
+
+    const jsonFileName = path.join(
+      projectUrl,
+      projectid,
+      'chapters',
+      chapterFileName + '.json'
     )
+
+    fs.writeFileSync(jsonFileName, JSON.stringify(localChapterData, null, 2), {
+      encoding: 'utf-8',
+    })
     event.returnValue = true
     event.sender.send('notify', 'Updated')
   }
 })
 
-ipcMain.on('update-verse', (event, projectid, chapter, verse, text) => {
+ipcMain.on('update-verse', (event, projectid, chapter, verse, text, typeProject) => {
+  let chapterFileName = chapter
+  if (typeProject === 'OBS') {
+    chapterFileName = chapter.toString().padStart(2, '0')
+  }
+
+  const jsonFileName = path.join(
+    projectUrl,
+    projectid,
+    'chapters',
+    chapterFileName + '.json'
+  )
   const chapterData = JSON.parse(
-    fs.readFileSync(path.join(projectUrl, projectid, 'chapters', chapter + '.json'), {
+    fs.readFileSync(jsonFileName, {
       encoding: 'utf-8',
     })
   )
   chapterData[verse].text = text
-  fs.writeFileSync(
-    path.join(projectUrl, projectid, 'chapters', chapter + '.json'),
-    JSON.stringify(chapterData, null, 2),
-    { encoding: 'utf-8' }
-  )
+  fs.writeFileSync(jsonFileName, JSON.stringify(chapterData, null, 2), {
+    encoding: 'utf-8',
+  })
   event.sender.send('notify', 'Updated')
 })
 
-ipcMain.on('divide-verse', (event, projectid, chapter, verse, enabled) => {
+ipcMain.on('divide-verse', (event, projectid, typeProject, chapter, verse, enabled) => {
+  let chapterFileName = chapter
+  if (typeProject === 'OBS') {
+    chapterFileName = chapter.toString().padStart(2, '0')
+  }
+
+  const jsonFileName = path.join(
+    projectUrl,
+    projectid,
+    'chapters',
+    chapterFileName + '.json'
+  )
   const chapterData = JSON.parse(
-    fs.readFileSync(path.join(projectUrl, projectid, 'chapters', chapter + '.json'), {
+    fs.readFileSync(jsonFileName, {
       encoding: 'utf-8',
     })
   )
-  chapterData[verse].enabled = enabled
-  if (!enabled) {
-    chapterData[verse].text = ''
+
+  if (chapterData[verse]) {
+    chapterData[verse].enabled = enabled
+    if (!enabled) {
+      chapterData[verse].text = ''
+    }
+  } else {
+    console.error(`The key ${verse} is missing in chapterData`)
   }
 
-  fs.writeFileSync(
-    path.join(projectUrl, projectid, 'chapters', chapter + '.json'),
-    JSON.stringify(chapterData, null, 2),
-    { encoding: 'utf-8' }
-  )
+  fs.writeFileSync(jsonFileName, JSON.stringify(chapterData, null, 2), {
+    encoding: 'utf-8',
+  })
+
   event.sender.send('notify', 'Updated')
 })
 
@@ -731,8 +788,11 @@ ipcMain.on('get-tn', (event, id, resource, mainResource, chapter) => {
     )
 
     const res = formatToString(result)
+    console.log(799)
     selectedTn.origQuote = selectedTn.Quote
     selectedTn.Quote = res || 'General Information'
+    console.log(selectedTn, 802)
+
     return selectedTn
   })
   event.returnValue = data
@@ -790,9 +850,20 @@ ipcMain.on('get-twl', (event, id, resource, mainResource, chapter) => {
   event.sender.send('notify', 'Loaded')
 })
 
-const saveStepData = (projectid, chapter, step) => {
+const saveStepData = (projectid, chapter, step, typeProject) => {
+  let chapterFileName = chapter
+  if (typeProject === 'OBS') {
+    chapterFileName = chapter.toString().padStart(2, '0')
+  }
+
+  const jsonFileName = path.join(
+    projectUrl,
+    projectid,
+    'chapters',
+    chapterFileName + '.json'
+  )
   const chapterData = JSON.parse(
-    fs.readFileSync(path.join(projectUrl, projectid, 'chapters', chapter + '.json'), {
+    fs.readFileSync(jsonFileName, {
       encoding: 'utf-8',
     })
   )
@@ -806,11 +877,9 @@ const saveStepData = (projectid, chapter, step) => {
       })
     }
   }
-  fs.writeFileSync(
-    path.join(projectUrl, projectid, 'chapters', chapter + '.json'),
-    JSON.stringify(chapterData, null, 2),
-    { encoding: 'utf-8' }
-  )
+  fs.writeFileSync(jsonFileName, JSON.stringify(chapterData, null, 2), {
+    encoding: 'utf-8',
+  })
 }
 
 const restoreStepData = (projectid, chapter, step) => {
@@ -864,7 +933,7 @@ ipcMain.on('update-project-config', (event, id, updatedConfig) => {
   }
 })
 
-ipcMain.on('go-to-step', async (event, id, chapter, step) => {
+ipcMain.on('go-to-step', async (event, id, chapter, step, typeProject) => {
   const config = JSON.parse(
     fs.readFileSync(path.join(projectUrl, id, 'config.json'), {
       encoding: 'utf-8',
@@ -883,13 +952,14 @@ ipcMain.on('go-to-step', async (event, id, chapter, step) => {
     newStep = parseInt(step) < 0 ? 0 : config.steps.length - 1
   }
   if (newStep > oldStep) {
-    saveStepData(id, chapter, oldStep)
+    saveStepData(id, chapter, oldStep, typeProject)
   }
+
   if (newStep < oldStep) {
     // restoreStepData(id, chapter, oldStep); Пока решил закрыть, чтобы данные не потерять во время тестирования
   }
   if (newStep === oldStep && oldStep === config.steps.length - 1) {
-    saveStepData(id, chapter, oldStep)
+    saveStepData(id, chapter, oldStep, typeProject)
   }
   event.returnValue = newStep
 })
