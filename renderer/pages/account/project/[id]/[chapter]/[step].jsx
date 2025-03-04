@@ -76,7 +76,12 @@ function StepPage() {
   }
 
   const nextStepHandle = () => {
-    const nextStep = window.electronAPI.goToStep(id, chapter, parseInt(step) + 1)
+    const nextStep = window.electronAPI.goToStep(
+      id,
+      chapter,
+      parseInt(step) + 1,
+      project.typeProject
+    )
     const config = window.electronAPI.getProject(id)
     const isRepeatInfo = getIsRepeatIntro(parseInt(step) + 1, chapter, id)
     const showIntro = config.showIntro && !isRepeatInfo
