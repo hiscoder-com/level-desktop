@@ -7,7 +7,7 @@ import {
   selectionsFromQuoteAndVerseObjects,
   tsvToJSON,
 } from '@texttree/tn-quote-helpers'
-import { markRepeatedWords } from '@texttree/translation-words-helpers'
+import { markRepeatedWords, tsvToJson } from '@texttree/translation-words-helpers'
 import decompress from 'decompress'
 import { app, dialog, ipcMain } from 'electron'
 import serve from 'electron-serve'
@@ -846,6 +846,23 @@ ipcMain.on('get-twl', (event, id, resource, mainResource, chapter) => {
   const data = markedWords.filter(
     (wordObject) => chapter.toString() === wordObject.chapter.toString()
   )
+  event.returnValue = data
+  event.sender.send('notify', 'Loaded')
+})
+
+ipcMain.on('get-twl-obs', (event, id, resource, mainResource, chapter) => {
+  const fileName = resource + '.tsv'
+  const filePath = path.join(projectUrl, id, fileName)
+  const _data = fs.readFileSync(filePath, {
+    encoding: 'utf-8',
+  })
+  const jsonData = tsvToJson(_data)
+
+  const markedWords = markRepeatedWords(jsonData, 'all')
+  const data = markedWords.filter((wordObject) => {
+    const [_chapter] = wordObject.Reference.split(':')
+    return _chapter === chapter
+  })
   event.returnValue = data
   event.sender.send('notify', 'Loaded')
 })

@@ -98,6 +98,8 @@ process.once('loaded', () => {
       ipcRenderer.sendSync('get-tq', id, resource, mainResource, chapter),
     getTWL: (id, resource, mainResource, chapter = false) =>
       ipcRenderer.sendSync('get-twl', id, resource, mainResource, chapter),
+    getTWLObs: (id, resource, mainResource, chapter = false) =>
+      ipcRenderer.sendSync('get-twl-obs', id, resource, mainResource, chapter),
     addProject: (fileUrl) => {
       return new Promise((resolve, reject) => {
         ipcRenderer.removeAllListeners('project-added')
