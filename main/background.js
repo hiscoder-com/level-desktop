@@ -1103,7 +1103,7 @@ async function handleAddProject(url, event) {
       await fs.promises.writeFile(configPath, JSON.stringify(config, null, 2))
 
       project.book = { ...config.book }
-      project.title = config.project.title
+      project.title = config.project.title || config.project
       project.method = config.method
       project.fileName = fileName
 
