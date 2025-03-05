@@ -9,7 +9,6 @@ import Close from 'public/icons/close.svg'
 function Merger({ config }) {
   const { t } = useTranslation(['common', 'projects', 'merger'])
   const [importedChapter, setImportedChapter] = useState(null)
-
   const fileInputRef = useRef()
 
   useEffect(() => {
@@ -38,7 +37,11 @@ function Merger({ config }) {
   }
 
   const exportChapterToZip = () => {
-    const chapter = window.electronAPI.getChapter(config.id, config.chapter)
+    const chapter = window.electronAPI.getChapter(
+      config.id,
+      config.typeProject,
+      config.chapter
+    )
 
     try {
       if (!chapter) {
@@ -95,7 +98,8 @@ function Merger({ config }) {
     const isUpdated = window.electronAPI.updateChapter(
       config.id,
       config.chapter,
-      Object.values(importedChapter)[0]
+      Object.values(importedChapter)[0],
+      config.typeProject
     )
     if (isUpdated) {
       toast.success(t('ChapterUpdated'))

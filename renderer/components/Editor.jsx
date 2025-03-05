@@ -17,7 +17,7 @@ function Editor({ config: { id, typeProject, chapter = false, wholeChapter } }) 
   const updateVerse = (idx, verseNum, text) => {
     setVerseObjects((prev) => {
       prev[idx].verse = text
-      window.electronAPI.updateVerse(id, chapter, verseNum.toString(), text)
+      window.electronAPI.updateVerse(id, chapter, verseNum.toString(), text, typeProject)
       return [...prev]
     })
   }

@@ -575,9 +575,9 @@ ipcMain.on('update-chapter', (event, projectid, chapter, data, typeProject) => {
     'chapters',
     chapterFileName + '.json'
   )
-  const localChapterData = fs.readFileSync(jsonFileName, {
-    encoding: 'utf-8',
-  })
+  const localChapterData = JSON.parse(
+    fs.readFileSync(jsonFileName, { encoding: 'utf-8' })
+  )
 
   const compareEqualArrays = (arr1, arr2) => {
     if (arr1.length !== arr2.length) {
@@ -594,7 +594,6 @@ ipcMain.on('update-chapter', (event, projectid, chapter, data, typeProject) => {
         localChapterData[verse].text = data[verse].text
       }
     }
-
     let chapterFileName = chapter
     if (typeProject === 'OBS') {
       chapterFileName = chapter.toString().padStart(2, '0')
@@ -606,7 +605,6 @@ ipcMain.on('update-chapter', (event, projectid, chapter, data, typeProject) => {
       'chapters',
       chapterFileName + '.json'
     )
-
     fs.writeFileSync(jsonFileName, JSON.stringify(localChapterData, null, 2), {
       encoding: 'utf-8',
     })

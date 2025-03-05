@@ -86,7 +86,8 @@ function BlindEditor({
       id,
       chapter,
       verseObjects[index].num.toString(),
-      verseObjects[index].verse
+      verseObjects[index].verse,
+      typeProject
     )
   }
   const saveVerse = (ref) => {
