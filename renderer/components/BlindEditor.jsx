@@ -12,7 +12,7 @@ import Check from 'public/icons/check.svg'
 import Pencil from 'public/icons/pencil.svg'
 
 function BlindEditor({
-  config: { id, mainResource, typeProject, chapter = false },
+  config: { id, mainResource, chapter = false, typeProject = '' },
   toolName,
 }) {
   const { t } = useTranslation()
@@ -30,7 +30,7 @@ function BlindEditor({
 
   useEffect(() => {
     const savedVerses = Object.entries(
-      window.electronAPI.getChapter(id, typeProject, chapter)
+      window.electronAPI.getChapter(id, chapter, typeProject)
     )
       .map(([k, v]) => ({ num: k, verse: v.text, enabled: v.enabled }))
       .filter((v) => v.enabled)

@@ -542,7 +542,7 @@ ipcMain.on('get-book', (event, projectid) => {
   event.sender.send('notify', 'Loaded')
 })
 
-ipcMain.on('get-chapter', (event, projectid, typeProject, chapter) => {
+ipcMain.on('get-chapter', (event, projectid, chapter, typeProject) => {
   let chapterFileName = chapter
   if (typeProject === 'OBS') {
     chapterFileName = chapter.toString().padStart(2, '0')
@@ -637,7 +637,7 @@ ipcMain.on('update-verse', (event, projectid, chapter, verse, text, typeProject)
   event.sender.send('notify', 'Updated')
 })
 
-ipcMain.on('divide-verse', (event, projectid, typeProject, chapter, verse, enabled) => {
+ipcMain.on('divide-verse', (event, projectid, chapter, verse, enabled, typeProject) => {
   let chapterFileName = chapter
   if (typeProject === 'OBS') {
     chapterFileName = chapter.toString().padStart(2, '0')

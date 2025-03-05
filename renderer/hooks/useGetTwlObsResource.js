@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react'
 
 export function useGetTwlObsResource({
   id,
-  typeProject,
   resource,
   mainResource,
   chapter,
   wholeChapter,
+  typeProject,
 }) {
   const [isLoading, setIsLoading] = useState(true)
   const [data, setData] = useState([])

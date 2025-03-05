@@ -13,7 +13,7 @@ export function useGetTnResource({
   useEffect(() => {
     const tn = window.electronAPI.getTN(id, resource, mainResource, chapter)
     if (wholeChapter === false) {
-      const verses = window.electronAPI.getChapter(id, typeProject, chapter)
+      const verses = window.electronAPI.getChapter(id, chapter, typeProject)
       const versesEnabled = Object.keys(verses).reduce((acc, key) => {
         acc[key] = verses[key].enabled
         return acc

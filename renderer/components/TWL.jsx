@@ -79,20 +79,20 @@ function TWL({
   if (typeProject === 'OBS') {
     ;({ isLoading, data } = useGetTwlObsResource({
       id,
-      typeProject,
       resource,
       mainResource,
       chapter,
       wholeChapter,
+      typeProject,
     }))
   } else {
     ;({ isLoading, data } = useGetTwlResource({
       id,
-      typeProject,
       resource,
       mainResource,
       chapter,
       wholeChapter,
+      typeProject,
     }))
   }
   const [wordObjects, setWordObjects] = useState({})

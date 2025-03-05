@@ -276,8 +276,8 @@ function Panel({
                     ...tool.config,
                     wholeChapter: stepConfig.whole_chapter,
                     book,
-                    typeProject,
                     config: tool.config,
+                    typeProject,
                   }}
                   toolName={tool.name}
                   resourceTitle={toolNames[tool.config.resource]?.title || ''}

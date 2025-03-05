@@ -16,7 +16,7 @@ export const obsCheckAdditionalVerses = (numVerse) => {
 }
 
 function Divider({
-  config: { resource, id, typeProject, chapter = false },
+  config: { resource, id, chapter = false, typeProject = '' },
   toolName,
   wholeChapter,
 }) {
@@ -64,12 +64,12 @@ function Divider({
 
 export default Divider
 
-function Verses({ typeProject, verseObjects, id, chapter, currentScrollVerse = 1 }) {
+function Verses({ verseObjects, id, chapter, currentScrollVerse = 1, typeProject = '' }) {
   const t = () => {}
   const [versesDivide, setVersesDivide] = useState({})
 
   useEffect(() => {
-    const verses = window.electronAPI.getChapter(id, typeProject, chapter)
+    const verses = window.electronAPI.getChapter(id, chapter, typeProject)
     const versesEnabled = Object.keys(verses).reduce((acc, key) => {
       acc[key] = verses[key].enabled
 
@@ -80,7 +80,7 @@ function Verses({ typeProject, verseObjects, id, chapter, currentScrollVerse = 1
   }, [])
 
   const divideVerse = (verseNum, enabled) => {
-    window.electronAPI.divideVerse(id, typeProject, chapter, verseNum.toString(), enabled)
+    window.electronAPI.divideVerse(id, chapter, verseNum.toString(), enabled, typeProject)
     setVersesDivide((prev) => ({
       ...prev,
       [verseNum]: enabled,

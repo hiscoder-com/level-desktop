@@ -51,9 +51,9 @@ function ChapterList({ id, chapters, steps, mutate, book, project }) {
     }
   }
   const handleDownloadChapter = (chapter) => {
-    const savedVerses = Object.entries(window.electronAPI.getChapter(id, chapter)).map(
-      ([k, v]) => ({ verse: k, text: v.text, enabled: v.enabled })
-    )
+    const savedVerses = Object.entries(
+      window.electronAPI.getChapter(id, chapter, typeProject)
+    ).map(([k, v]) => ({ verse: k, text: v.text, enabled: v.enabled }))
 
     const project = window.electronAPI.getProject(id)
     const currentDate = new Date().toISOString().split('T')[0]
