@@ -35,90 +35,57 @@ function Tool({ config, toolName, isSingleTab, resourceTitle }) {
       CurrentTool = Divider
       title = t('divider')
       break
-
     case 'merger':
       CurrentTool = Merger
       break
-
     case 'twl':
       CurrentTool = TWL
       title = t('tWords')
       break
-
     case 'tn':
       CurrentTool = TN
       title = t('tNotes')
       break
-
     case 'tq':
       CurrentTool = TQ
       break
-
     case 'editor':
       CurrentTool = Editor
       title = t('translate')
       break
-
     case 'blindEditor':
       CurrentTool = BlindEditor
       title = t('translate')
       break
-
     case 'personalNotes':
       CurrentTool = PersonalNotes
       title = t('personalNotes')
       break
-
     case 'teamNotes':
       CurrentTool = TeamNotes
       title = t('teamNotes')
       break
-
     case 'retelling':
       CurrentTool = Retelling
       title = t('retelling')
       break
-
     case 'dictionary':
       CurrentTool = Dictionary
       title = t('dictionary')
       break
-
     case 'info':
       CurrentTool = Info
       title = t('info')
       break
-
     case 'studyQuestions':
-      CurrentTool = Questions
-      title = t('studyQuestions')
-      break
-
     case 'translationQuestions':
-      CurrentTool = Questions
-      title = t('translationQuestions')
-      break
-
     case 'observationQuestions':
-      CurrentTool = Questions
-      title = t('observationQuestions')
-      break
-
     case 'discourseQuestions':
-      CurrentTool = Questions
-      title = t('discourseQuestions')
-      break
-
     case 'theologicalQuestions':
-      CurrentTool = Questions
-      title = t('theologicalQuestions')
-      break
-
     case 'reflectionQuestions':
       CurrentTool = Questions
-      title = t('reflectionQuestions')
+      title = t(toolName)
       break
-
     default:
       return <div>{t('WrongResource')}</div>
   }
@@ -180,18 +147,14 @@ function Tool({ config, toolName, isSingleTab, resourceTitle }) {
   return (
     <>
       <div
-        className={`h-10 bg-th-primary-200 ${
+        className={`h-10 bg-th-primary-200 pt-3 ${
           isSingleTab
-            ? 'rounded-tr-xl'
+            ? 'rounded-t-xl px-4 font-bold text-th-text-secondary-100'
             : 'truncate rounded-t-xl px-4 pt-2.5 font-bold text-th-text-secondary-100'
         }`}
       >
-        {!isSingleTab && (
-          <>
-            <span>{displayBookChapter}</span>
-            <span>{resourceTitle ? resourceTitle : title}</span>
-          </>
-        )}
+        <span>{displayBookChapter}</span>
+        <span>{resourceTitle || title}</span>
       </div>
       <div className="adaptive-card box-border rounded-b-lg border border-b-th-secondary-300 border-l-th-secondary-300 border-r-th-secondary-300">
         <div
