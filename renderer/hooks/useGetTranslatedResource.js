@@ -37,7 +37,7 @@ export function useGetTranslatedResource({
           if (!window.electron || !window.electron.readOBSZipFile) {
             throw new Error('API window.electron недоступен')
           }
-          let result = await window.electron.readOBSZipFile(chapter)
+          let result = await window.electron.readOBSZipFile(id, chapter)
           if (!wholeChapter) {
             const verses = await window.electronAPI.getChapter(id, chapter, typeProject)
             result = filterEnabledVerses(result, verses)
