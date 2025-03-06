@@ -209,7 +209,7 @@ function Panel({
   if (isSingleTab) {
     const tool = tools[0]
     return (
-      <div className="mt-3 flex h-full flex-col rounded-xl bg-white">
+      <div className="mt-9 flex h-full flex-col rounded-xl bg-white">
         <Tool
           config={{
             mainResource,
@@ -263,6 +263,12 @@ function Panel({
               'dictionary',
               'merger',
               'info',
+              'studyQuestions',
+              'translationQuestions',
+              'discourseQuestions',
+              'theologicalQuestions',
+              'tn',
+              'twl',
             ].includes(tool.name) ? (
               <span title={t(tool.name)}>
                 {icons[tool.name] ? (
