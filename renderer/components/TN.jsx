@@ -4,7 +4,6 @@ import dynamic from 'next/dynamic'
 
 import { currentVerse } from '@/helpers/atoms'
 import { checkLSVal } from '@/helpers/checkls'
-import { useGetTnObsResource } from '@/hooks/useGetTnObsResource'
 import { useGetTnResource } from '@/hooks/useGetTnResource'
 import { useRecoilState } from 'recoil'
 
@@ -36,44 +35,29 @@ function TN({
 }) {
   const [currentScrollVerse, setCurrentScrollVerse] = useRecoilState(currentVerse)
   const [tnotes, setTnotes] = useState({})
-  let isLoading, data
-  if (typeProject === 'obs') {
-    ;({ isLoading, data } = useGetTnObsResource({
-      id,
-      resource,
-      mainResource,
-      chapter,
-      wholeChapter,
-      typeProject,
-    }))
-  } else {
-    ;({ isLoading, data } = useGetTnResource({
-      id,
-      resource,
-      mainResource,
-      chapter,
-      wholeChapter,
-      typeProject,
-    }))
-  }
+  const { isLoading, data } = useGetTnResource({
+    id,
+    resource,
+    mainResource,
+    chapter,
+    wholeChapter,
+    typeProject,
+  })
 
   useEffect(() => {
     if (typeProject === 'obs' && data) {
       const notesObj = {}
       data.forEach((group, index) => {
         const verseKey = String(index)
-        notesObj[verseKey] = group.map((note) => {
-          return {
-            ...note,
-            Quote: note.title,
-            Note: note.text,
-          }
-        })
+        notesObj[verseKey] = group.map((note) => ({
+          ...note,
+          Quote: note.title,
+          Note: note.text,
+        }))
       })
-
       setTnotes(notesObj)
     }
-  }, [data])
+  }, [data, typeProject])
 
   useEffect(() => {
     if (typeProject !== 'obs' && data) {
@@ -83,7 +67,7 @@ function TN({
       })
       setTnotes(notes)
     }
-  }, [data])
+  }, [data, typeProject])
 
   return (
     <div id="container_tn" className="h-full overflow-y-auto">
@@ -97,7 +81,7 @@ function TN({
         classes={{
           content: {
             container:
-              'absolute top-0 bottom-0 pr-2 ,bg-th-secondary-10 overflow-auto left-0 right-0',
+              'absolute top-0 bottom-0 pr-2 bg-th-secondary-10 overflow-auto left-0 right-0',
             header: 'sticky flex top-0 pb-4 bg-th-secondary-10',
             backButton:
               'w-fit h-fit p-1 mr-2.5 cursor-pointer hover:opacity-70 rounded-full bg-th-secondary-100',
