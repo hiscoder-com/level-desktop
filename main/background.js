@@ -544,7 +544,7 @@ ipcMain.on('get-book', (event, projectid) => {
 
 ipcMain.on('get-chapter', (event, projectid, chapter, typeProject) => {
   let chapterFileName = chapter
-  if (typeProject === 'OBS') {
+  if (typeProject === 'obs') {
     chapterFileName = chapter.toString().padStart(2, '0')
   }
 
@@ -565,7 +565,7 @@ ipcMain.on('get-chapter', (event, projectid, chapter, typeProject) => {
 
 ipcMain.on('update-chapter', (event, projectid, chapter, data, typeProject) => {
   let chapterFileName = chapter
-  if (typeProject === 'OBS') {
+  if (typeProject === 'obs') {
     chapterFileName = chapter.toString().padStart(2, '0')
   }
 
@@ -595,7 +595,7 @@ ipcMain.on('update-chapter', (event, projectid, chapter, data, typeProject) => {
       }
     }
     let chapterFileName = chapter
-    if (typeProject === 'OBS') {
+    if (typeProject === 'obs') {
       chapterFileName = chapter.toString().padStart(2, '0')
     }
 
@@ -615,7 +615,7 @@ ipcMain.on('update-chapter', (event, projectid, chapter, data, typeProject) => {
 
 ipcMain.on('update-verse', (event, projectid, chapter, verse, text, typeProject) => {
   let chapterFileName = chapter
-  if (typeProject === 'OBS') {
+  if (typeProject === 'obs') {
     chapterFileName = chapter.toString().padStart(2, '0')
   }
 
@@ -639,7 +639,7 @@ ipcMain.on('update-verse', (event, projectid, chapter, verse, text, typeProject)
 
 ipcMain.on('divide-verse', (event, projectid, chapter, verse, enabled, typeProject) => {
   let chapterFileName = chapter
-  if (typeProject === 'OBS') {
+  if (typeProject === 'obs') {
     chapterFileName = chapter.toString().padStart(2, '0')
   }
 
@@ -909,7 +909,7 @@ ipcMain.on('get-twl-obs', (event, id, resource, mainResource, chapter) => {
 
 const saveStepData = (projectid, chapter, step, typeProject) => {
   let chapterFileName = chapter
-  if (typeProject === 'OBS') {
+  if (typeProject === 'obs') {
     chapterFileName = chapter.toString().padStart(2, '0')
   }
 

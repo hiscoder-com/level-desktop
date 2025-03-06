@@ -37,7 +37,7 @@ function TN({
   const [currentScrollVerse, setCurrentScrollVerse] = useRecoilState(currentVerse)
   const [tnotes, setTnotes] = useState({})
   let isLoading, data
-  if (typeProject === 'OBS') {
+  if (typeProject === 'obs') {
     ;({ isLoading, data } = useGetTnObsResource({
       id,
       resource,
@@ -58,7 +58,7 @@ function TN({
   }
 
   useEffect(() => {
-    if (typeProject === 'OBS' && data) {
+    if (typeProject === 'obs' && data) {
       const notesObj = {}
       data.forEach((group, index) => {
         const verseKey = String(index)
@@ -76,7 +76,7 @@ function TN({
   }, [data])
 
   useEffect(() => {
-    if (typeProject !== 'OBS' && data) {
+    if (typeProject !== 'obs' && data) {
       const notes = {}
       data.forEach((el) => {
         filterNotes(el, el.verse, notes)

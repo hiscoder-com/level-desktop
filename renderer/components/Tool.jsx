@@ -23,7 +23,7 @@ function Tool({ config, toolName, isSingleTab, resourceTitle }) {
   let title = toolName
 
   switch (toolName) {
-    case 'OBS':
+    case 'obs':
       CurrentTool = Bible
       title = t('OBS')
       break
@@ -42,10 +42,12 @@ function Tool({ config, toolName, isSingleTab, resourceTitle }) {
 
     case 'twl':
       CurrentTool = TWL
+      title = t('tWords')
       break
 
     case 'tn':
       CurrentTool = TN
+      title = t('tNotes')
       break
 
     case 'tq':

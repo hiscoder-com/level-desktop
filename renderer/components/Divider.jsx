@@ -22,7 +22,7 @@ function Divider({
 }) {
   let isLoading, data
 
-  if (typeProject === 'OBS') {
+  if (typeProject === 'obs') {
     const response = useGetObsResource({
       chapter,
     })

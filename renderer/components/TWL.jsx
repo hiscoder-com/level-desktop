@@ -76,7 +76,7 @@ function TWL({
 
   let isLoading, data
 
-  if (typeProject === 'OBS') {
+  if (typeProject === 'obs') {
     ;({ isLoading, data } = useGetTwlObsResource({
       id,
       resource,
