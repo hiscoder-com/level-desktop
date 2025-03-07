@@ -1031,22 +1031,25 @@ ipcMain.on('get-project', async (event, id) => {
   event.returnValue = config
   event.sender.send('notify', 'Project Loaded')
 })
+
 async function handleAddProject(url, event) {
-  let tempDir = null
-  const defaultProperties = {
-    h: '',
-    toc1: '',
-    toc2: '',
-    toc3: '',
-    mt: '',
-    chapter_label: '',
+  if (!url) {
+    console.error('Url not set')
+    event.sender.send('notify', 'Url not set')
+    return
   }
 
-  const createPropertiesFile = async (projectId, properties) => {
-    const projectPath = path.join(projectUrl, projectId)
-    const propertiesPath = path.join(projectPath, 'properties.json')
+  let tempDir = null
 
-    await fs.promises.writeFile(propertiesPath, JSON.stringify(properties, null, 2))
+  const createPropertiesFile = async (projectId, properties) => {
+    try {
+      console.log(properties, 1046)
+      const projectPath = path.join(projectUrl, projectId)
+      const propertiesPath = path.join(projectPath, 'properties.json')
+      await fs.promises.writeFile(propertiesPath, JSON.stringify(properties, null, 2))
+    } catch (error) {
+      console.error('Error writing properties file:', error)
+    }
   }
 
   const validateProjectStructure = (projectPath) => {
@@ -1068,7 +1071,13 @@ async function handleAddProject(url, event) {
       throw new Error('config.json is empty!')
     }
 
-    const config = JSON.parse(configContent)
+    let config
+    try {
+      config = JSON.parse(configContent)
+    } catch (err) {
+      throw new Error('Invalid JSON format in config.json')
+    }
+
     if (
       !config.book ||
       typeof config.book !== 'object' ||
@@ -1101,6 +1110,26 @@ async function handleAddProject(url, event) {
       config.showIntro ??= true
 
       await fs.promises.writeFile(configPath, JSON.stringify(config, null, 2))
+
+      // Определяем defaultProperties после получения config
+      let defaultProperties
+      if (config.typeProject === 'obs') {
+        defaultProperties = {
+          title: '',
+          intro: '',
+          back: '',
+          chapter_label: '',
+        }
+      } else {
+        defaultProperties = {
+          h: '',
+          toc1: '',
+          toc2: '',
+          toc3: '',
+          mt: '',
+          chapter_label: '',
+        }
+      }
 
       project.book = { ...config.book }
       project.title = config.project.title || config.project
