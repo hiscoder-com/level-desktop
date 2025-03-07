@@ -1413,15 +1413,15 @@ const checkFileExists = (fileName) => {
   })
 }
 
-ipcMain.handle('read-obs-zip', async (event, { chapter }) => {
+ipcMain.handle('read-obs-zip', async (event, { id, chapter }) => {
   try {
     const fileName =
       chapter === 'front' || chapter === 'back'
         ? `${chapter}.md`
         : `${String(chapter).padStart(2, '0')}.md`
 
-    const zipDir = path.join(__dirname, '..', '.AppData', 'zip')
-    const filePath = path.join(zipDir, 'en_obs.zip')
+    const zipDir = path.join(__dirname, '..', '.AppData', 'projects', id)
+    const filePath = path.join(zipDir, 'obs.zip')
 
     const zipBuffer = await fs.promises.readFile(filePath)
     const zip = await JSZip.loadAsync(zipBuffer)

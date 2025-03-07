@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 
-import useGetObsResource from '@/hooks/useGetObsResource'
-import { useGetUsfmResource } from '@/hooks/useGetUsfmResource'
+import { useGetTranslatedResource } from '@/hooks/useGetTranslatedResource'
 import { useScroll } from '@/hooks/useScroll'
 import ReactMarkdown from 'react-markdown'
 
@@ -20,29 +19,23 @@ function Divider({
   toolName,
   wholeChapter,
 }) {
-  let isLoading, data
+  const { data, isLoading, error } = useGetTranslatedResource({
+    typeProject,
+    id,
+    resource,
+    chapter,
+    wholeChapter,
+  })
 
-  if (typeProject === 'obs') {
-    const response = useGetObsResource({
-      chapter,
-    })
-    isLoading = response.isLoading
-    data = response.data
-  } else {
-    const response = useGetUsfmResource({
-      id,
-      resource,
-      chapter,
-      wholeChapter,
-    })
-    isLoading = response.isLoading
-    data = response.data
-  }
   const { handleSaveScroll, currentScrollVerse } = useScroll({
     toolName,
     idPrefix: 'id',
     isLoading,
   })
+
+  if (error) {
+    return <div>Error: {error.message}</div>
+  }
 
   return (
     <>

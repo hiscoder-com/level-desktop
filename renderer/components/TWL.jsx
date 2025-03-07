@@ -4,7 +4,6 @@ import dynamic from 'next/dynamic'
 
 import { currentVerse } from '@/helpers/atoms'
 import { checkLSVal } from '@/helpers/checkls'
-import { useGetTwlObsResource } from '@/hooks/useGetTwlObsResource'
 import { useGetTwlResource } from '@/hooks/useGetTwlResource'
 import { useTranslation } from '@/next-i18next'
 import jszip from 'jszip'
@@ -74,27 +73,15 @@ function TWL({
   const [word, setWord] = useState(null)
   const [filter, setFilter] = useState('disabled')
 
-  let isLoading, data
+  const { isLoading, data } = useGetTwlResource({
+    id,
+    resource,
+    mainResource,
+    chapter,
+    wholeChapter,
+    typeProject,
+  })
 
-  if (typeProject === 'obs') {
-    ;({ isLoading, data } = useGetTwlObsResource({
-      id,
-      resource,
-      mainResource,
-      chapter,
-      wholeChapter,
-      typeProject,
-    }))
-  } else {
-    ;({ isLoading, data } = useGetTwlResource({
-      id,
-      resource,
-      mainResource,
-      chapter,
-      wholeChapter,
-      typeProject,
-    }))
-  }
   const [wordObjects, setWordObjects] = useState({})
   const [isLoadingTW, setIsLoadingTW] = useState(false)
   useEffect(() => {
@@ -147,7 +134,7 @@ function TWL({
     <div id="container_tw" className="h-full overflow-y-auto">
       {!word && (
         <div className="mb-2 text-center">
-          {<FilterRepeated filter={filter} setFilter={setFilter} />}
+          <FilterRepeated filter={filter} setFilter={setFilter} />
         </div>
       )}
       <TWords
