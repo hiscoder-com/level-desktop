@@ -244,6 +244,7 @@ function Panel({
               'translationQuestions',
               'discourseQuestions',
               'theologicalQuestions',
+              'reflectionQuestions',
               'tn',
               'twl',
               'obs',

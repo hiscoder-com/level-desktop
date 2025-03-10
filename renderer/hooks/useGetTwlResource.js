@@ -17,11 +17,19 @@ export function useGetTwlResource({
 
       if (typeProject === 'obs') {
         const rawTwl = window.electronAPI.getTWLObs(id, resource, mainResource, chapter)
-        twl = rawTwl.flatMap((items, index) =>
-          Array.isArray(items)
-            ? items.map((item) => ({ verse: (index + 1).toString(), ...item }))
-            : [{ verse: (index + 1).toString(), ...items }]
-        )
+
+        twl = rawTwl.flatMap((items) => {
+          const parts = items.Reference?.split(':') || []
+          const versesStr = parts[1] || ''
+          const verseArr = versesStr.split(',')
+
+          return [
+            {
+              ...items,
+              verse: verseArr,
+            },
+          ]
+        })
       } else {
         twl = window.electronAPI.getTWL(id, resource, mainResource, chapter)
       }
