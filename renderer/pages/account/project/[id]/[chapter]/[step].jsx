@@ -206,29 +206,6 @@ function Panel({
     setIsSingleTab(tools.length === 1)
   }, [tools])
 
-  if (isSingleTab) {
-    const tool = tools[0]
-    return (
-      <div className="mt-9 flex h-full flex-col rounded-xl bg-white">
-        <Tool
-          config={{
-            mainResource,
-            id,
-            chapter,
-            ...tool.config,
-            wholeChapter: stepConfig.whole_chapter,
-            book,
-            config: tool.config,
-            typeProject,
-          }}
-          toolName={tool.name}
-          resourceTitle={toolNames[tool.config.resource]?.title || ''}
-          isSingleTab={true}
-        />
-      </div>
-    )
-  }
-
   return (
     <TabGroup
       selectedIndex={activeTabIndexes[columnIndex] || 0}
@@ -269,6 +246,7 @@ function Panel({
               'theologicalQuestions',
               'tn',
               'twl',
+              'obs',
             ].includes(tool.name) ? (
               <span title={t(tool.name)}>
                 {icons[tool.name] ? (
