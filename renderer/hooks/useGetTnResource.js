@@ -13,8 +13,28 @@ export function useGetTnResource({
 
   useEffect(() => {
     let tn
+
     if (typeProject === 'obs') {
       tn = window.electronAPI.getTNObs(id, resource, mainResource, chapter)
+
+      tn = tn.flatMap((notesArray, index) => {
+        return notesArray.map((note) => ({
+          verse: [(index + 1).toString()],
+          ID: note.id,
+          Note: note.text,
+          Quote: note.title,
+        }))
+      })
+
+      if (wholeChapter === false) {
+        const verses = window.electronAPI.getChapter(id, chapter, typeProject)
+        const versesEnabled = Object.keys(verses).reduce((acc, key) => {
+          acc[key] = verses[key].enabled
+          return acc
+        }, {})
+
+        tn = tn.filter((v) => versesEnabled[v.verse])
+      }
     } else {
       tn = window.electronAPI.getTN(id, resource, mainResource, chapter)
       if (wholeChapter === false) {
