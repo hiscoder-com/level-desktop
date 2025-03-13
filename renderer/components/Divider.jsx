@@ -86,12 +86,7 @@ function Verses({ verseObjects, id, chapter, currentScrollVerse = 1, typeProject
         <div
           key={verseObject.verse}
           id={'id' + verseObject.verse}
-          className={`flex items-start gap-2 p-2 ${
-            'id' + currentScrollVerse === 'id' + verseObject.verse ? 'bg-gray-200' : ''
-          }`}
-          // onClick={() => {
-          //   handleSaveScroll(String(verseObject.verse));
-          // }} // убрал - автоскролл на время теста, он раздражает, если понадобится- верну
+          className="flex items-start gap-2 p-2"
         >
           <CheckBox
             onChange={() => {
