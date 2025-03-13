@@ -132,7 +132,7 @@ function ChapterList({ id, chapters, steps, mutate, book, project }) {
               </td>
               <td className="w-1/12 cursor-pointer break-words py-4 pl-8">
                 <span className="rounded bg-th-secondary-100 px-3 py-2">
-                  {versesCount?.[chapter]}
+                  {versesCount?.[chapter] ?? versesCount?.[chapter.padStart(2, '0')]}
                 </span>
               </td>
               <td className="w-4/12 cursor-pointer break-words py-4 pl-8">

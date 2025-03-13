@@ -45,22 +45,7 @@ function TN({
   })
 
   useEffect(() => {
-    if (typeProject === 'obs' && data) {
-      const notesObj = {}
-      data.forEach((group, index) => {
-        const verseKey = String(index)
-        notesObj[verseKey] = group.map((note) => ({
-          ...note,
-          Quote: note.title,
-          Note: note.text,
-        }))
-      })
-      setTnotes(notesObj)
-    }
-  }, [data, typeProject])
-
-  useEffect(() => {
-    if (typeProject !== 'obs' && data) {
+    if (data) {
       const notes = {}
       data.forEach((el) => {
         filterNotes(el, el.verse, notes)
