@@ -1420,8 +1420,15 @@ ipcMain.handle('read-obs-zip', async (event, { id, chapter }) => {
         ? `${chapter}.md`
         : `${String(chapter).padStart(2, '0')}.md`
 
-    const zipDir = path.join(__dirname, '..', '.AppData', 'projects', id)
-    const filePath = path.join(zipDir, 'obs.zip')
+    const baseDir = isProd
+      ? path.join(app.getPath('userData'), 'projects', id)
+      : path.join(__dirname, '..', '.AppData', 'projects', id)
+
+    const filePath = path.join(baseDir, 'obs.zip')
+
+    if (!fs.existsSync(filePath)) {
+      throw new Error(`Archive not found at ${filePath}`)
+    }
 
     const zipBuffer = await fs.promises.readFile(filePath)
     const zip = await JSZip.loadAsync(zipBuffer)
