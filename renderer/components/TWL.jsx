@@ -66,19 +66,22 @@ function filterNotes(newNote, verse, notes) {
 }
 
 function TWL({
-  config: { resource, id, mainResource, chapter = false, wholeChapter },
+  config: { resource, id, typeProject, mainResource, chapter = false, wholeChapter },
   toolName,
 }) {
   const [currentScrollVerse, setCurrentScrollVerse] = useRecoilState(currentVerse)
   const [word, setWord] = useState(null)
   const [filter, setFilter] = useState('disabled')
+
   const { isLoading, data } = useGetTwlResource({
     id,
     resource,
     mainResource,
     chapter,
     wholeChapter,
+    typeProject,
   })
+
   const [wordObjects, setWordObjects] = useState({})
   const [isLoadingTW, setIsLoadingTW] = useState(false)
   useEffect(() => {
@@ -131,7 +134,7 @@ function TWL({
     <div id="container_tw" className="h-full overflow-y-auto">
       {!word && (
         <div className="mb-2 text-center">
-          {<FilterRepeated filter={filter} setFilter={setFilter} />}
+          <FilterRepeated filter={filter} setFilter={setFilter} />
         </div>
       )}
       <TWords

@@ -31,7 +31,7 @@ function RtlTextArea({ value, onChange, autoFocus = false, className = '' }) {
       ref={textAreaRef}
       autoFocus={autoFocus}
       rows={1}
-      className={className}
+      className={` ${className} ${inputValue.trim() === '' ? 'bg-th-secondary-100' : ''} `}
       value={inputValue}
       onChange={handleInputChange}
       dir={direction}

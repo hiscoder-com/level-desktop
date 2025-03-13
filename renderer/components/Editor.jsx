@@ -3,13 +3,13 @@ import { useEffect, useState } from 'react'
 import { obsCheckAdditionalVerses } from './Bible'
 import RtlTextArea from './RtlTextArea'
 
-function Editor({ config: { id, chapter = false, wholeChapter } }) {
+function Editor({ config: { id, chapter = false, wholeChapter, typeProject = '' } }) {
   const [verseObjects, setVerseObjects] = useState([])
 
   useEffect(() => {
-    const savedVerses = Object.entries(window.electronAPI.getChapter(id, chapter)).map(
-      ([k, v]) => ({ num: k, verse: v.text, enabled: v.enabled })
-    )
+    const savedVerses = Object.entries(
+      window.electronAPI.getChapter(id, chapter, typeProject)
+    ).map(([k, v]) => ({ num: k, verse: v.text, enabled: v.enabled }))
 
     setVerseObjects(wholeChapter ? savedVerses : savedVerses.filter((v) => v.enabled))
   }, [id, chapter])
@@ -17,7 +17,7 @@ function Editor({ config: { id, chapter = false, wholeChapter } }) {
   const updateVerse = (idx, verseNum, text) => {
     setVerseObjects((prev) => {
       prev[idx].verse = text
-      window.electronAPI.updateVerse(id, chapter, verseNum.toString(), text)
+      window.electronAPI.updateVerse(id, chapter, verseNum.toString(), text, typeProject)
       return [...prev]
     })
   }

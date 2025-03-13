@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-import { useGetUsfmResource } from '@/hooks/useGetUsfmResource'
+import { useGetTranslatedResource } from '@/hooks/useGetTranslatedResource'
 import { useScroll } from '@/hooks/useScroll'
 import ReactMarkdown from 'react-markdown'
 
@@ -14,8 +14,13 @@ export const obsCheckAdditionalVerses = (numVerse) => {
   return String(numVerse)
 }
 
-function Divider({ config: { resource, id, chapter = false }, toolName, wholeChapter }) {
-  const { isLoading, data } = useGetUsfmResource({
+function Divider({
+  config: { resource, id, chapter = false, typeProject = '' },
+  toolName,
+  wholeChapter,
+}) {
+  const { data, isLoading, error } = useGetTranslatedResource({
+    typeProject,
     id,
     resource,
     chapter,
@@ -28,12 +33,17 @@ function Divider({ config: { resource, id, chapter = false }, toolName, wholeCha
     isLoading,
   })
 
+  if (error) {
+    return <div>Error: {error.message}</div>
+  }
+
   return (
     <>
       {isLoading ? (
         <Placeholder />
       ) : (
         <Verses
+          typeProject={typeProject}
           verseObjects={data}
           handleSaveScroll={handleSaveScroll}
           currentScrollVerse={currentScrollVerse}
@@ -47,12 +57,12 @@ function Divider({ config: { resource, id, chapter = false }, toolName, wholeCha
 
 export default Divider
 
-function Verses({ verseObjects, id, chapter, currentScrollVerse = 1 }) {
+function Verses({ verseObjects, id, chapter, currentScrollVerse = 1, typeProject = '' }) {
   const t = () => {}
   const [versesDivide, setVersesDivide] = useState({})
 
   useEffect(() => {
-    const verses = window.electronAPI.getChapter(id, chapter)
+    const verses = window.electronAPI.getChapter(id, chapter, typeProject)
     const versesEnabled = Object.keys(verses).reduce((acc, key) => {
       acc[key] = verses[key].enabled
 
@@ -63,7 +73,7 @@ function Verses({ verseObjects, id, chapter, currentScrollVerse = 1 }) {
   }, [])
 
   const divideVerse = (verseNum, enabled) => {
-    window.electronAPI.divideVerse(id, chapter, verseNum.toString(), enabled)
+    window.electronAPI.divideVerse(id, chapter, verseNum.toString(), enabled, typeProject)
     setVersesDivide((prev) => ({
       ...prev,
       [verseNum]: enabled,
@@ -76,12 +86,7 @@ function Verses({ verseObjects, id, chapter, currentScrollVerse = 1 }) {
         <div
           key={verseObject.verse}
           id={'id' + verseObject.verse}
-          className={`flex items-start gap-2 p-2 ${
-            'id' + currentScrollVerse === 'id' + verseObject.verse ? 'bg-gray-200' : ''
-          }`}
-          // onClick={() => {
-          //   handleSaveScroll(String(verseObject.verse));
-          // }} // убрал - автоскролл на время теста, он раздражает, если понадобится- верну
+          className="flex items-start gap-2 p-2"
         >
           <CheckBox
             onChange={() => {
