@@ -2,8 +2,19 @@ import { useEffect } from 'react'
 
 import { useRtlInput } from '@/hooks/useRtlInput'
 
-function RtlInput({ value, onChange, placeholder, readOnly, className = '' }) {
-  const { value: inputValue, handleChange, direction } = useRtlInput(value)
+function RtlInput({
+  value,
+  onChange,
+  placeholder,
+  readOnly,
+  className = '',
+  defaultDirection = 'ltr',
+}) {
+  const {
+    value: inputValue,
+    handleChange,
+    direction,
+  } = useRtlInput(value, defaultDirection)
 
   useEffect(() => {
     if (value !== inputValue) {
