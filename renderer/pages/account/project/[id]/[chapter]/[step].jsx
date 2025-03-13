@@ -248,6 +248,7 @@ function Panel({
               'tn',
               'twl',
               'obs',
+              'divider',
             ].includes(tool.name) ? (
               <span title={t(tool.name)}>
                 {icons[tool.name] ? (
