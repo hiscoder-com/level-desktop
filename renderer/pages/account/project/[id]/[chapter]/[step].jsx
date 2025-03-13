@@ -242,7 +242,7 @@ function Panel({
               'dictionary',
               'merger',
               'info',
-              'studyQuestions',
+              'observationQuestions',
               'translationQuestions',
               'discourseQuestions',
               'theologicalQuestions',
