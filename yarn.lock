@@ -2644,8 +2644,10 @@
     react-arborist "3.4.0"
     react-editor-js "^2.1.0"
 
-"@texttree/obs-format-convert-rcl@../obs-format-convert-rcl":
+"@texttree/obs-format-convert-rcl@^0.5.0":
   version "0.5.0"
+  resolved "https://registry.yarnpkg.com/@texttree/obs-format-convert-rcl/-/obs-format-convert-rcl-0.5.0.tgz#7779ff4612fbefd3fc0c7ffa556fd4e62e53cd7a"
+  integrity sha512-vjFDcm+o26FdSxOEl0y27Rlv7mDgsvvDYo+6cqBokoxEBF9O/VSZk566cOiPq11rBjF3YBdjYHtqBzRlF+/C2g==
   dependencies:
     "@texttree/epub-gen-memory" "^1.0.10"
     file-saver "^2.0.5"

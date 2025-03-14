@@ -12,8 +12,8 @@ import decompress from 'decompress'
 import { app, dialog, ipcMain } from 'electron'
 import serve from 'electron-serve'
 import Store from 'electron-store'
-import puppeteer from 'puppeteer'
 import JSZip from 'jszip'
+import puppeteer from 'puppeteer'
 import { toJSON } from 'usfm-js'
 import { v4 as uuid } from 'uuid'
 
@@ -1426,7 +1426,7 @@ ipcMain.handle('check-file-exists', async (event, fileName) => {
   return checkFileExists(fileName)
 })
 
-ipcMain.handle('export-to-pdf', async (_, chapters, project) => {
+ipcMain.handle('export-to-pdf-obs', async (_, chapters, project) => {
   try {
     if (!chapters || !project || !project.book?.code) {
       throw new Error('Invalid project or chapters data')

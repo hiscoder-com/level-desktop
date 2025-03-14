@@ -194,9 +194,9 @@ function ProjectsList({ projectsList, setProjectsList }) {
     }
   }
 
-  const handleExport = async (chapters, project) => {
+  const exportToPdfObs = async (chapters, project) => {
     try {
-      const filePath = await window.electron.exportToPdf(chapters, project) // исправил window.electron → window.electronAPI
+      const filePath = await window.electron.exportToPdfObs(chapters, project) // исправил window.electron → window.electronAPI
       if (!filePath) throw new Error('Failed to generate PDF')
     } catch (error) {
       toast.error(t('projects:FailedToCreatePDF'))
@@ -286,7 +286,7 @@ function ProjectsList({ projectsList, setProjectsList }) {
 
   const download = async (project, type) => {
     try {
-      if (!project || !project.id) {
+      if (!project || !project.id || !project.typeProject) {
         throw new Error('Invalid project data')
       }
 
@@ -297,7 +297,11 @@ function ProjectsList({ projectsList, setProjectsList }) {
       }
 
       if (type === 'pdf') {
-        await handleExport(chapters, project)
+        if (project.typeProject !== 'obs') {
+          exportToPdf(chapters, project)
+        } else {
+          await exportToPdfObs(chapters, project)
+        }
       } else if (type === 'usfm') {
         exportToUsfm(chapters, project)
       } else if (type === 'zip') {
