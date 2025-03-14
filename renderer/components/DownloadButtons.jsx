@@ -1,6 +1,6 @@
+import { useTranslation } from '@/next-i18next'
 import { exportToPdf, exportToUsfm, exportToZip } from '@/utils/exportHelpers'
 import toast from 'react-hot-toast'
-import { useTranslation } from 'react-i18next'
 
 const DownloadButtons = ({ project }) => {
   const { t } = useTranslation(['projects'])
