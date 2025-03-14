@@ -2,6 +2,7 @@ import { convertBookChapters, convertToUsfm } from '@/helpers/usfm'
 import { JsonToMd, JsonToPdf, MdToZip } from '@texttree/obs-format-convert-rcl'
 import toast from 'react-hot-toast'
 
+import { showToastWarning } from './customToast'
 import { createObjectToTransform, findEmptyJsonElements } from './helper'
 
 const styles = {
@@ -145,14 +146,15 @@ export const exportToZip = async (t, chapters, project) => {
         })
       }
     }
-
     if (fileData.content.length === 0) {
       throw new Error('No fully translated chapters available for export.')
     }
 
     if (incompleteChapters.length > 0) {
-      toast.error(
-        `Attention: the stories of ${incompleteChapters.join(', ')} have not been fully translated`
+      showToastWarning(
+        t('projects:IncompleteChaptersWarning', {
+          chapters: incompleteChapters.join(', '),
+        })
       )
     }
 
