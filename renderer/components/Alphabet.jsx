@@ -106,7 +106,7 @@ function Alphabet({ alphabet, setCurrentPage, setSearchQuery, disabled }) {
   return (
     <div
       className="flex w-full flex-wrap rounded-lg bg-th-secondary-100 px-4 py-3 font-bold"
-      style={{ direction }}
+      dir={direction}
     >
       {alphabet.map((letter, index) => (
         <div key={letter} className="flex items-center">

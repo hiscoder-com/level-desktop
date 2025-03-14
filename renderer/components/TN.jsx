@@ -30,7 +30,7 @@ function filterNotes(newNote, verse, notes) {
 }
 
 function TN({
-  config: { resource, id, mainResource, chapter = false, wholeChapter },
+  config: { resource, id, mainResource, chapter = false, wholeChapter, typeProject },
   toolName,
 }) {
   const [currentScrollVerse, setCurrentScrollVerse] = useRecoilState(currentVerse)
@@ -41,6 +41,7 @@ function TN({
     mainResource,
     chapter,
     wholeChapter,
+    typeProject,
   })
 
   useEffect(() => {
@@ -51,7 +52,7 @@ function TN({
       })
       setTnotes(notes)
     }
-  }, [data])
+  }, [data, typeProject])
 
   return (
     <div id="container_tn" className="h-full overflow-y-auto">
@@ -65,7 +66,7 @@ function TN({
         classes={{
           content: {
             container:
-              'absolute top-0 bottom-0 pr-2 ,bg-th-secondary-10 overflow-auto left-0 right-0',
+              'absolute top-0 bottom-0 pr-2 bg-th-secondary-10 overflow-auto left-0 right-0',
             header: 'sticky flex top-0 pb-4 bg-th-secondary-10',
             backButton:
               'w-fit h-fit p-1 mr-2.5 cursor-pointer hover:opacity-70 rounded-full bg-th-secondary-100',

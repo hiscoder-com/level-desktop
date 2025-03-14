@@ -8,7 +8,7 @@ const WordItem = ({ word, setIsOpenModal, setWordToDel, setWordId }) => {
   return (
     <div
       key={word.id}
-      style={{ direction, textAlign: direction === 'rtl' ? 'right' : 'left' }}
+      dir={direction}
       className="group my-3 flex cursor-pointer items-start justify-between rounded-lg bg-th-secondary-100"
       onClick={() => setWordId(word.id)}
     >

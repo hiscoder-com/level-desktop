@@ -11,7 +11,10 @@ import RtlTextArea from './RtlTextArea'
 import Check from 'public/icons/check.svg'
 import Pencil from 'public/icons/pencil.svg'
 
-function BlindEditor({ config: { id, mainResource, chapter = false }, toolName }) {
+function BlindEditor({
+  config: { id, mainResource, chapter = false, typeProject = '' },
+  toolName,
+}) {
   const { t } = useTranslation()
   const [isShowFinalButton, setIsShowFinalButton] = useState(false)
   const [translatedVerses, setTranslatedVerses] = useState([])
@@ -26,7 +29,9 @@ function BlindEditor({ config: { id, mainResource, chapter = false }, toolName }
   const setCheckedVersesBible = useSetRecoilState(checkedVersesBibleState)
 
   useEffect(() => {
-    const savedVerses = Object.entries(window.electronAPI.getChapter(id, chapter))
+    const savedVerses = Object.entries(
+      window.electronAPI.getChapter(id, chapter, typeProject)
+    )
       .map(([k, v]) => ({ num: k, verse: v.text, enabled: v.enabled }))
       .filter((v) => v.enabled)
     setVerseObjects(savedVerses)
@@ -81,7 +86,8 @@ function BlindEditor({ config: { id, mainResource, chapter = false }, toolName }
       id,
       chapter,
       verseObjects[index].num.toString(),
-      verseObjects[index].verse
+      verseObjects[index].verse,
+      typeProject
     )
   }
   const saveVerse = (ref) => {
