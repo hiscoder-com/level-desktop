@@ -39,6 +39,7 @@
     "i18next-electron-fs-backend": "^3.0.2",
     "jszip": "^3.10.1",
     "localforage": "^1.10.0",
+    "marked": "^15.0.7",
     "next-i18next": "^15.3.0",
     "prop-types": "^15.8.1",
     "puppeteer": "^24.2.0",

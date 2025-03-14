@@ -13,6 +13,7 @@ import { app, dialog, ipcMain } from 'electron'
 import serve from 'electron-serve'
 import Store from 'electron-store'
 import JSZip from 'jszip'
+import { marked } from 'marked'
 import puppeteer from 'puppeteer'
 import { toJSON } from 'usfm-js'
 import { v4 as uuid } from 'uuid'
@@ -1462,8 +1463,33 @@ ipcMain.handle('export-to-pdf-obs', async (_, chapters, project) => {
 })
 
 const generateHtmlContent = (project, chapters) => {
+  const propertiesPath = path.join(projectUrl, project.id, 'properties.json')
+  let properties = {}
+  try {
+    const propertiesContent = fs.readFileSync(propertiesPath, 'utf8')
+    properties = JSON.parse(propertiesContent)
+  } catch (err) {
+    console.error(`Error reading properties file for project ${project.id}:`, err)
+  }
+  const chapter_label = properties.chapter_label ?? 'Chapter'
+  const titlePage = properties.title
+    ? `
+      <div class="title-page">
+        <h1>${properties.title}</h1>
+      </div>
+    `
+    : ''
+
+  const introPage = properties.intro
+    ? `
+      <div class="intro-page">
+        ${marked(properties.intro)}
+      </div>
+    `
+    : ''
+
   const book = Object.entries(chapters).map(([chapterNum, verses]) => ({
-    title: `Chapter ${chapterNum}`,
+    title: `${chapter_label} ${chapterNum}`,
     verseObjects: Object.entries(verses).map(([verse, data]) => ({
       verse,
       text: data.text,
@@ -1476,13 +1502,44 @@ const generateHtmlContent = (project, chapters) => {
     <head>
       <meta charset="UTF-8">
       <style>
-        body { font-family: 'Amiri', serif; direction: rtl; text-align: right; padding: 20px; }
+        body { 
+          font-family: 'Amiri', serif; 
+          direction: rtl; 
+          text-align: right; 
+          padding: 20px; 
+        }
         h1 { font-size: 24px; margin-bottom: 10px; }
-        .chapter { margin-bottom: 20px; page-break-before: always; } 
-        .verse { font-size: 16px; margin-bottom: 5px; }
+        h2 { font-size: 20px; margin-bottom: 10px; }
+        .chapter { 
+          margin-bottom: 20px; 
+          page-break-before: always; 
+        }
+        .verse { 
+          font-size: 16px; 
+          margin-bottom: 5px; 
+        }
+        .title-page {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          height: 100vh;
+          text-align: center;
+        }
+        .title-page h1 {
+          font-size: 36px;
+        }
+        .intro-page {
+          padding: 40px;
+          min-height: 100vh;
+        }
+        .page-break {
+          page-break-after: always;
+        }
       </style>
     </head>
     <body>
+      ${titlePage ? titlePage + '<div class="page-break"></div>' : ''}
+      ${introPage ? introPage + '<div class="page-break"></div>' : ''}
       <h1>${project.name} - ${project.book.code}</h1>
       ${book
         .map(
