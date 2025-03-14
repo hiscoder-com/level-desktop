@@ -974,10 +974,10 @@ async function handleAddProject(url, event) {
       await fs.promises.writeFile(configPath, JSON.stringify(config, null, 2))
 
       project.book = { ...config.book }
-      project.title = config.project.title
+      project.title = config.project.title ?? config.project
       project.method = config.method
       project.fileName = fileName
-
+      project.typeProject = config.typeProject
       await createPropertiesFile(id, defaultProperties)
 
       const currentUser = storeUsers.get('currentUser')
@@ -1252,9 +1252,8 @@ ipcMain.handle('save-file', async (event, content, fileName) => {
   }
 })
 
-ipcMain.handle('get-path-file', async (event,  fileName) => {
+ipcMain.handle('get-path-file', async (event, fileName) => {
   try {
-   
     const zipDir = path.join(__dirname, '..', '.AppData', 'zip')
     const filePath = path.join(zipDir, fileName)
 
