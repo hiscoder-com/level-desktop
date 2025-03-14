@@ -25,6 +25,7 @@
   "ErrorDownloadingZip": "Error downloading ZIP file",
   "ErrorExportingPDF": "Error exporting to PDF",
   "ErrorExportingUSFM": "Error exporting to USFM",
+  "ErrorExportingZip": "Error exporting to ZIP",
   "ErrorParsing": "JSON parsing error",
   "ErrorProcessingFiles": "File processing error",
   "ExistingText": "Existing Text:",

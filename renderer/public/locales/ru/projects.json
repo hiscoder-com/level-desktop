@@ -25,6 +25,7 @@
   "ErrorDownloadingZip": "Ошибка загрузки ZIP-файла",
   "ErrorExportingPDF": "Ошибка экспорта в PDF",
   "ErrorExportingUSFM": "Ошибка экспорта в USFM",
+  "ErrorExportingZip": "Ошибка экспорта в ZIP",
   "ErrorParsing": "Ошибка парсинга JSON",
   "ErrorProcessingFiles": "Ошибка обработки файлов",
   "ExistingText": "Существующий текст:",
