@@ -2,8 +2,18 @@ import { useEffect, useRef } from 'react'
 
 import { useRtlInput } from '@/hooks/useRtlInput'
 
-function RtlTextArea({ value, onChange, autoFocus = false, className = '' }) {
-  const { value: inputValue, handleChange, direction } = useRtlInput(value)
+function RtlTextArea({
+  value,
+  onChange,
+  autoFocus = false,
+  className = '',
+  defaultDirection,
+}) {
+  const {
+    value: inputValue,
+    handleChange,
+    direction,
+  } = useRtlInput(value, defaultDirection)
   const textAreaRef = useRef(null)
 
   useEffect(() => {

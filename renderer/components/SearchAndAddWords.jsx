@@ -23,6 +23,7 @@ function SearchAndAddWords({
   listUpdate,
   importWords,
   activeWord,
+  defaultDirection,
 }) {
   const { t } = useTranslation()
 
@@ -84,6 +85,7 @@ function SearchAndAddWords({
           onChange={setSearchQuery}
           placeholder={t('Search')}
           readOnly={activeWord}
+          defaultDirection={defaultDirection}
         />
         {searchQuery && (
           <Close

@@ -12,8 +12,7 @@ import Check from 'public/icons/check.svg'
 import Pencil from 'public/icons/pencil.svg'
 
 function BlindEditor({
-  config: { id, mainResource, chapter = false, typeProject = '' },
-  toolName,
+  config: { id, chapter = false, language = {}, typeProject = '' },
 }) {
   const { t } = useTranslation()
   const [isShowFinalButton, setIsShowFinalButton] = useState(false)
@@ -25,6 +24,7 @@ function BlindEditor({
   const [firstStepRef, setFirstStepRef] = useState({})
 
   const textAreaRef = useRef([])
+  const is_rtl = language.is_rtl
 
   const setCheckedVersesBible = useSetRecoilState(checkedVersesBibleState)
 
@@ -146,7 +146,10 @@ function BlindEditor({
           const isTranslating = enabledInputs.includes(verseObject.num.toString())
           const isTranslated = translatedVerses.includes(currentNumVerse)
           return (
-            <div key={verseObject.num} className="my-3 flex items-start">
+            <div
+              key={verseObject.num}
+              className={`my-3 flex items-start ${is_rtl ? 'flex-row-reverse' : ''}`}
+            >
               <button
                 onClick={() =>
                   handleSaveVerse({
@@ -163,7 +166,9 @@ function BlindEditor({
                 disabled={disabledButton}
               >
                 {isTranslated ? (
-                  <Check className="h-4 w-4 stroke-2" />
+                  <Check
+                    className={`h-4 w-4 stroke-2 ${is_rtl ? 'scale-x-[-1] transform' : ''}`}
+                  />
                 ) : (
                   <Pencil
                     className={`h-4 w-4 stroke-2 ${
@@ -172,18 +177,21 @@ function BlindEditor({
                         : !isTranslating
                           ? 'fill-th-secondary-100'
                           : 'stroke-th-text-secondary-100'
-                    }`}
+                    } ${is_rtl ? 'scale-x-[-1] transform' : ''}`}
                   />
                 )}
               </button>
 
-              <div className="mx-4">{obsCheckAdditionalVerses(verseObject.num)}</div>
+              <div className={`mx-4 ${is_rtl ? 'order-first' : ''}`}>
+                {obsCheckAdditionalVerses(verseObject.num)}
+              </div>
               {isTranslating ? (
                 <RtlTextArea
                   className="focus:inline-none w-full resize-none focus:outline-none"
-                  ref={(el) => (textAreaRef.current[0] = el)}
+                  ref={(el) => (textAreaRef.current[index] = el)}
                   value={verseObject.verse ?? ''}
                   onChange={(newText) => updateVerse(index, newText)}
+                  defaultDirection={is_rtl ? 'rtl' : 'ltr'}
                 />
               ) : (
                 <div className="whitespace-pre-line">{verseObject.verse}</div>
@@ -191,17 +199,20 @@ function BlindEditor({
             </div>
           )
         })}
+
         {isShowFinalButton && (
-          <button
-            onClick={() => {
-              setEnabledIcons(['201'])
-              setEnabledInputs([])
-              sendToDb(verseObjects.length - 1)
-            }}
-            className="btn-base bg-th-primary-100 text-th-text-secondary-100 hover:opacity-70"
-          >
-            {t('Save')}
-          </button>
+          <div className="flex w-full">
+            <button
+              onClick={() => {
+                setEnabledIcons(['201'])
+                setEnabledInputs([])
+                sendToDb(verseObjects.length - 1)
+              }}
+              className={`btn-base bg-th-primary-100 text-th-text-secondary-100 hover:opacity-70 ${is_rtl ? 'ml-auto' : ''}`}
+            >
+              {t('Save')}
+            </button>
+          </div>
         )}
       </div>
       <Modal isOpen={isOpenModal} closeHandle={() => setIsOpenModal(false)}>
