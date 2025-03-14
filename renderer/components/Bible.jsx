@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 
 import { checkedVersesBibleState } from '@/helpers/atoms'
-import { useGetUsfmResource } from '@/hooks/useGetUsfmResource'
+import { useGetTranslatedResource } from '@/hooks/useGetTranslatedResource'
 import { useScroll } from '@/hooks/useScroll'
 import ReactMarkdown from 'react-markdown'
 import { useRecoilValue } from 'recoil'
@@ -14,12 +14,18 @@ export const obsCheckAdditionalVerses = (numVerse) => {
   }
   return String(numVerse)
 }
+function Bible({ config, toolName }) {
+  const {
+    resource,
+    id,
+    chapter = false,
+    isDraft = false,
+    wholeChapter,
+    typeProject,
+  } = config
 
-function Bible({
-  config: { resource, id, chapter = false, isDraft = false, wholeChapter },
-  toolName,
-}) {
-  const { isLoading, data } = useGetUsfmResource({
+  const { data, isLoading, error } = useGetTranslatedResource({
+    typeProject,
     id,
     resource,
     chapter,
@@ -31,6 +37,10 @@ function Bible({
     idPrefix: 'id',
     isLoading,
   })
+
+  if (error) {
+    return <div>Error: {error.message}</div>
+  }
 
   return (
     <>

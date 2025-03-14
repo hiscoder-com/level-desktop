@@ -76,7 +76,12 @@ function StepPage() {
   }
 
   const nextStepHandle = () => {
-    const nextStep = window.electronAPI.goToStep(id, chapter, parseInt(step) + 1)
+    const nextStep = window.electronAPI.goToStep(
+      id,
+      chapter,
+      parseInt(step) + 1,
+      project.typeProject
+    )
     const config = window.electronAPI.getProject(id)
     const isRepeatInfo = getIsRepeatIntro(parseInt(step) + 1, chapter, id)
     const showIntro = config.showIntro && !isRepeatInfo
@@ -134,6 +139,8 @@ function StepPage() {
                 activeTabIndexes={activeTabIndexes}
                 setActiveTabIndexes={setActiveTabIndexes}
                 book={project.book}
+                typeProject={project?.typeProject || 'Bible'}
+                language={project?.language}
               />
             </div>
           ))}
@@ -192,6 +199,8 @@ function Panel({
   activeTabIndexes,
   setActiveTabIndexes,
   book,
+  typeProject,
+  language,
 }) {
   const [isSingleTab, setIsSingleTab] = useState(false)
 
@@ -233,6 +242,15 @@ function Panel({
               'dictionary',
               'merger',
               'info',
+              'observationQuestions',
+              'translationQuestions',
+              'discourseQuestions',
+              'theologicalQuestions',
+              'reflectionQuestions',
+              'tn',
+              'twl',
+              'obs',
+              'divider',
             ].includes(tool.name) ? (
               <span title={t(tool.name)}>
                 {icons[tool.name] ? (
@@ -250,7 +268,7 @@ function Panel({
               </span>
             ) : (
               <p className={`${!isSingleTab ? 'truncate' : 'px-10 sm:px-20'} `}>
-                {toolNames[tool.config.resource].name}
+                {toolNames[tool.config.resource]?.name}
               </p>
             )}
           </Tab>
@@ -269,6 +287,9 @@ function Panel({
                     ...tool.config,
                     wholeChapter: stepConfig.whole_chapter,
                     book,
+                    config: tool.config,
+                    typeProject,
+                    language,
                   }}
                   toolName={tool.name}
                   resourceTitle={toolNames[tool.config.resource]?.title || ''}

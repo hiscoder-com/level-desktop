@@ -7,3 +7,6 @@ dist
 pack
 yalc.lock
 .yalc
+renderer/.env.develop
+renderer/.env.production 
+

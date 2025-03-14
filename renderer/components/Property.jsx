@@ -1,16 +1,17 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 
+import { useRtlInput } from '@/hooks/useRtlInput'
 import ReactTextareaAutosize from 'react-textarea-autosize'
 
 function Property({ t, property, content, onContentChange }) {
-  const [propertyContent, setPropertyContent] = useState()
+  const { value, setValue, direction, handleChange } = useRtlInput(content)
 
   useEffect(() => {
-    setPropertyContent(content)
-  }, [content])
+    setValue(content)
+  }, [content, setValue])
 
-  const handleChange = (e) => {
-    setPropertyContent(e.target.value)
+  const handleInputChange = (e) => {
+    handleChange(e)
     onContentChange(e.target.value, property)
   }
 
@@ -21,8 +22,9 @@ function Property({ t, property, content, onContentChange }) {
         maxRows="7"
         className="input-primary"
         placeholder={t(`projects:${property}_placeholder`)}
-        value={propertyContent}
-        onChange={handleChange}
+        value={value}
+        onChange={handleInputChange}
+        dir={direction}
       />
     </div>
   )

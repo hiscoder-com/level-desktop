@@ -34,13 +34,13 @@ process.once('loaded', () => {
     },
     updateProjectConfig: (id, updatedConfig) =>
       ipcRenderer.send('update-project-config', id, updatedConfig),
-    goToStep: (id, chapter, step) =>
-      ipcRenderer.sendSync('go-to-step', id, chapter, step),
-    getChapter: (projectid, chapter) =>
-      ipcRenderer.sendSync('get-chapter', projectid, chapter),
+    goToStep: (id, chapter, step, typeProject) =>
+      ipcRenderer.sendSync('go-to-step', id, chapter, step, typeProject),
+    getChapter: (projectid, chapter, typeProject) =>
+      ipcRenderer.sendSync('get-chapter', projectid, chapter, typeProject),
     getBook: (projectid) => ipcRenderer.sendSync('get-book', projectid),
-    updateChapter: (projectid, chapter, data) =>
-      ipcRenderer.sendSync('update-chapter', projectid, chapter, data),
+    updateChapter: (projectid, chapter, data, typeProject) =>
+      ipcRenderer.sendSync('update-chapter', projectid, chapter, data, typeProject),
     onUpdateChapter: (callback) => {
       ipcRenderer.on('notify', callback)
       return () => ipcRenderer.removeListener('notify', callback)
@@ -48,10 +48,10 @@ process.once('loaded', () => {
     removeUpdateChapterListener: (callback) => {
       ipcRenderer.removeListener('notify', callback)
     },
-    divideVerse: (projectid, chapter, verse, enabled) =>
-      ipcRenderer.send('divide-verse', projectid, chapter, verse, enabled),
-    updateVerse: (projectid, chapter, verse, text) =>
-      ipcRenderer.send('update-verse', projectid, chapter, verse, text),
+    divideVerse: (projectid, chapter, verse, enabled, typeProject) =>
+      ipcRenderer.send('divide-verse', projectid, chapter, verse, enabled, typeProject),
+    updateVerse: (projectid, chapter, verse, text, typeProject) =>
+      ipcRenderer.send('update-verse', projectid, chapter, verse, text, typeProject),
     getItem: (key) => ipcRenderer.sendSync('get-item', key),
     removeItem: (key) => ipcRenderer.sendSync('remove-item', key),
     setProjectFolder: (id) => ipcRenderer.send('set-project-folder', id),
@@ -92,12 +92,16 @@ process.once('loaded', () => {
       ipcRenderer.sendSync('get-zip', id, resource, chapter),
     getTN: (id, resource, mainResource, chapter = false) =>
       ipcRenderer.sendSync('get-tn', id, resource, mainResource, chapter),
+    getTNObs: (id, resource, mainResource, chapter = false) =>
+      ipcRenderer.sendSync('get-tn-obs', id, resource, mainResource, chapter),
     getInfo: (id, resource, mainResource, chapter = false) =>
       ipcRenderer.sendSync('get-info', id, resource, mainResource, chapter),
     getTQ: (id, resource, mainResource, chapter = false) =>
       ipcRenderer.sendSync('get-tq', id, resource, mainResource, chapter),
     getTWL: (id, resource, mainResource, chapter = false) =>
       ipcRenderer.sendSync('get-twl', id, resource, mainResource, chapter),
+    getTWLObs: (id, resource, mainResource, chapter = false) =>
+      ipcRenderer.sendSync('get-twl-obs', id, resource, mainResource, chapter),
     addProject: (fileUrl) => {
       return new Promise((resolve, reject) => {
         ipcRenderer.removeAllListeners('project-added')
@@ -167,5 +171,6 @@ process.once('loaded', () => {
   contextBridge.exposeInMainWorld('electron', {
     initCurrentUser: (userId, email) =>
       ipcRenderer.invoke('init-current-user', userId, email),
+    readOBSZipFile: (id, chapter) => ipcRenderer.invoke('read-obs-zip', { id, chapter }),
   })
 })

@@ -4,9 +4,6 @@ import { generateUniqueId } from '@/helpers/noteEditor'
 import { useGetDictionary } from '@/hooks/useGetDictionary'
 import { useTranslation } from '@/next-i18next'
 import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react'
-import Down from 'public/icons/arrow-down.svg'
-import LeftArrow from 'public/icons/left-arrow.svg'
-import RightArrow from 'public/icons/right-arrow.svg'
 import toast from 'react-hot-toast'
 
 import Alphabet from './Alphabet'
@@ -14,9 +11,13 @@ import LoadingPage from './LoadingPage'
 import SearchAndAddWords from './SearchAndAddWords'
 import WordList from './WordList'
 
+import Down from 'public/icons/arrow-down.svg'
+import LeftArrow from 'public/icons/left-arrow.svg'
+import RightArrow from 'public/icons/right-arrow.svg'
+
 const countWordsOnPage = 10
 
-function Dictionary({ config: { id } }) {
+function Dictionary({ config: { id, language } }) {
   const { t } = useTranslation(['common', 'projects'])
   const [isLoading, setIsLoading] = useState(false)
   const [currentPage, setCurrentPage] = useState(0)
@@ -27,6 +28,7 @@ function Dictionary({ config: { id } }) {
   const [wordId, setWordId] = useState('')
   const [words, setWords] = useState({ data: [], count: 0 })
   const { data: dictionary, alphabet, mutate } = useGetDictionary(id)
+  const is_rtl = language.is_rtl
 
   const totalPageCount = useMemo(
     () => Math.ceil(words?.count / countWordsOnPage),
@@ -218,6 +220,7 @@ function Dictionary({ config: { id } }) {
           {...sharedProps}
           importWords={importWords}
           exportWords={exportWords}
+          defaultDirection={is_rtl ? 'rtl' : 'ltr'}
         />
         {alphabet.length ? (
           <Card t={t}>

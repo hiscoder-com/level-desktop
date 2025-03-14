@@ -2,14 +2,18 @@ import { useEffect, useRef, useState } from 'react'
 
 import { checkedVersesBibleState } from '@/helpers/atoms'
 import { useTranslation } from '@/next-i18next'
-import Check from 'public/icons/check.svg'
-import Pencil from 'public/icons/pencil.svg'
 import { useSetRecoilState } from 'recoil'
 
 import { obsCheckAdditionalVerses } from './Bible'
 import Modal from './Modal'
+import RtlTextArea from './RtlTextArea'
 
-function BlindEditor({ config: { id, mainResource, chapter = false }, toolName }) {
+import Check from 'public/icons/check.svg'
+import Pencil from 'public/icons/pencil.svg'
+
+function BlindEditor({
+  config: { id, chapter = false, language = {}, typeProject = '' },
+}) {
   const { t } = useTranslation()
   const [isShowFinalButton, setIsShowFinalButton] = useState(false)
   const [translatedVerses, setTranslatedVerses] = useState([])
@@ -20,11 +24,14 @@ function BlindEditor({ config: { id, mainResource, chapter = false }, toolName }
   const [firstStepRef, setFirstStepRef] = useState({})
 
   const textAreaRef = useRef([])
+  const is_rtl = language.is_rtl
 
   const setCheckedVersesBible = useSetRecoilState(checkedVersesBibleState)
 
   useEffect(() => {
-    const savedVerses = Object.entries(window.electronAPI.getChapter(id, chapter))
+    const savedVerses = Object.entries(
+      window.electronAPI.getChapter(id, chapter, typeProject)
+    )
       .map(([k, v]) => ({ num: k, verse: v.text, enabled: v.enabled }))
       .filter((v) => v.enabled)
     setVerseObjects(savedVerses)
@@ -79,16 +86,21 @@ function BlindEditor({ config: { id, mainResource, chapter = false }, toolName }
       id,
       chapter,
       verseObjects[index].num.toString(),
-      verseObjects[index].verse
+      verseObjects[index].verse,
+      typeProject
     )
   }
   const saveVerse = (ref) => {
     const { index, currentNumVerse, nextNumVerse, prevNumVerse, isTranslating } = ref
     if ((index !== 0 && !verseObjects[index - 1].verse) || isTranslating) {
-      if (textAreaRef?.current?.[index - 1]) {
-        textAreaRef?.current[index - 1].focus()
+      const prevTextArea = textAreaRef?.current?.[index - 1]
+      if (prevTextArea) {
+        prevTextArea.focus()
       } else {
-        textAreaRef?.current[index].focus()
+        const currentTextArea = textAreaRef?.current?.[index]
+        if (currentTextArea) {
+          currentTextArea.focus()
+        }
       }
       return
     }
@@ -134,7 +146,10 @@ function BlindEditor({ config: { id, mainResource, chapter = false }, toolName }
           const isTranslating = enabledInputs.includes(verseObject.num.toString())
           const isTranslated = translatedVerses.includes(currentNumVerse)
           return (
-            <div key={verseObject.num} className="my-3 flex items-start">
+            <div
+              key={verseObject.num}
+              className={`my-3 flex items-start ${is_rtl ? 'flex-row-reverse' : ''}`}
+            >
               <button
                 onClick={() =>
                   handleSaveVerse({
@@ -151,7 +166,9 @@ function BlindEditor({ config: { id, mainResource, chapter = false }, toolName }
                 disabled={disabledButton}
               >
                 {isTranslated ? (
-                  <Check className="h-4 w-4 stroke-2" />
+                  <Check
+                    className={`h-4 w-4 stroke-2 ${is_rtl ? 'scale-x-[-1] transform' : ''}`}
+                  />
                 ) : (
                   <Pencil
                     className={`h-4 w-4 stroke-2 ${
@@ -160,30 +177,21 @@ function BlindEditor({ config: { id, mainResource, chapter = false }, toolName }
                         : !isTranslating
                           ? 'fill-th-secondary-100'
                           : 'stroke-th-text-secondary-100'
-                    }`}
+                    } ${is_rtl ? 'scale-x-[-1] transform' : ''}`}
                   />
                 )}
               </button>
 
-              <div className="mx-4">{obsCheckAdditionalVerses(verseObject.num)}</div>
+              <div className={`mx-4 ${is_rtl ? 'order-first' : ''}`}>
+                {obsCheckAdditionalVerses(verseObject.num)}
+              </div>
               {isTranslating ? (
-                <textarea
-                  ref={(el) => (textAreaRef.current[index] = el)}
-                  autoFocus
-                  rows={1}
+                <RtlTextArea
                   className="focus:inline-none w-full resize-none focus:outline-none"
-                  onChange={(e) => {
-                    e.target.style.height = 'inherit'
-                    e.target.style.height = `${e.target.scrollHeight}px`
-                    updateVerse(
-                      index,
-                      e.target.value
-                        .replace(/  +/g, ' ')
-                        .replace(/ +([\.\,\)\!\?\;\:])/g, '$1')
-                        .trim()
-                    )
-                  }}
-                  defaultValue={verseObject.verse ?? ''}
+                  ref={(el) => (textAreaRef.current[index] = el)}
+                  value={verseObject.verse ?? ''}
+                  onChange={(newText) => updateVerse(index, newText)}
+                  defaultDirection={is_rtl ? 'rtl' : 'ltr'}
                 />
               ) : (
                 <div className="whitespace-pre-line">{verseObject.verse}</div>
@@ -191,17 +199,20 @@ function BlindEditor({ config: { id, mainResource, chapter = false }, toolName }
             </div>
           )
         })}
+
         {isShowFinalButton && (
-          <button
-            onClick={() => {
-              setEnabledIcons(['201'])
-              setEnabledInputs([])
-              sendToDb(verseObjects.length - 1)
-            }}
-            className="btn-base bg-th-primary-100 text-th-text-secondary-100 hover:opacity-70"
-          >
-            {t('Save')}
-          </button>
+          <div className="flex w-full">
+            <button
+              onClick={() => {
+                setEnabledIcons(['201'])
+                setEnabledInputs([])
+                sendToDb(verseObjects.length - 1)
+              }}
+              className={`btn-base bg-th-primary-100 text-th-text-secondary-100 hover:opacity-70 ${is_rtl ? 'ml-auto' : ''}`}
+            >
+              {t('Save')}
+            </button>
+          </div>
         )}
       </div>
       <Modal isOpen={isOpenModal} closeHandle={() => setIsOpenModal(false)}>
@@ -214,8 +225,8 @@ function BlindEditor({ config: { id, mainResource, chapter = false }, toolName }
                 setIsOpenModal(false)
                 saveVerse(firstStepRef)
                 setTimeout(() => {
-                  if (textAreaRef?.current) {
-                    textAreaRef?.current[0].focus()
+                  if (textAreaRef.current && textAreaRef.current[0]) {
+                    textAreaRef.current[0].focus()
                   }
                 }, 1000)
               }}
