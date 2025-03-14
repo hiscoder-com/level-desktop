@@ -51,6 +51,20 @@ export const readableDate = (date, locale = 'ru') => {
   }).format(new Date(date))
 }
 
+export function findEmptyJsonElements(json) {
+  const emptyKeys = []
+  for (const [key, value] of Object.entries(json)) {
+    if (
+      value === null ||
+      value === undefined ||
+      (typeof value === 'string' && value.trim() === '')
+    ) {
+      emptyKeys.push(key)
+    }
+  }
+  return emptyKeys
+}
+
 export const createObjectToTransform = (ref, partOfChapterTitle, typeProject = '') => {
   if (ref.json === null) {
     return
@@ -62,6 +76,7 @@ export const createObjectToTransform = (ref, partOfChapterTitle, typeProject = '
     title: `${chapterNum}.`,
     reference: ' ', // PDF Bible does not work without reference
   }
+  const info = findEmptyJsonElements(json)
 
   if (typeProject === 'obs' && (!json[0] || !json[200])) {
     throw new Error(

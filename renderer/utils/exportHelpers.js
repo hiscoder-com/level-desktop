@@ -2,7 +2,7 @@ import { convertBookChapters, convertToUsfm } from '@/helpers/usfm'
 import { JsonToMd, JsonToPdf, MdToZip } from '@texttree/obs-format-convert-rcl'
 import toast from 'react-hot-toast'
 
-import { createObjectToTransform } from './helper'
+import { createObjectToTransform, findEmptyJsonElements } from './helper'
 
 const styles = {
   currentPage: {
@@ -113,9 +113,17 @@ export const exportToZip = async (t, chapters, project) => {
       throw new Error('Failed to load OBS book data')
     }
     const fileData = { name: 'content', isFolder: true, content: [] }
+    const incompleteChapters = []
 
     for (const story of obs) {
       if (!story || story.text === null) continue
+      const emptyChunks = findEmptyJsonElements(story.text)
+
+      if (emptyChunks.length > 0) {
+        incompleteChapters.push(story.num)
+        continue
+      }
+
       let objectToTransform
       try {
         objectToTransform = createObjectToTransform(
@@ -137,6 +145,17 @@ export const exportToZip = async (t, chapters, project) => {
         })
       }
     }
+
+    if (fileData.content.length === 0) {
+      throw new Error('No fully translated chapters available for export.')
+    }
+
+    if (incompleteChapters.length > 0) {
+      toast.error(
+        `Attention: the stories of ${incompleteChapters.join(', ')} have not been fully translated`
+      )
+    }
+
     const frontContent = []
     if (bookProperties?.intro) {
       frontContent.push({
