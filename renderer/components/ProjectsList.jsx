@@ -4,8 +4,9 @@ import { useRouter } from 'next/router'
 
 import { convertBookChapters, convertToUsfm } from '@/helpers/usfm'
 import { useTranslation } from '@/next-i18next'
+import { createObjectToTransform } from '@/utils/helper'
 import { Field, Label, Switch } from '@headlessui/react'
-import { JsonToPdf } from '@texttree/obs-format-convert-rcl'
+import { JsonToMd, JsonToPdf, MdToZip } from '@texttree/obs-format-convert-rcl'
 import toast from 'react-hot-toast'
 
 import Modal from './Modal'
@@ -193,6 +194,87 @@ function ProjectsList({ projectsList, setProjectsList }) {
     }
   }
 
+  const exportToZip = async (chapters, project) => {
+    if (!project) {
+      return
+    }
+    try {
+      const bookProperties = window.electronAPI.getProperties(project.id)
+      if (!bookProperties) throw new Error('Failed to load book properties')
+      const obs = convertBookChapters(chapters)
+      if (!obs || !Array.isArray(obs)) {
+        throw new Error('Failed to load OBS book data')
+      }
+      const fileData = { name: 'content', isFolder: true, content: [] }
+
+      for (const story of obs) {
+        if (!story || story.text === null) continue
+        let objectToTransform
+        try {
+          objectToTransform = createObjectToTransform(
+            {
+              json: story.text,
+              chapterNum: story.num,
+            },
+            bookProperties.chapter_label,
+            project.typeProject
+          )
+        } catch (err) {
+          throw new Error(`${err.message}`)
+        }
+        const text = JsonToMd(objectToTransform)
+        if (text) {
+          fileData.content.push({
+            name: `${story.num}.md`,
+            content: text,
+          })
+        }
+      }
+      const frontContent = []
+      if (bookProperties?.intro) {
+        frontContent.push({
+          name: 'intro.md',
+          content: bookProperties.intro,
+        })
+      }
+      if (bookProperties?.title) {
+        frontContent.push({
+          name: 'title.md',
+          content: bookProperties.title,
+        })
+      }
+      if (frontContent.length > 0) {
+        fileData.content.push({
+          name: 'front',
+          isFolder: true,
+          content: frontContent,
+        })
+      }
+      if (bookProperties?.back) {
+        fileData.content.push({
+          name: 'back',
+          isFolder: true,
+          content: [
+            {
+              name: 'intro.md',
+              content: bookProperties.back,
+            },
+          ],
+        })
+      }
+      const projectName = project.name ?? project.title
+      const formattedDate = new Date().toISOString().split('T')[0]
+      const fileName = `${projectName}_${project.book.code}_${formattedDate}.zip`
+      await MdToZip({
+        fileData,
+        fileName,
+      })
+    } catch (error) {
+      console.error('Error during ZIP export:', error)
+      toast.error(t('projects:ErrorExportingZip'))
+    }
+  }
+
   const download = (project, type) => {
     try {
       const chapters = window.electronAPI.getBook(project.id)
@@ -201,6 +283,8 @@ function ProjectsList({ projectsList, setProjectsList }) {
         exportToPdf(chapters, project)
       } else if (type === 'usfm') {
         exportToUsfm(chapters, project)
+      } else if (type === 'zip') {
+        exportToZip(chapters, project)
       }
     } catch (error) {
       console.error('Download error:', error)
@@ -313,15 +397,27 @@ function ProjectsList({ projectsList, setProjectsList }) {
               </td>
               <td className="px-8 py-4">
                 <div className="flex cursor-pointer justify-end gap-5">
-                  <button
-                    className="rounded-md bg-th-primary-100 p-1 text-th-secondary-10 hover:opacity-70"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      download(project, 'usfm')
-                    }}
-                  >
-                    USFM
-                  </button>
+                  {project.typeProject === 'obs' ? (
+                    <button
+                      className="rounded-md bg-th-primary-100 p-1 text-th-secondary-10 hover:opacity-70"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        download(project, 'zip')
+                      }}
+                    >
+                      ZIP
+                    </button>
+                  ) : (
+                    <button
+                      className="rounded-md bg-th-primary-100 p-1 text-th-secondary-10 hover:opacity-70"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        download(project, 'usfm')
+                      }}
+                    >
+                      USFM
+                    </button>
+                  )}
                   <button
                     className="rounded-md bg-th-primary-100 p-1 text-th-secondary-10 hover:opacity-70"
                     onClick={(e) => {
