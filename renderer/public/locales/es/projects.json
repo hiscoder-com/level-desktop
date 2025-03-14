@@ -25,6 +25,7 @@
   "ErrorDownloadingZip": "Error al descargar el archivo ZIP",
   "ErrorExportingPDF": "Error al exportar el archivo PDF",
   "ErrorExportingUSFM": "Error al exportar el archivo USFM",
+  "ErrorExportingZip": "Error al exportar el archivo ZIP",
   "ErrorParsing": "Error de análisis JSON",
   "ErrorProcessingFiles": "Error de procesamiento de archivos",
   "ExistingText": "Texto existente:",

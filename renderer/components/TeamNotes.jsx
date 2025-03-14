@@ -75,7 +75,7 @@ const icons = {
   ),
 }
 
-export default function TeamNotes({ config: { id } }) {
+export default function TeamNotes({ config: { id, language } }) {
   const { t } = useTranslation(['common', 'projects'])
 
   const [noteId, setNoteId] = useState('')
@@ -90,8 +90,8 @@ export default function TeamNotes({ config: { id } }) {
   const notes = Object.values(notesObject)
   const [dataForTreeView, setDataForTreeView] = useState(convertNotesToTree(notes))
   const [term, setTerm] = useState('')
-  // const isRtl = config?.isRtl || false;
-  const isRtl = false
+
+  const isRtl = language?.is_rtl || false
   const saveNote = () => {
     window.electronAPI.updateNote(id, activeNote, 'team-notes')
   }
@@ -539,6 +539,7 @@ export default function TeamNotes({ config: { id } }) {
             onChange={setTerm}
             placeholder={t('Search')}
             readOnly={activeNote}
+            defaultDirection={isRtl ? 'rtl' : 'ltr'}
           />
           {term && (
             <Close

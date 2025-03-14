@@ -1112,7 +1112,6 @@ async function handleAddProject(url, event) {
 
       await fs.promises.writeFile(configPath, JSON.stringify(config, null, 2))
 
-      // Определяем defaultProperties после получения config
       let defaultProperties
       if (config.typeProject === 'obs') {
         defaultProperties = {
@@ -1133,10 +1132,10 @@ async function handleAddProject(url, event) {
       }
 
       project.book = { ...config.book }
-      project.title = config.project.title || config.project
+      project.title = config.project.title ?? config.project
       project.method = config.method
       project.fileName = fileName
-
+      project.typeProject = config.typeProject
       await createPropertiesFile(id, defaultProperties)
 
       const currentUser = storeUsers.get('currentUser')

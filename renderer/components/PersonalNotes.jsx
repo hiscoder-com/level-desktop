@@ -73,7 +73,7 @@ const icons = {
   ),
 }
 
-export default function PersonalNotes({ config: { id }, config, toolName }) {
+export default function PersonalNotes({ config: { id, language } }) {
   const { t } = useTranslation(['common', 'projects'])
 
   const [noteId, setNoteId] = useState('')
@@ -88,7 +88,8 @@ export default function PersonalNotes({ config: { id }, config, toolName }) {
   const notes = Object.values(notesObject)
   const [dataForTreeView, setDataForTreeView] = useState(convertNotesToTree(notes))
   const [term, setTerm] = useState('')
-  const isRtl = false
+  const isRtl = language?.is_rtl || false
+
   const saveNote = () => {
     window.electronAPI.updateNote(id, activeNote, 'personal-notes')
   }
@@ -532,6 +533,7 @@ export default function PersonalNotes({ config: { id }, config, toolName }) {
             onChange={setTerm}
             placeholder={t('Search')}
             readOnly={activeNote}
+            defaultDirection={isRtl ? 'rtl' : 'ltr'}
           />
           {term && (
             <Close
