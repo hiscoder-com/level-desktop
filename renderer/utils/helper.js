@@ -1,8 +1,7 @@
+import { JsonToPdf } from '@texttree/obs-format-convert-rcl'
 import axios from 'axios'
 import jsyaml from 'js-yaml'
 import usfm from 'usfm-js'
-
-import { JsonToPdf } from '@texttree/obs-format-convert-rcl'
 
 import { obsStoryVerses } from './config'
 
@@ -52,7 +51,7 @@ export const readableDate = (date, locale = 'ru') => {
   }).format(new Date(date))
 }
 
-export const createObjectToTransform = (ref, partOfChapterTitle) => {
+export const createObjectToTransform = (ref, partOfChapterTitle, typeProject = '') => {
   if (ref.json === null) {
     return
   }
@@ -64,6 +63,11 @@ export const createObjectToTransform = (ref, partOfChapterTitle) => {
     reference: ' ', // PDF Bible does not work without reference
   }
 
+  if (typeProject === 'obs' && (!json[0] || !json[200])) {
+    throw new Error(
+      `OBS chapter ${chapterNum} is missing required keys: title (json[0]) and/or reference (json[200]).`
+    )
+  }
   if (json[0] && json[200]) {
     objectToTransform.title = `${chapterNum}. ${json[0]}`
     objectToTransform.reference = json[200]
