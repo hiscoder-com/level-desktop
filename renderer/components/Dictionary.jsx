@@ -28,7 +28,7 @@ function Dictionary({ config: { id, language } }) {
   const [wordId, setWordId] = useState('')
   const [words, setWords] = useState({ data: [], count: 0 })
   const { data: dictionary, alphabet, mutate } = useGetDictionary(id)
-  const is_rtl = language.is_rtl
+  const isRtl = language?.is_rtl || false
 
   const totalPageCount = useMemo(
     () => Math.ceil(words?.count / countWordsOnPage),
@@ -220,7 +220,7 @@ function Dictionary({ config: { id, language } }) {
           {...sharedProps}
           importWords={importWords}
           exportWords={exportWords}
-          defaultDirection={is_rtl ? 'rtl' : 'ltr'}
+          defaultDirection={isRtl ? 'rtl' : 'ltr'}
         />
         {alphabet.length ? (
           <Card t={t}>
