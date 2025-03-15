@@ -15,14 +15,14 @@ const DownloadButtons = ({ project }) => {
       const chapters = window.electronAPI.getBook(project.id)
       if (type === 'pdf') {
         if (project.typeProject !== 'obs') {
-          exportToPdf(chapters, project)
+          exportToPdf(t, chapters, project)
         } else {
           await exportToPdfObs(chapters, project)
         }
       } else if (type === 'usfm') {
-        exportToUsfm(chapters, project)
+        exportToUsfm(t, chapters, project)
       } else if (type === 'zip') {
-        exportToZip(chapters, project)
+        exportToZip(t, chapters, project)
       }
     } catch (error) {
       console.error('Download error:', error)
