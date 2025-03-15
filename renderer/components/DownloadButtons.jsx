@@ -9,6 +9,7 @@ import toast from 'react-hot-toast'
 
 const DownloadButtons = ({ project }) => {
   const { t } = useTranslation(['projects'])
+  const isRtl = project?.language?.is_rtl || false
 
   const handleDownload = async (type) => {
     try {
@@ -17,7 +18,7 @@ const DownloadButtons = ({ project }) => {
         if (project.typeProject !== 'obs') {
           exportToPdf(t, chapters, project)
         } else {
-          await exportToPdfObs(t, chapters, project)
+          await exportToPdfObs(t, chapters, project, isRtl)
         }
       } else if (type === 'usfm') {
         exportToUsfm(t, chapters, project)

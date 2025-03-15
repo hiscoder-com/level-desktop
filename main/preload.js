@@ -172,8 +172,8 @@ process.once('loaded', () => {
     initCurrentUser: (userId, email) =>
       ipcRenderer.invoke('init-current-user', userId, email),
 
-    exportToPdfObs: (chapters, project) =>
-      ipcRenderer.invoke('export-to-pdf-obs', chapters, project),
+    exportToPdfObs: (chapters, project, isRtl) =>
+      ipcRenderer.invoke('export-to-pdf-obs', chapters, project, isRtl),
 
     readOBSZipFile: (id, chapter) => ipcRenderer.invoke('read-obs-zip', { id, chapter }),
   })

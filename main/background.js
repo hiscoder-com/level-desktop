@@ -1137,6 +1137,7 @@ async function handleAddProject(url, event) {
       project.method = config.method
       project.fileName = fileName
       project.typeProject = config.typeProject
+      project.language = config.language
       await createPropertiesFile(id, defaultProperties)
 
       const currentUser = storeUsers.get('currentUser')
@@ -1429,7 +1430,7 @@ ipcMain.handle('check-file-exists', async (event, fileName) => {
 //Удалить после отладки
 const { shell } = require('electron')
 
-ipcMain.handle('export-to-pdf-obs', async (_, chapters, project) => {
+ipcMain.handle('export-to-pdf-obs', async (_, chapters, project, isRtl) => {
   try {
     if (!chapters || !project || !project.book?.code) {
       throw new Error('Invalid project or chapters data')
@@ -1452,7 +1453,7 @@ ipcMain.handle('export-to-pdf-obs', async (_, chapters, project) => {
     // }
 
     // const filePath = result.filePath
-    const htmlContent = await generateHtmlContent(project, chapters)
+    const htmlContent = await generateHtmlContent(project, chapters, isRtl)
 
     const browser = await puppeteer.launch()
     const page = await browser.newPage()
@@ -1558,7 +1559,7 @@ const generateChapterContentHtml = async (chapter, zip, pad, chapter_label) => {
   return versesHtml
 }
 
-const generateHtmlContent = async (project, chapters) => {
+const generateHtmlContent = async (project, chapters, isRtl) => {
   const propertiesPath = path.join(projectUrl, project.id, 'properties.json')
   const properties = readJsonFile(propertiesPath)
   const chapter_label = properties.chapter_label || 'Story'
@@ -1614,14 +1615,14 @@ const generateHtmlContent = async (project, chapters) => {
   )
 
   return `
-    <html lang="ar" dir="rtl">
+    <html lang="ar" dir="${isRtl ? 'rtl' : 'ltr'}">
     <head>
       <meta charset="UTF-8">
       <style>
       @page { size: A4; margin: 20mm; }
       @page :left { margin-left: 25mm; }
       @page :right { margin-right: 25mm; }
-      body { font-family: 'Amiri', serif; direction: rtl; text-align: right; padding: 20px; }
+      body { font-family: 'Amiri', serif; direction: ${isRtl ? 'rtl' : 'ltr'}; text-align: ${isRtl ? 'right' : 'left'}; padding: 20px; }
       h1 { font-size: 24px; margin-bottom: 10px; }
       h2 { font-size: 20px; margin-bottom: 10px; }
       .chapter { margin-bottom: 20px; page-break-before: always; }
@@ -1639,10 +1640,9 @@ const generateHtmlContent = async (project, chapters) => {
       .chapter-header {
         position: absolute;
         top: 0;
-        right: 0;
+        ${isRtl ? 'left' : 'right'}: 0;
         font-size: 12px;
-        text-align: right;
-        
+        text-align: ${isRtl ? 'left' : 'right'};
       }
     </style>
     
