@@ -46,7 +46,7 @@
   "ImportingProject": "Importando un proyecto",
   "ImportProject": "Importando un proyecto",
   "ImportSuccess": "Importaciones exitosas",
-  "IncompleteChaptersWarning": "Atención: las historias de {{chapters}} no se han traducido por completo",
+  "IncompleteChaptersWarning": "Atención: las {{chapterLabel}}  {{chapters}} no se han traducido por completo",
   "Information": "Información",
   "intro": "Intro",
   "intro_placeholder": "**Aquí necesitas un texto en formato markdown para describir el libro**",
