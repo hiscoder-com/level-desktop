@@ -57,6 +57,15 @@ export const exportToPdf = (t, chapters, project) => {
   }
 }
 
+export const exportToPdfObs = async (chapters, project) => {
+  try {
+    const filePath = await window.electron.exportToPdfObs(chapters, project)
+    if (!filePath) throw new Error('Failed to generate PDF')
+  } catch (error) {
+    toast.error(t('projects:FailedToCreatePDF'))
+  }
+}
+
 export const exportToUsfm = (t, chapters, project) => {
   if (!project) {
     return

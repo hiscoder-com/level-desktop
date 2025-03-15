@@ -1,19 +1,28 @@
 import { useTranslation } from '@/next-i18next'
-import { exportToPdf, exportToUsfm, exportToZip } from '@/utils/exportHelpers'
+import {
+  exportToPdf,
+  exportToPdfObs,
+  exportToUsfm,
+  exportToZip,
+} from '@/utils/exportHelpers'
 import toast from 'react-hot-toast'
 
 const DownloadButtons = ({ project }) => {
   const { t } = useTranslation(['projects'])
 
-  const handleDownload = (type) => {
+  const handleDownload = async (type) => {
     try {
       const chapters = window.electronAPI.getBook(project.id)
       if (type === 'pdf') {
-        exportToPdf(t, chapters, project)
+        if (project.typeProject !== 'obs') {
+          exportToPdf(chapters, project)
+        } else {
+          await exportToPdfObs(chapters, project)
+        }
       } else if (type === 'usfm') {
-        exportToUsfm(t, chapters, project)
+        exportToUsfm(chapters, project)
       } else if (type === 'zip') {
-        exportToZip(t, chapters, project)
+        exportToZip(chapters, project)
       }
     } catch (error) {
       console.error('Download error:', error)
