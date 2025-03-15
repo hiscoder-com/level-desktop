@@ -2,7 +2,7 @@ import { convertBookChapters, convertToUsfm } from '@/helpers/usfm'
 import { JsonToMd, JsonToPdf, MdToZip } from '@texttree/obs-format-convert-rcl'
 import toast from 'react-hot-toast'
 
-import { showToastWarning } from './customToast'
+import { showToastWarningWithBlock } from './customToast'
 import { createObjectToTransform, findEmptyJsonElements } from './helper'
 
 const styles = {
@@ -150,9 +150,9 @@ export const exportToZip = async (t, chapters, project) => {
         })
       }
     }
-    if (fileData.content.length === 0) {
-      throw new Error('No fully translated chapters available for export.')
-    }
+    // if (fileData.content.length === 0) {
+    //   throw new Error('No fully translated chapters available for export.')
+    // }
 
     if (incompleteChapters.length > 0) {
       const sortedChapters = incompleteChapters
@@ -166,7 +166,7 @@ export const exportToZip = async (t, chapters, project) => {
         .replace('{{chapterLabel}}', chapterLabel)
         .replace('{{chapters}}', sortedChapters)
 
-      showToastWarning(message)
+      await showToastWarningWithBlock(message, 5000, true)
     }
 
     const frontContent = []

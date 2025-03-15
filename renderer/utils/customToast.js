@@ -29,3 +29,14 @@ export function showToastWarning(message, duration = 5000) {
     { duration: duration }
   )
 }
+
+export const showToastWarningWithBlock = (message, duration, block) => {
+  return new Promise((resolve) => {
+    showToastWarning(message, duration)
+    if (block) {
+      setTimeout(() => resolve(), duration)
+    } else {
+      resolve()
+    }
+  })
+}
