@@ -1510,16 +1510,10 @@ const generateChapterTitleHtml = async (chapter, zip, chapter_label, pad) => {
   const titleVerse = chapter.verseObjects.find((v) => v.verse === 0)
   if (!titleVerse) return ''
 
-  const imageFileName = `obs-en-${pad(chapter.chapterNum)}-${pad(titleVerse.verse)}`
-  const titleImageSrc = await getImageFromZip(zip, imageFileName)
-
   return `
     <div class="chapter-title">
       <h2>${chapter_label} ${chapter.chapterNum}</h2>
-      ${titleImageSrc ? `<img src="${titleImageSrc}" alt="Title image for chapter ${chapter.chapterNum}">` : ''}
-      <p>${titleVerse.text}</p>
     </div>
-    <div class="page-break"></div>
   `
 }
 
@@ -1531,21 +1525,37 @@ const generateChapterContentHtml = async (chapter, zip, pad, chapter_label) => {
     </div>
   `
 
-  for (const v of chapter.verseObjects.filter((v) => v.verse !== 0)) {
-    const imageFileName = `obs-en-${pad(chapter.chapterNum)}-${pad(v.verse)}`
-    const imageSrc = await getImageFromZip(zip, imageFileName)
+  const verses = chapter.verseObjects.filter((v) => v.verse !== 0)
 
+  const versesWithImages = await Promise.all(
+    verses.map(async (v) => {
+      const imageFileName = `obs-en-${pad(chapter.chapterNum)}-${pad(v.verse)}`
+      const imageSrc = await getImageFromZip(zip, imageFileName)
+      return { ...v, imageSrc }
+    })
+  )
+
+  let lastImageIndex = -1
+  versesWithImages.forEach((v, idx) => {
+    if (v.imageSrc) {
+      lastImageIndex = idx
+    }
+  })
+
+  for (let i = 0; i < versesWithImages.length; i++) {
+    const v = versesWithImages[i]
     versesHtml += `
       <div class="verse ${v.enabled ? 'enabled' : 'disabled'}">
-        ${imageSrc ? `<img src="${imageSrc}" alt="Image for chapter ${chapter.chapterNum}, verse ${v.verse}">` : ''}
+        ${v.imageSrc ? `<img src="${v.imageSrc}" alt="Image for chapter ${chapter.chapterNum}, verse ${v.verse}">` : ''}
         <p>${v.text}</p>
       </div>
     `
 
-    if (imageSrc) {
+    if (v.imageSrc) {
       imageCount++
     }
-    if (imageCount >= 2) {
+
+    if (imageCount >= 2 && i < versesWithImages.length - 1 && i < lastImageIndex) {
       versesHtml += `
         <div class="page-break"></div>
         <div class="header-container">
