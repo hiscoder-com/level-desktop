@@ -174,6 +174,7 @@ process.once('loaded', () => {
 
     exportToPdfObs: (chapters, project) =>
       ipcRenderer.invoke('export-to-pdf-obs', chapters, project),
+
     readOBSZipFile: (id, chapter) => ipcRenderer.invoke('read-obs-zip', { id, chapter }),
   })
 })

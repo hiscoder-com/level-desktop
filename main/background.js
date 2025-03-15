@@ -1452,7 +1452,7 @@ ipcMain.handle('export-to-pdf-obs', async (_, chapters, project) => {
     // }
 
     // const filePath = result.filePath
-    const htmlContent = generateHtmlContent(project, chapters)
+    const htmlContent = await generateHtmlContent(project, chapters)
 
     const browser = await puppeteer.launch()
     const page = await browser.newPage()
@@ -1469,7 +1469,7 @@ ipcMain.handle('export-to-pdf-obs', async (_, chapters, project) => {
   }
 })
 
-const generateHtmlContent = (project, chapters) => {
+const generateHtmlContent = async (project, chapters) => {
   const propertiesPath = path.join(projectUrl, project.id, 'properties.json')
   let properties = {}
   try {
@@ -1478,7 +1478,7 @@ const generateHtmlContent = (project, chapters) => {
   } catch (err) {
     console.error(`Error reading properties file for project ${project.id}:`, err)
   }
-  const chapter_label = properties.chapter_label ?? 'Chapter'
+  const chapter_label = properties.chapter_label || 'Story'
   const titlePage = properties.title
     ? `
       <div class="title-page">
@@ -1495,7 +1495,10 @@ const generateHtmlContent = (project, chapters) => {
     `
     : ''
 
+  const pad = (num) => String(num).padStart(2, '0')
+
   const book = Object.entries(chapters).map(([chapterNum, verses]) => ({
+    chapterNum,
     title: `${chapter_label} ${chapterNum}`,
     verseObjects: Object.entries(verses).map(([verse, data]) => ({
       verse,
@@ -1503,6 +1506,54 @@ const generateHtmlContent = (project, chapters) => {
       enabled: data.enabled,
     })),
   }))
+
+  const zipPath = path.join(projectUrl, project.id, 'obs-images-360px.zip')
+  let zip = null
+  try {
+    const zipData = fs.readFileSync(zipPath)
+    zip = await JSZip.loadAsync(zipData)
+  } catch (err) {
+    console.error(`Ошибка загрузки ZIP архива ${zipPath}:`, err)
+  }
+
+  const chaptersHtmlArray = await Promise.all(
+    book.map(async (chapter) => {
+      const versesHtmlArray = await Promise.all(
+        chapter.verseObjects.map(async (v) => {
+          const imageFileName = `obs-en-${pad(chapter.chapterNum)}-${pad(v.verse)}`
+          let imageSrc = ''
+          if (zip) {
+            const file = zip.file(`${imageFileName}.jpg`)
+            if (file) {
+              try {
+                const base64Data = await file.async('base64')
+                imageSrc = `data:image/jpeg;base64,${base64Data}`
+              } catch (err) {
+                console.error(
+                  `Ошибка получения данных изображения ${imageFileName}.jpg:`,
+                  err
+                )
+              }
+            } else {
+              console.error(`Изображение не найдено в архиве: ${imageFileName}.jpg`)
+            }
+          }
+          return `
+            <div class="verse ${v.enabled ? 'enabled' : 'disabled'}">
+              ${imageSrc ? `<img src="${imageSrc}" alt="Image for chapter ${chapter.chapterNum}, verse ${v.verse}">` : ''}
+              <p>${v.text}</p>
+            </div>
+          `
+        })
+      )
+      return `
+        <div class="chapter">
+          <h2>${chapter.title}</h2>
+          ${versesHtmlArray.join('')}
+        </div>
+      `
+    })
+  )
 
   return `
     <html lang="ar" dir="rtl">
@@ -1524,6 +1575,12 @@ const generateHtmlContent = (project, chapters) => {
         .verse { 
           font-size: 16px; 
           margin-bottom: 5px; 
+        }
+        .verse img {
+          display: block;
+          margin-bottom: 5px;
+          max-width: 100%;
+          height: auto;
         }
         .title-page {
           display: flex;
@@ -1548,24 +1605,7 @@ const generateHtmlContent = (project, chapters) => {
       ${titlePage} 
       ${introPage} 
       <h1>${project.name} - ${project.book.code}</h1>
-      ${book
-        .map(
-          (chapter) => `
-            <div class="chapter">
-              <h2>${chapter.title}</h2>
-              ${chapter.verseObjects
-                .map(
-                  (v) => `
-                    <p class="verse ${v.enabled ? 'enabled' : 'disabled'}">
-                      <strong>${v.verse}:</strong> ${v.text}
-                    </p>
-                  `
-                )
-                .join('')}
-            </div>
-          `
-        )
-        .join('')}
+      ${chaptersHtmlArray.join('')}
     </body>
     </html>
   `
