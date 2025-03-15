@@ -1469,30 +1469,96 @@ ipcMain.handle('export-to-pdf-obs', async (_, chapters, project) => {
   }
 })
 
-const generateHtmlContent = async (project, chapters) => {
-  const propertiesPath = path.join(projectUrl, project.id, 'properties.json')
-  let properties = {}
+const readJsonFile = (filePath) => {
   try {
-    const propertiesContent = fs.readFileSync(propertiesPath, 'utf8')
-    properties = JSON.parse(propertiesContent)
+    const content = fs.readFileSync(filePath, 'utf8')
+    return JSON.parse(content)
   } catch (err) {
-    console.error(`Error reading properties file for project ${project.id}:`, err)
+    console.error(`Ошибка чтения JSON файла ${filePath}:`, err)
+    return {}
   }
-  const chapter_label = properties.chapter_label || 'Story'
-  const titlePage = properties.title
-    ? `
-      <div class="title-page">
-        <h1>${properties.title}</h1>
+}
+
+const loadZipArchive = async (zipPath) => {
+  try {
+    const zipData = fs.readFileSync(zipPath)
+    return await JSZip.loadAsync(zipData)
+  } catch (err) {
+    console.error(`Ошибка загрузки ZIP архива ${zipPath}:`, err)
+    return null
+  }
+}
+
+const getImageFromZip = async (zip, imageFileName) => {
+  if (!zip) return ''
+  const file = zip.file(`${imageFileName}.jpg`)
+  if (file) {
+    try {
+      const base64Data = await file.async('base64')
+      return `data:image/jpeg;base64,${base64Data}`
+    } catch (err) {
+      console.error(`Ошибка получения данных изображения ${imageFileName}.jpg:`, err)
+    }
+  } else {
+    console.error(`Изображение не найдено в архиве: ${imageFileName}.jpg`)
+  }
+  return ''
+}
+
+const generateChapterTitleHtml = async (chapter, zip, chapter_label, pad) => {
+  const titleVerse = chapter.verseObjects.find((v) => v.verse === 0)
+  if (!titleVerse) return ''
+
+  const imageFileName = `obs-en-${pad(chapter.chapterNum)}-${pad(titleVerse.verse)}`
+  const titleImageSrc = await getImageFromZip(zip, imageFileName)
+
+  return `
+    <div class="chapter-title">
+      <h2>${chapter_label} ${chapter.chapterNum}</h2>
+      ${titleImageSrc ? `<img src="${titleImageSrc}" alt="Title image for chapter ${chapter.chapterNum}">` : ''}
+      <p>${titleVerse.text}</p>
+    </div>
+    <div class="page-break"></div>
+  `
+}
+
+const generateChapterContentHtml = async (chapter, zip, pad) => {
+  let imageCount = 0
+  let versesHtml = ''
+
+  for (const v of chapter.verseObjects.filter((v) => v.verse !== 0)) {
+    const imageFileName = `obs-en-${pad(chapter.chapterNum)}-${pad(v.verse)}`
+    const imageSrc = await getImageFromZip(zip, imageFileName)
+
+    versesHtml += `
+      <div class="verse ${v.enabled ? 'enabled' : 'disabled'}">
+        ${imageSrc ? `<img src="${imageSrc}" alt="Image for chapter ${chapter.chapterNum}, verse ${v.verse}">` : ''}
+        <p>${v.text}</p>
       </div>
     `
+    if (imageSrc) {
+      imageCount++
+    }
+    if (imageCount >= 2) {
+      versesHtml += `<div class="page-break"></div>`
+      imageCount = 0
+    }
+  }
+
+  return versesHtml
+}
+
+const generateHtmlContent = async (project, chapters) => {
+  const propertiesPath = path.join(projectUrl, project.id, 'properties.json')
+  const properties = readJsonFile(propertiesPath)
+  const chapter_label = properties.chapter_label || 'Story'
+
+  const titlePage = properties.title
+    ? `<div class="title-page"><h1>${properties.title}</h1></div>`
     : ''
 
   const introPage = properties.intro
-    ? `
-      <div class="intro-page">
-        ${marked(properties.intro)}
-      </div>
-    `
+    ? `<div class="intro-page">${marked(properties.intro)}</div>`
     : ''
 
   const pad = (num) => String(num).padStart(2, '0')
@@ -1501,7 +1567,6 @@ const generateHtmlContent = async (project, chapters) => {
     .sort((a, b) => Number(a[0]) - Number(b[0]))
     .map(([chapterNum, verses]) => ({
       chapterNum,
-      title: `${chapter_label} ${chapterNum}`,
       verseObjects: Object.entries(verses)
         .map(([verse, data]) => ({
           verse: Number(verse),
@@ -1512,103 +1577,24 @@ const generateHtmlContent = async (project, chapters) => {
     }))
 
   const zipPath = path.join(projectUrl, project.id, 'obs-images-360px.zip')
-  let zip = null
-  try {
-    const zipData = fs.readFileSync(zipPath)
-    zip = await JSZip.loadAsync(zipData)
-  } catch (err) {
-    console.error(`Ошибка загрузки ZIP архива ${zipPath}:`, err)
-  }
+  const zip = await loadZipArchive(zipPath)
 
   const chaptersHtmlArray = await Promise.all(
     book.map(async (chapter) => {
-      const titleVerse = chapter.verseObjects.find((v) => v.verse === 0)
-      const contentVerses = chapter.verseObjects.filter((v) => v.verse !== 0)
+      const chapterTitleHtml = await generateChapterTitleHtml(
+        chapter,
+        zip,
+        chapter_label,
+        pad
+      )
+      const versesHtml = await generateChapterContentHtml(chapter, zip, pad)
 
-      let chapterTitleHtml = ''
-      if (titleVerse) {
-        let titleImageSrc = ''
-        const imageFileName = `obs-en-${pad(chapter.chapterNum)}-${pad(titleVerse.verse)}`
-        if (zip) {
-          const file = zip.file(`${imageFileName}.jpg`)
-          if (file) {
-            try {
-              const base64Data = await file.async('base64')
-              titleImageSrc = `data:image/jpeg;base64,${base64Data}`
-            } catch (err) {
-              console.error(
-                `Ошибка получения данных изображения ${imageFileName}.jpg:`,
-                err
-              )
-            }
-          } else {
-            console.error(
-              `Изображение титульного стиха не найдено в архиве: ${imageFileName}.jpg`
-            )
-          }
-        }
-        chapterTitleHtml = `
-          <div class="chapter-title">
-            <h2>${chapter.title}</h2>
-            ${titleImageSrc ? `<img src="${titleImageSrc}" alt="Title image for chapter ${chapter.chapterNum}">` : ''}
-            <p>${titleVerse.text}</p>
-          </div>
-          <div class="page-break"></div>
-        `
-      }
-
-      let imageCount = 0
-      let versesHtml = ''
-      for (const v of contentVerses) {
-        const imageFileName = `obs-en-${pad(chapter.chapterNum)}-${pad(v.verse)}`
-        let imageSrc = ''
-        if (zip) {
-          const file = zip.file(`${imageFileName}.jpg`)
-          if (file) {
-            try {
-              const base64Data = await file.async('base64')
-              imageSrc = `data:image/jpeg;base64,${base64Data}`
-            } catch (err) {
-              console.error(
-                `Ошибка получения данных изображения ${imageFileName}.jpg:`,
-                err
-              )
-            }
-          } else {
-            console.error(`Изображение не найдено в архиве: ${imageFileName}.jpg`)
-          }
-        }
-        let verseHtml = `
-          <div class="verse ${v.enabled ? 'enabled' : 'disabled'}">
-            ${imageSrc ? `<img src="${imageSrc}" alt="Image for chapter ${chapter.chapterNum}, verse ${v.verse}">` : ''}
-            <p>${v.text}</p>
-          </div>
-        `
-        if (imageSrc) {
-          imageCount++
-        }
-        versesHtml += verseHtml
-        if (imageCount >= 2) {
-          versesHtml += `<div class="page-break"></div>`
-          imageCount = 0
-        }
-      }
-
-      if (!titleVerse) {
-        return `
-          <div class="chapter">
-            <h2>${chapter.title}</h2>
-            ${versesHtml}
-          </div>
-        `
-      } else {
-        return `
-          <div class="chapter">
-            ${chapterTitleHtml}
-            ${versesHtml}
-          </div>
-        `
-      }
+      return `
+        <div class="chapter">
+          ${chapterTitleHtml}
+          ${versesHtml}
+        </div>
+      `
     })
   )
 
@@ -1617,79 +1603,27 @@ const generateHtmlContent = async (project, chapters) => {
     <head>
       <meta charset="UTF-8">
       <style>
-                @page {
-          size: A4;
-          margin: 20mm;
-        }
-        @page :left {
-          margin-left: 25mm;
-        }
-        @page :right {
-          margin-right: 25mm;
-        }
-        body { 
-          font-family: 'Amiri', serif; 
-          direction: rtl; 
-          text-align: right; 
-          padding: 20px; 
-        }
-        h1 { 
-          font-size: 24px; 
-          margin-bottom: 10px; 
-        }
-        h2 { 
-          font-size: 20px; 
-          margin-bottom: 10px; 
-        }
-        .chapter { 
-          margin-bottom: 20px; 
-          page-break-before: always; 
-        }
-        .chapter-title {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          height: 100vh;
-          text-align: center;
-        }
-        .chapter-title h2 {
-          font-size: 36px;
-          margin-bottom: 10px;
-        }
-        .verse { 
-          font-size: 16px; 
-          margin-bottom: 5px; 
-        }
-        .verse img {
-          display: block;
-          margin-bottom: 5px;
-          max-width: 100%;
-          height: auto;
-        }
-        .title-page {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          height: 100vh;
-          text-align: center;
-        }
-        .title-page h1 {
-          font-size: 36px;
-        }
-        .intro-page {
-          padding: 40px;
-          min-height: 100vh;
-        }
-                .page-break {
-          page-break-after: always;
-        }
+        @page { size: A4; margin: 20mm; }
+        @page :left { margin-left: 25mm; }
+        @page :right { margin-right: 25mm; }
+        body { font-family: 'Amiri', serif; direction: rtl; text-align: right; padding: 20px; }
+        h1 { font-size: 24px; margin-bottom: 10px; }
+        h2 { font-size: 20px; margin-bottom: 10px; }
+        .chapter { margin-bottom: 20px; page-break-before: always; }
+        .chapter-title { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; text-align: center; }
+        .chapter-title h2 { font-size: 36px; margin-bottom: 10px; }
+        .verse { font-size: 16px; margin-bottom: 5px; }
+        .verse img { display: block; margin-bottom: 5px; max-width: 100%; height: auto; }
+        .title-page { display: flex; align-items: center; justify-content: center; height: 100vh; text-align: center; }
+        .title-page h1 { font-size: 36px; }
+        .intro-page { padding: 40px; min-height: 100vh; }
+        .page-break { page-break-after: always; }
       </style>
     </head>
     <body>
       ${titlePage} 
       ${introPage} 
-            ${chaptersHtmlArray.join('')}
+      ${chaptersHtmlArray.join('')}
     </body>
     </html>
   `
