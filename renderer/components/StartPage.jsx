@@ -15,6 +15,7 @@ import LevelLogo from 'public/icons/level-logo-color.svg'
 export default function StartPage() {
   const router = useRouter()
   const { t } = useTranslation(['projects', 'users'])
+  const isConnectedToWeb = process.env.CONNECT_TO_WEB === 'true'
 
   const [isLoginFormVisible, setIsLoginFormVisible] = useState(false)
 
@@ -65,19 +66,35 @@ export default function StartPage() {
 
           {!isLoginFormVisible && (
             <>
-              <div className="rounded-3xl bg-th-primary-100" onClick={checkAgreements}>
-                <p className="green-two-layers cursor-pointer rounded-3xl px-7 py-8 text-xl text-th-secondary-10 after:rounded-3xl">
-                  {t('users:SignIn')}
-                  {t('users:WithoutRegistration')}
-                </p>
-              </div>
+              {!isConnectedToWeb ? (
+                <div className="rounded-3xl bg-th-primary-100" onClick={checkAgreements}>
+                  <p className="green-two-layers cursor-pointer rounded-3xl px-7 py-8 text-xl text-th-secondary-10 after:rounded-3xl">
+                    {t('users:SignIn')}
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <div
+                    className="rounded-3xl bg-th-primary-100"
+                    onClick={checkAgreements}
+                  >
+                    <p className="green-two-layers cursor-pointer rounded-3xl px-7 py-8 text-xl text-th-secondary-10 after:rounded-3xl">
+                      {t('users:SignIn')}
+                      {t('users:WithoutRegistration')}
+                    </p>
+                  </div>
 
-              <div className="rounded-3xl bg-th-primary-100" onClick={isAuthorization}>
-                <p className="green-two-layers cursor-pointer rounded-3xl px-7 py-8 text-xl text-th-secondary-10 after:rounded-3xl">
-                  {t('users:SignIn')}
-                  {t('users:ByRegistration')}
-                </p>
-              </div>
+                  <div
+                    className="rounded-3xl bg-th-primary-100"
+                    onClick={isAuthorization}
+                  >
+                    <p className="green-two-layers cursor-pointer rounded-3xl px-7 py-8 text-xl text-th-secondary-10 after:rounded-3xl">
+                      {t('users:SignIn')}
+                      {t('users:ByRegistration')}
+                    </p>
+                  </div>
+                </>
+              )}
             </>
           )}
 

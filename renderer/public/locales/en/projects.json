@@ -46,6 +46,7 @@
   "ImportingProject": "Importing a project",
   "ImportProject": "Importing a project",
   "ImportSuccess": "Successful import",
+  "IncompleteChaptersWarning": "Attention: the {{chapterLabel}}  {{chapters}} have not been fully translated",
   "Information": "Information",
   "intro": "Intro",
   "intro_placeholder": "**Here you need a text in markdown format to describe the book**",

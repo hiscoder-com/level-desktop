@@ -46,6 +46,7 @@
   "ImportingProject": "Импортирование проекта",
   "ImportProject": "Импорт проекта",
   "ImportSuccess": "Успешный импорт",
+  "IncompleteChaptersWarning": "Внимание:  {{chapterLabel}}  {{chapters}} переведены не полностью",
   "Information": "Информация",
   "intro": "Описание",
   "intro_placeholder": "**Здесь нужен текст в формате markdown для описания книги**",
