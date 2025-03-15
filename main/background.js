@@ -1573,11 +1573,9 @@ const generateHtmlContent = async (project, chapters, isRtl) => {
   const properties = readJsonFile(propertiesPath)
   const chapter_label = properties.chapter_label || 'Story'
 
-  // Определяем наличие содержимого
   const hasTitle = Boolean(properties.title && properties.title.trim())
   const hasIntro = Boolean(properties.intro && properties.intro.trim())
 
-  // Генерируем titlePage и introPage без CSS-разрывов внутри
   const titlePage = hasTitle
     ? `<div class="title-page"><h1>${properties.title.trim()}</h1></div>`
     : ''
@@ -1586,7 +1584,6 @@ const generateHtmlContent = async (project, chapters, isRtl) => {
     ? `<div class="intro-page">${marked(properties.intro.trim())}</div>`
     : ''
 
-  // Формируем разметку для секций с главами
   const pad = (num) => String(num).padStart(2, '0')
 
   const book = Object.entries(chapters)
@@ -1623,7 +1620,9 @@ const generateHtmlContent = async (project, chapters, isRtl) => {
       return `
         <div class="chapter">
           ${chapterTitleHtml}
+          ${chapterTitleHtml ? '<div class="page-break"></div>' : ''}
           ${versesHtml}
+          ${versesHtml ? '<div class="page-break"></div>' : ''}
         </div>
       `
     })
