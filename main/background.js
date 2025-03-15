@@ -1619,7 +1619,7 @@ const generateHtmlContent = async (project, chapters, isRtl) => {
     <head>
       <meta charset="UTF-8">
       <style>
-      @page { size: A4; margin: 20mm; }
+      @page { size: A4; }
       @page :left { margin-left: 25mm; }
       @page :right { margin-right: 25mm; }
       body { font-family: 'Amiri', serif; direction: ${isRtl ? 'rtl' : 'ltr'}; text-align: ${isRtl ? 'right' : 'left'}; padding: 20px; }
@@ -1641,7 +1641,9 @@ const generateHtmlContent = async (project, chapters, isRtl) => {
         position: absolute;
         top: 0;
         ${isRtl ? 'left' : 'right'}: 0;
-        font-size: 12px;
+        font-size: 18px;
+        font-weight: bold;
+        margin-top: 20px;
         text-align: ${isRtl ? 'left' : 'right'};
       }
     </style>
