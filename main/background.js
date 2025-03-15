@@ -1426,6 +1426,8 @@ ipcMain.handle('get-path-file', async (event, fileName) => {
 ipcMain.handle('check-file-exists', async (event, fileName) => {
   return checkFileExists(fileName)
 })
+//Удалить после отладки
+const { shell } = require('electron')
 
 ipcMain.handle('export-to-pdf-obs', async (_, chapters, project) => {
   try {
@@ -1437,17 +1439,19 @@ ipcMain.handle('export-to-pdf-obs', async (_, chapters, project) => {
     const formattedDate = new Date().toISOString().split('T')[0]
     const defaultFileName = `${project.name}_${project.book.code}_${formattedDate}.pdf`
 
-    const result = await dialog.showSaveDialog({
-      defaultPath: path.join(app.getPath('desktop'), defaultFileName),
-      filters: [{ name: 'PDF Files', extensions: ['pdf'] }],
-    })
+    //Удалить после отладки
+    const filePath = path.join(app.getPath('downloads'), defaultFileName)
 
-    if (result.canceled) {
-      return
-    }
+    // const result = await dialog.showSaveDialog({
+    //   defaultPath: path.join(app.getPath('desktop'), defaultFileName),
+    //   filters: [{ name: 'PDF Files', extensions: ['pdf'] }],
+    // })
 
-    const filePath = result.filePath
+    // if (result.canceled) {
+    //   return
+    // }
 
+    // const filePath = result.filePath
     const htmlContent = generateHtmlContent(project, chapters)
 
     const browser = await puppeteer.launch()
@@ -1455,6 +1459,9 @@ ipcMain.handle('export-to-pdf-obs', async (_, chapters, project) => {
     await page.setContent(htmlContent, { waitUntil: 'load' })
     await page.pdf({ path: filePath, format: 'A4' })
     await browser.close()
+
+    //Удалить после отладки
+    await shell.openPath(filePath)
 
     return filePath
   } catch (error) {
@@ -1538,8 +1545,8 @@ const generateHtmlContent = (project, chapters) => {
       </style>
     </head>
     <body>
-      ${titlePage ? titlePage + '<div class="page-break"></div>' : ''}
-      ${introPage ? introPage + '<div class="page-break"></div>' : ''}
+      ${titlePage} 
+      ${introPage} 
       <h1>${project.name} - ${project.book.code}</h1>
       ${book
         .map(
