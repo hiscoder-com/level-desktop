@@ -1568,20 +1568,25 @@ const generateChapterContentHtml = async (chapter, zip, pad, chapter_label) => {
 
   return versesHtml
 }
-
 const generateHtmlContent = async (project, chapters, isRtl) => {
   const propertiesPath = path.join(projectUrl, project.id, 'properties.json')
   const properties = readJsonFile(propertiesPath)
   const chapter_label = properties.chapter_label || 'Story'
 
-  const titlePage = properties.title
-    ? `<div class="title-page"><h1>${properties.title}</h1></div>`
+  // Определяем наличие содержимого
+  const hasTitle = Boolean(properties.title && properties.title.trim())
+  const hasIntro = Boolean(properties.intro && properties.intro.trim())
+
+  // Генерируем titlePage и introPage без CSS-разрывов внутри
+  const titlePage = hasTitle
+    ? `<div class="title-page"><h1>${properties.title.trim()}</h1></div>`
     : ''
 
-  const introPage = properties.intro
-    ? `<div class="intro-page">${marked(properties.intro)}</div>`
+  const introPage = hasIntro
+    ? `<div class="intro-page">${marked(properties.intro.trim())}</div>`
     : ''
 
+  // Формируем разметку для секций с главами
   const pad = (num) => String(num).padStart(2, '0')
 
   const book = Object.entries(chapters)
@@ -1624,46 +1629,96 @@ const generateHtmlContent = async (project, chapters, isRtl) => {
     })
   )
 
+  const chaptersSection =
+    chaptersHtmlArray.length > 0 ? `${chaptersHtmlArray.join('')}` : ''
+
   return `
     <html lang="ar" dir="${isRtl ? 'rtl' : 'ltr'}">
-    <head>
-      <meta charset="UTF-8">
-      <style>
-      @page { size: A4; }
-      @page :left { margin-left: 25mm; }
-      @page :right { margin-right: 25mm; }
-      body { font-family: 'Amiri', serif; direction: ${isRtl ? 'rtl' : 'ltr'}; text-align: ${isRtl ? 'right' : 'left'}; padding: 20px; }
-      h1 { font-size: 24px; margin-bottom: 10px; }
-      h2 { font-size: 20px; margin-bottom: 10px; }
-      .chapter { margin-bottom: 20px; page-break-before: always; }
-      .chapter-title { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; text-align: center; }
-      .verse { font-size: 16px; margin-bottom: 5px; }
-      .verse img { display: block; margin-bottom: 5px; max-width: 100%; height: auto; }
-      .title-page { display: flex; align-items: center; justify-content: center; height: 100vh; text-align: center; }
-      .intro-page { padding: 40px; min-height: 100vh; }
-      .page-break { page-break-after: always; }
-    
-      .header-container {
-        position: relative;
-        height: 20mm; 
-      }
-      .chapter-header {
-        position: absolute;
-        top: 0;
-        ${isRtl ? 'left' : 'right'}: 0;
-        font-size: 18px;
-        font-weight: bold;
-        margin-top: 20px;
-        text-align: ${isRtl ? 'left' : 'right'};
-      }
-    </style>
-    
-    </head>
-    <body>
-      ${titlePage} 
-      ${introPage} 
-      ${chaptersHtmlArray.join('')}
-    </body>
+    <title>${properties.title}</title>
+      <head>
+        <meta charset="UTF-8">
+        <style>
+          @page { size: A4; }
+          @page :left { margin-left: 25mm; }
+          @page :right { margin-right: 25mm; }
+          body {
+            font-family: 'Amiri', serif;
+            direction: ${isRtl ? 'rtl' : 'ltr'};
+            text-align: ${isRtl ? 'right' : 'left'};
+            padding: 20px;
+          }
+          h1 { font-size: 24px; margin-bottom: 10px; }
+          h2 { font-size: 20px; margin-bottom: 10px; }
+
+          .title-page {
+            padding-top: 40vh; 
+            text-align: center;
+            height: 100vh;
+            box-sizing: border-box;
+          }
+          .title-page h1 {
+            margin: 0;
+          }
+          .intro-page {
+            padding: 40px;
+            min-height: 100vh;
+          }
+          .chapter {
+            margin-bottom: 20px;
+          }
+          .chapter-title {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+          }
+          .verse { font-size: 16px; margin-bottom: 5px; }
+          .verse img {
+            display: block;
+            margin-bottom: 5px;
+            max-width: 100%;
+            height: auto;
+          }
+
+          .page-break {
+            display: block;
+            height: 0;
+            line-height: 0;
+            page-break-after: always;
+          }
+
+          .header-container {
+            position: relative;
+            height: 20mm; 
+          }
+          .chapter-header {
+            position: absolute;
+            top: 0;
+            ${isRtl ? 'left' : 'right'}: 0;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 20px;
+            text-align: ${isRtl ? 'left' : 'right'};
+          }
+
+          @media print {
+            .title-page,
+            .intro-page {
+              height: auto !important;
+              min-height: auto !important;
+            }
+          }
+        </style>
+      </head>
+      <body>
+        ${titlePage}
+        ${hasTitle && hasIntro ? '<div class="page-break"></div>' : ''}
+        ${introPage}
+        ${(hasTitle || hasIntro) && chaptersHtmlArray.length > 0 ? '<div class="page-break"></div>' : ''}
+        ${chaptersSection}
+      </body>
     </html>
   `
 }
