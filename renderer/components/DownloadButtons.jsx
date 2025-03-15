@@ -17,7 +17,7 @@ const DownloadButtons = ({ project }) => {
         if (project.typeProject !== 'obs') {
           exportToPdf(t, chapters, project)
         } else {
-          await exportToPdfObs(chapters, project)
+          await exportToPdfObs(t, chapters, project)
         }
       } else if (type === 'usfm') {
         exportToUsfm(t, chapters, project)
