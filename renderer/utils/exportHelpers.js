@@ -112,7 +112,7 @@ export const exportToZip = async (t, chapters, project) => {
       throw new Error('Failed to load book properties')
     }
 
-    const chapterLabel = bookProperties.chapter_label || 'Chapter'
+    const chapterLabel = bookProperties.chapter_label || 'Story'
     const obs = convertBookChapters(chapters)
     if (!obs || !Array.isArray(obs)) {
       throw new Error('Failed to load OBS book data')
@@ -150,9 +150,9 @@ export const exportToZip = async (t, chapters, project) => {
         })
       }
     }
-    // if (fileData.content.length === 0) {
-    //   throw new Error('No fully translated chapters available for export.')
-    // }
+    if (fileData.content.length === 0) {
+      throw new Error('No fully translated chapters available for export.')
+    }
 
     if (incompleteChapters.length > 0) {
       const sortedChapters = incompleteChapters
