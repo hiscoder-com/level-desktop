@@ -17,6 +17,7 @@ module.exports = {
         'process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY': JSON.stringify(
           process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
         ),
+        'process.env.CONNECT_TO_WEB': JSON.stringify(process.env.CONNECT_TO_WEB),
       })
     )
 

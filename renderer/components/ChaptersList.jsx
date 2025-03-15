@@ -50,7 +50,7 @@ function ChapterList({ id, chapters, steps, mutate, book, project }) {
       mutate()
     }
   }
-  const handleDownloadChapter = (chapter) => {
+  const handleDownloadChapter = (chapter, typeProject = '') => {
     const savedVerses = Object.entries(
       window.electronAPI.getChapter(id, chapter, typeProject)
     ).map(([k, v]) => ({ verse: k, text: v.text, enabled: v.enabled }))
