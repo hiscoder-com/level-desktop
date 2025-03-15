@@ -108,7 +108,11 @@ export const exportToZip = async (t, chapters, project) => {
   }
   try {
     const bookProperties = window.electronAPI.getProperties(project.id)
-    if (!bookProperties) throw new Error('Failed to load book properties')
+    if (!bookProperties) {
+      throw new Error('Failed to load book properties')
+    }
+
+    const chapterLabel = bookProperties.chapter_label || 'Chapter'
     const obs = convertBookChapters(chapters)
     if (!obs || !Array.isArray(obs)) {
       throw new Error('Failed to load OBS book data')
@@ -151,11 +155,18 @@ export const exportToZip = async (t, chapters, project) => {
     }
 
     if (incompleteChapters.length > 0) {
-      showToastWarning(
-        t('projects:IncompleteChaptersWarning', {
-          chapters: incompleteChapters.join(', '),
-        })
-      )
+      const sortedChapters = incompleteChapters
+        .map(Number)
+        .sort((a, b) => a - b)
+        .join(', ')
+
+      let message = t('projects:IncompleteChaptersWarning')
+
+      message = message
+        .replace('{{chapterLabel}}', chapterLabel)
+        .replace('{{chapters}}', sortedChapters)
+
+      showToastWarning(message)
     }
 
     const frontContent = []
