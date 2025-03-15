@@ -1522,9 +1522,13 @@ const generateChapterTitleHtml = async (chapter, zip, chapter_label, pad) => {
   `
 }
 
-const generateChapterContentHtml = async (chapter, zip, pad) => {
+const generateChapterContentHtml = async (chapter, zip, pad, chapter_label) => {
   let imageCount = 0
-  let versesHtml = ''
+  let versesHtml = `
+    <div class="header-container">
+      <span class="chapter-header">${chapter_label} ${chapter.chapterNum}</span>
+    </div>
+  `
 
   for (const v of chapter.verseObjects.filter((v) => v.verse !== 0)) {
     const imageFileName = `obs-en-${pad(chapter.chapterNum)}-${pad(v.verse)}`
@@ -1536,11 +1540,17 @@ const generateChapterContentHtml = async (chapter, zip, pad) => {
         <p>${v.text}</p>
       </div>
     `
+
     if (imageSrc) {
       imageCount++
     }
     if (imageCount >= 2) {
-      versesHtml += `<div class="page-break"></div>`
+      versesHtml += `
+        <div class="page-break"></div>
+        <div class="header-container">
+          <span class="chapter-header">${chapter_label} ${chapter.chapterNum}</span>
+        </div>
+      `
       imageCount = 0
     }
   }
@@ -1587,7 +1597,12 @@ const generateHtmlContent = async (project, chapters) => {
         chapter_label,
         pad
       )
-      const versesHtml = await generateChapterContentHtml(chapter, zip, pad)
+      const versesHtml = await generateChapterContentHtml(
+        chapter,
+        zip,
+        pad,
+        chapter_label
+      )
 
       return `
         <div class="chapter">
@@ -1603,22 +1618,34 @@ const generateHtmlContent = async (project, chapters) => {
     <head>
       <meta charset="UTF-8">
       <style>
-        @page { size: A4; margin: 20mm; }
-        @page :left { margin-left: 25mm; }
-        @page :right { margin-right: 25mm; }
-        body { font-family: 'Amiri', serif; direction: rtl; text-align: right; padding: 20px; }
-        h1 { font-size: 24px; margin-bottom: 10px; }
-        h2 { font-size: 20px; margin-bottom: 10px; }
-        .chapter { margin-bottom: 20px; page-break-before: always; }
-        .chapter-title { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; text-align: center; }
-        .chapter-title h2 { font-size: 36px; margin-bottom: 10px; }
-        .verse { font-size: 16px; margin-bottom: 5px; }
-        .verse img { display: block; margin-bottom: 5px; max-width: 100%; height: auto; }
-        .title-page { display: flex; align-items: center; justify-content: center; height: 100vh; text-align: center; }
-        .title-page h1 { font-size: 36px; }
-        .intro-page { padding: 40px; min-height: 100vh; }
-        .page-break { page-break-after: always; }
-      </style>
+      @page { size: A4; margin: 20mm; }
+      @page :left { margin-left: 25mm; }
+      @page :right { margin-right: 25mm; }
+      body { font-family: 'Amiri', serif; direction: rtl; text-align: right; padding: 20px; }
+      h1 { font-size: 24px; margin-bottom: 10px; }
+      h2 { font-size: 20px; margin-bottom: 10px; }
+      .chapter { margin-bottom: 20px; page-break-before: always; }
+      .chapter-title { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; text-align: center; }
+      .verse { font-size: 16px; margin-bottom: 5px; }
+      .verse img { display: block; margin-bottom: 5px; max-width: 100%; height: auto; }
+      .title-page { display: flex; align-items: center; justify-content: center; height: 100vh; text-align: center; }
+      .intro-page { padding: 40px; min-height: 100vh; }
+      .page-break { page-break-after: always; }
+    
+      .header-container {
+        position: relative;
+        height: 20mm; 
+      }
+      .chapter-header {
+        position: absolute;
+        top: 0;
+        right: 0;
+        font-size: 12px;
+        text-align: right;
+        
+      }
+    </style>
+    
     </head>
     <body>
       ${titlePage} 
