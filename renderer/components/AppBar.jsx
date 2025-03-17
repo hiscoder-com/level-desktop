@@ -36,9 +36,9 @@ export default function AppBar({ isStep = false, isShowAppBar = false }) {
               </div>
             </div>
           ) : (
-            <div className="fixed left-0 top-0 flex h-16 w-full items-center bg-th-primary-100">
+            <div className="fixed left-0 top-0 flex h-16 w-full items-center bg-th-primary-100 px-14 lg:px-8 xl:px-20 2xl:px-20">
               <Link href={'/account'}>
-                <LevelLogo className="ml-14 h-11 fill-th-text-secondary-100" />
+                <LevelLogo className="h-8 fill-th-text-secondary-100" />
               </Link>
             </div>
           )}
