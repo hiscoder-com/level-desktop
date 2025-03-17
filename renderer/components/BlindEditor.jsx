@@ -148,7 +148,8 @@ function BlindEditor({
           return (
             <div
               key={verseObject.num}
-              className={`my-3 flex items-start ${isRtl ? 'flex-row-reverse' : ''}`}
+              className="my-3 flex items-center"
+              dir={isRtl ? 'rtl' : 'ltr'}
             >
               <button
                 onClick={() =>
@@ -166,9 +167,7 @@ function BlindEditor({
                 disabled={disabledButton}
               >
                 {isTranslated ? (
-                  <Check
-                    className={`h-4 w-4 stroke-2 ${isRtl ? 'scale-x-[-1] transform' : ''}`}
-                  />
+                  <Check className="h-4 w-4 stroke-2" />
                 ) : (
                   <Pencil
                     className={`h-4 w-4 stroke-2 ${
@@ -177,14 +176,12 @@ function BlindEditor({
                         : !isTranslating
                           ? 'fill-th-secondary-100'
                           : 'stroke-th-text-secondary-100'
-                    } ${isRtl ? 'scale-x-[-1] transform' : ''}`}
+                    }`}
                   />
                 )}
               </button>
 
-              <div className={`mx-4 ${isRtl ? 'order-first' : ''}`}>
-                {obsCheckAdditionalVerses(verseObject.num)}
-              </div>
+              <div className="mx-4">{obsCheckAdditionalVerses(verseObject.num)}</div>
               {isTranslating ? (
                 <RtlTextArea
                   className="focus:inline-none w-full resize-none focus:outline-none"
