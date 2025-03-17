@@ -22,12 +22,7 @@ function Layout({ children }) {
   }
 
   const isShowSidebar = useMemo(() => {
-    return (
-      router &&
-      router.pathname !== homePath &&
-      !router.pathname.includes('chapter') &&
-      router.pathname.includes('account')
-    )
+    return router && router.pathname !== homePath && router.pathname.includes('account')
   }, [router])
   const isStep = useMemo(() => {
     return (

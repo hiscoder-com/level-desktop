@@ -145,7 +145,7 @@ function StepPage() {
             </div>
           ))}
       </div>
-      <div className="mx-auto mt-4 flex w-full flex-col items-center justify-between md:mt-2 md:h-16 md:flex-row md:px-4 lg:px-2">
+      <div className="xl:px-18 lg:px-18 mx-auto mt-4 flex w-full flex-col items-center justify-between px-12 md:mt-2 md:h-16 md:flex-row md:px-20">
         <div className="hidden lg:block lg:w-1/3" />
         <div className="flex w-full justify-center md:justify-start lg:w-1/3 lg:justify-center">
           {project && !project.steps[step].isTech && (
