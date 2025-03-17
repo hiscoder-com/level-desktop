@@ -44,16 +44,16 @@ function ChapterList({ id, chapters, steps, mutate, book, project }) {
     setVersesCount(_chapters)
   }, [])
 
-  const handleBackStep = (chapter, step) => {
-    const backStep = window.electronAPI.goToStep(id, chapter, step - 1)
+  const handleBackStep = (chapter, step, typeProject) => {
+    const backStep = window.electronAPI.goToStep(id, chapter, step - 1, typeProject)
     if (backStep !== step) {
       mutate()
     }
   }
-  const handleDownloadChapter = (chapter) => {
-    const savedVerses = Object.entries(window.electronAPI.getChapter(id, chapter)).map(
-      ([k, v]) => ({ verse: k, text: v.text, enabled: v.enabled })
-    )
+  const handleDownloadChapter = (chapter, typeProject = '') => {
+    const savedVerses = Object.entries(
+      window.electronAPI.getChapter(id, chapter, typeProject)
+    ).map(([k, v]) => ({ verse: k, text: v.text, enabled: v.enabled }))
 
     const project = window.electronAPI.getProject(id)
     const currentDate = new Date().toISOString().split('T')[0]
@@ -132,7 +132,7 @@ function ChapterList({ id, chapters, steps, mutate, book, project }) {
               </td>
               <td className="w-1/12 cursor-pointer break-words py-4 pl-8">
                 <span className="rounded bg-th-secondary-100 px-3 py-2">
-                  {versesCount?.[chapter]}
+                  {versesCount?.[chapter] ?? versesCount?.[chapter.padStart(2, '0')]}
                 </span>
               </td>
               <td className="w-4/12 cursor-pointer break-words py-4 pl-8">
@@ -148,6 +148,7 @@ function ChapterList({ id, chapters, steps, mutate, book, project }) {
                   chapter={chapter}
                   isTech={steps[step].isTech}
                   stepsInfo={steps}
+                  typeProject={project.typeProject}
                 />
               </td>
               <td className="w-2/12 px-8 py-4">
@@ -179,6 +180,7 @@ const StepNavigator = ({
   handleBackStep,
   chapter,
   stepsInfo,
+  typeProject,
 }) => {
   const isTechSteps = stepsInfo.map((s) => s.isTech)
   const getStepNumbers = () => {
@@ -207,7 +209,7 @@ const StepNavigator = ({
         disabled={currentStep === 0}
         onClick={(e) => {
           e.stopPropagation()
-          handleBackStep(chapter, currentStep)
+          handleBackStep(chapter, currentStep, typeProject)
         }}
       >
         <Left className="h-5 w-5" />

@@ -3,9 +3,9 @@ import dynamic from 'next/dynamic'
 import { useTranslation } from '@/next-i18next'
 
 import Modal from './Modal'
+import WordItem from './WordItem'
 
 import Back from 'public/icons/left.svg'
-import Trash from 'public/icons/trash.svg'
 
 const Redactor = dynamic(
   () => import('@texttree/notepad-rcl').then((mod) => mod.Redactor),
@@ -47,24 +47,14 @@ const WordList = ({
             </div>
           ) : (
             <div className="mt-2">
-              {words.data.map((el) => (
-                <div
-                  key={el.id}
-                  className="group my-3 flex cursor-pointer items-start justify-between rounded-lg bg-th-secondary-100"
-                  onClick={() => setWordId(el.id)}
-                >
-                  <div className="mr-4 p-2 font-bold">{el.title}</div>
-                  <button
-                    className="top-0 m-1 p-2 opacity-0 group-hover:opacity-100"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      setIsOpenModal(true)
-                      setWordToDel(el)
-                    }}
-                  >
-                    <Trash className={'h-4 w-4 text-cyan-800'} />
-                  </button>
-                </div>
+              {words.data.map((word) => (
+                <WordItem
+                  key={word.id}
+                  word={word}
+                  setIsOpenModal={setIsOpenModal}
+                  setWordToDel={setWordToDel}
+                  setWordId={setWordId}
+                />
               ))}
             </div>
           )}
@@ -72,7 +62,7 @@ const WordList = ({
       ) : (
         <>
           <div
-            className="absolute flex w-fit cursor-pointer rounded-full bg-th-secondary-100 p-1 hover:opacity-70"
+            className="absolute top-4 flex w-fit cursor-pointer rounded-full bg-th-secondary-100 p-1 hover:opacity-70"
             onClick={() => {
               saveWord()
               setActiveWord(null)

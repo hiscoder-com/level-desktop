@@ -35,7 +35,7 @@ function Dropdown({ description }) {
   return (
     <div>
       <div
-        className="relative hidden cursor-pointer whitespace-nowrap rounded-md px-3 py-4 md:flex"
+        className="relative hidden cursor-pointer whitespace-nowrap rounded-md py-4 md:flex"
         onClick={toggle}
         ref={toolsButton}
       >
