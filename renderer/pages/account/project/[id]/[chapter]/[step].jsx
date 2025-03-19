@@ -228,7 +228,7 @@ function Panel({
               classNames(
                 'overflow-hidden text-ellipsis whitespace-nowrap p-1 text-xs md:p-2 md:text-sm lg:pb-3 lg:text-base',
                 isSingleTab ? 'flex' : 'flex-1',
-                selected ? (isSingleTab ? 'tab-single' : 'tab-active') : 'tab-inactive'
+                selected ? 'tab-active' : 'tab-inactive'
               )
             }
           >
