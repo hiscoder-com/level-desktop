@@ -226,7 +226,7 @@ function Panel({
             key={tool.name + idx}
             className={({ selected }) =>
               classNames(
-                'overflow-hidden text-ellipsis whitespace-nowrap p-1 text-xs md:p-2 md:text-sm lg:pb-3 lg:text-base',
+                'h-12 overflow-hidden text-ellipsis whitespace-nowrap p-1 pt-2 text-xs md:p-2 md:text-sm lg:pb-5 lg:text-base',
                 isSingleTab ? 'flex' : 'flex-1',
                 selected ? 'tab-active' : 'tab-inactive'
               )
