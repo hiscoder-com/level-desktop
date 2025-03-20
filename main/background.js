@@ -1532,7 +1532,6 @@ const generateChapterContentHtml = async (chapter, zip, pad, chapter_label) => {
       <span class="chapter-header">${chapter_label} ${chapter.chapterNum}</span>
     </div>
   `
-  console.log(chapter, 1573)
   const verses = chapter.verseObjects.filter((v) => v.verse !== 0)
 
   const versesWithImages = await Promise.all(
