@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 
 import { checkedVersesBibleState } from '@/helpers/atoms'
 import { useTranslation } from '@/next-i18next'
-import { useRecoilState, useSetRecoilState } from 'recoil'
+import { useSetRecoilState } from 'recoil'
 
 import Recorder from './Recorder'
 
@@ -29,6 +29,10 @@ export default function Retelling({ config }) {
   }
 
   useEffect(() => {
+    const handleRouteChange = () => {
+      handleResetCheckedVerses()
+    }
+
     router.events.on('routeChangeStart', handleRouteChange)
 
     return () => {
@@ -145,24 +149,29 @@ function RecorderSection({
 function RetellPartner({ id, chapter, typeProject }) {
   const { t } = useTranslation()
   const setCheckedVersesBible = useSetRecoilState(checkedVersesBibleState)
+  const [inactive, setInactive] = useState(false)
 
   const savedVersesRef = useRef([])
   const handleResetCheckedVerses = () => {
     setCheckedVersesBible(['0'])
+    setInactive(false)
   }
 
   useEffect(() => {
-    const savedVerses = Object.entries(
-      window.electronAPI.getChapter(id, chapter, typeProject)
-    )
-      .map(([k, v]) => ({ num: k, verse: v.text, enabled: v.enabled }))
-      .filter((v) => v.enabled)
+    if (window.electronAPI) {
+      const savedVerses = Object.entries(
+        window.electronAPI.getChapter(id, chapter, typeProject)
+      )
+        .map(([k, v]) => ({ num: k, verse: v.text, enabled: v.enabled }))
+        .filter((v) => v.enabled)
 
-    savedVersesRef.current = savedVerses.map((el) => el.num.toString())
+      savedVersesRef.current = savedVerses.map((el) => el.num.toString())
+    }
   }, [id, chapter, typeProject])
 
   const handleSetCheckedVerses = () => {
     setCheckedVersesBible(savedVersesRef.current)
+    setInactive(true)
   }
 
   return (
