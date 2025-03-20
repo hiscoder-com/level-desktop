@@ -4,7 +4,7 @@ import { checkedVersesBibleState, currentVerse } from '@/helpers/atoms'
 import { useGetTranslatedResource } from '@/hooks/useGetTranslatedResource'
 import { useScroll } from '@/hooks/useScroll'
 import ReactMarkdown from 'react-markdown'
-import { useRecoilState, useRecoilValue } from 'recoil'
+import { useRecoilValue, useSetRecoilState } from 'recoil'
 
 import { Placeholder } from './Placeholder'
 
@@ -24,7 +24,7 @@ function Bible({ config, toolName }) {
     typeProject,
   } = config
 
-  const [currentScrllVerse, setCurrentScrollVerse] = useRecoilState(currentVerse)
+  const setCurrentScrollVerse = useSetRecoilState(currentVerse)
 
   useEffect(() => {
     setCurrentScrollVerse(1)
