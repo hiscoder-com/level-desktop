@@ -1,20 +1,20 @@
 import { useEffect, useRef, useState } from 'react'
 
-import { inactiveState } from '@/helpers/atoms'
+import { checkedVersesBibleState } from '@/helpers/atoms'
 import { useTranslation } from '@/next-i18next'
+import { useSetRecoilState } from 'recoil'
+
+import Modal from './Modal'
+
 import RecorderCrossedButton from 'public/icons/error-outline.svg'
 import PauseButton from 'public/icons/pause.svg'
 import PlayButton from 'public/icons/play.svg'
 import RecorderButton from 'public/icons/recorder.svg'
 import StopButton from 'public/icons/stop.svg'
 import TrashButton from 'public/icons/trash.svg'
-import { useSetRecoilState } from 'recoil'
 
-import Modal from './Modal'
-
-export default function Recorder({ setIsRecording, voice, setVoice }) {
+export default function Recorder({ setIsRecording, voice, setVoice, config }) {
   const { t } = useTranslation()
-  const setInactive = useSetRecoilState(inactiveState)
   const [showModal, setShowModal] = useState(false)
   const [mediaRec, setMediaRec] = useState()
   const [buttonRecord, setButtonRecord] = useState(
@@ -23,6 +23,31 @@ export default function Recorder({ setIsRecording, voice, setVoice }) {
   const [buttonPlay, setButtonPlay] = useState(<PlayButton />)
 
   const audioRef = useRef(null)
+  const savedVersesRef = useRef([])
+
+  const setCheckedVersesBible = useSetRecoilState(checkedVersesBibleState)
+
+  useEffect(() => {
+    setCheckedVersesBible(['0'])
+  }, [setCheckedVersesBible])
+
+  const handleResetCheckedVerses = () => {
+    setCheckedVersesBible(['0'])
+  }
+
+  useEffect(() => {
+    const savedVerses = Object.entries(
+      window.electronAPI.getChapter(config.id, config.chapter, config.typeProject)
+    )
+      .map(([k, v]) => ({ num: k, verse: v.text, enabled: v.enabled }))
+      .filter((v) => v.enabled)
+
+    savedVersesRef.current = savedVerses.map((el) => el.num.toString())
+  }, [config.id, config.chapter, config.typeProject])
+
+  const handleSetCheckedVerses = () => {
+    setCheckedVersesBible(savedVersesRef.current)
+  }
 
   const startStop = () => {
     if (mediaRec?.state === 'inactive') {
@@ -31,12 +56,12 @@ export default function Recorder({ setIsRecording, voice, setVoice }) {
       setButtonRecord(
         <StopButton className="animate-pulse stroke-th-primary-200 stroke-2" />
       )
-      setInactive(true)
+      handleSetCheckedVerses()
       setIsRecording(true)
     } else if (mediaRec?.state === 'recording') {
       mediaRec.stop()
       setButtonRecord(<RecorderButton className="stroke-th-primary-200 stroke-2" />)
-      setInactive(false)
+      handleResetCheckedVerses()
       setIsRecording(false)
     } else {
       setShowModal(true)

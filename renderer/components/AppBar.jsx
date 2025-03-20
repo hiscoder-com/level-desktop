@@ -1,6 +1,6 @@
 import Link from 'next/link'
 
-import { stepConfigState } from 'helpers/atoms'
+import { stepConfigState } from '@/helpers/atoms'
 import { useRecoilValue } from 'recoil'
 
 import Dropdown from './Dropdown'
@@ -31,14 +31,14 @@ export default function AppBar({ isStep = false, isShowAppBar = false }) {
                   <div className="hidden rounded-3xl bg-th-secondary-10 px-5 py-2.5 md:flex">
                     <Timer time={stepConfig.time} />
                   </div>
-                  <Dropdown description={stepConfig?.description} />
+                  <Dropdown description={stepConfig?.intro} />
                 </div>
               </div>
             </div>
           ) : (
-            <div className="fixed left-0 top-0 flex h-16 w-full items-center bg-th-primary-100">
-              <Link href={'/account'}>
-                <LevelLogo className="ml-14 h-11 fill-th-text-secondary-100" />
+            <div className="fixed left-0 top-0 flex h-16 w-full items-center bg-th-primary-100 px-14 lg:px-8 xl:px-20 2xl:px-20">
+              <Link href={'/account'} className="ml-12">
+                <LevelLogo className="h-8 fill-th-text-secondary-100" />
               </Link>
             </div>
           )}

@@ -1,4 +1,4 @@
-import { BrowserWindow, screen } from 'electron'
+import { BrowserWindow, screen, shell } from 'electron'
 import Store from 'electron-store'
 
 export const createWindow = (windowName, options) => {
@@ -70,6 +70,11 @@ export const createWindow = (windowName, options) => {
       contextIsolation: true,
       ...options.webPreferences,
     },
+  })
+
+  win.webContents.setWindowOpenHandler(({ url }) => {
+    shell.openExternal(url)
+    return { action: 'deny' }
   })
 
   win.on('close', saveState)
