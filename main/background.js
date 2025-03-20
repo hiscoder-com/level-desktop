@@ -1429,52 +1429,61 @@ ipcMain.handle('check-file-exists', async (event, fileName) => {
 //Удалить после отладки
 const { shell } = require('electron')
 
-ipcMain.handle('export-to-pdf-obs', async (_, chapters, project, isRtl) => {
-  try {
-    if (!chapters || !project || !project.book?.code) {
-      throw new Error('Invalid project or chapters data')
+ipcMain.handle(
+  'export-to-pdf-obs',
+  async (_, chapters, project, isRtl, singleChapter = null) => {
+    try {
+      if ((!chapters && !singleChapter) || !project || !project.book?.code) {
+        throw new Error('Invalid project or chapters data')
+      }
+      project.name = project.title || project.name
+
+      const formattedDate = new Date().toISOString().split('T')[0]
+      const defaultFileName = `${project.name}_${project.book.code}_${formattedDate}.pdf`
+
+      // Для отладки: сохраняем файл в папке загрузок
+      const filePath = path.join(app.getPath('downloads'), defaultFileName)
+
+      // Если нужно показывать диалог сохранения, можно раскомментировать этот код:
+      // const result = await dialog.showSaveDialog({
+      //   defaultPath: path.join(app.getPath('desktop'), defaultFileName),
+      //   filters: [{ name: 'PDF Files', extensions: ['pdf'] }],
+      // })
+      // if (result.canceled) {
+      //   return
+      // }
+      // const filePath = result.filePath
+
+      // Генерация HTML с учётом выбранной главы (или всех глав, если singleChapter === null)
+      const htmlContent = await generateHtmlContent(
+        project,
+        chapters,
+        isRtl,
+        singleChapter
+      )
+
+      const browser = await puppeteer.launch()
+      const page = await browser.newPage()
+      await page.setContent(htmlContent, { waitUntil: 'load' })
+      await page.pdf({ path: filePath, format: 'A4' })
+      await browser.close()
+
+      // Для отладки: открыть сгенерированный файл
+      await shell.openPath(filePath)
+
+      return filePath
+    } catch (error) {
+      throw error
     }
-    project.name = project.title || project.name
-
-    const formattedDate = new Date().toISOString().split('T')[0]
-    const defaultFileName = `${project.name}_${project.book.code}_${formattedDate}.pdf`
-
-    //Удалить после отладки
-    const filePath = path.join(app.getPath('downloads'), defaultFileName)
-
-    // const result = await dialog.showSaveDialog({
-    //   defaultPath: path.join(app.getPath('desktop'), defaultFileName),
-    //   filters: [{ name: 'PDF Files', extensions: ['pdf'] }],
-    // })
-
-    // if (result.canceled) {
-    //   return
-    // }
-
-    // const filePath = result.filePath
-    const htmlContent = await generateHtmlContent(project, chapters, isRtl)
-
-    const browser = await puppeteer.launch()
-    const page = await browser.newPage()
-    await page.setContent(htmlContent, { waitUntil: 'load' })
-    await page.pdf({ path: filePath, format: 'A4' })
-    await browser.close()
-
-    //Удалить после отладки
-    await shell.openPath(filePath)
-
-    return filePath
-  } catch (error) {
-    throw error
   }
-})
+)
 
 const readJsonFile = (filePath) => {
   try {
     const content = fs.readFileSync(filePath, 'utf8')
     return JSON.parse(content)
   } catch (err) {
-    console.error(`Ошибка чтения JSON файла ${filePath}:`, err)
+    console.error(`Error reading the JSON file ${filePath}:`, err)
     return {}
   }
 }
@@ -1484,7 +1493,7 @@ const loadZipArchive = async (zipPath) => {
     const zipData = fs.readFileSync(zipPath)
     return await JSZip.loadAsync(zipData)
   } catch (err) {
-    console.error(`Ошибка загрузки ZIP архива ${zipPath}:`, err)
+    console.error(`ZIP archive download error${zipPath}:`, err)
     return null
   }
 }
@@ -1497,10 +1506,10 @@ const getImageFromZip = async (zip, imageFileName) => {
       const base64Data = await file.async('base64')
       return `data:image/jpeg;base64,${base64Data}`
     } catch (err) {
-      console.error(`Ошибка получения данных изображения ${imageFileName}.jpg:`, err)
+      console.error(`Error receiving image data ${imageFileName}.jpg:`, err)
     }
   } else {
-    console.error(`Изображение не найдено в архиве: ${imageFileName}.jpg`)
+    console.error(`The image was not found in the archive.: ${imageFileName}.jpg`)
   }
   return ''
 }
@@ -1523,7 +1532,7 @@ const generateChapterContentHtml = async (chapter, zip, pad, chapter_label) => {
       <span class="chapter-header">${chapter_label} ${chapter.chapterNum}</span>
     </div>
   `
-
+  console.log(chapter, 1573)
   const verses = chapter.verseObjects.filter((v) => v.verse !== 0)
 
   const versesWithImages = await Promise.all(
@@ -1567,11 +1576,11 @@ const generateChapterContentHtml = async (chapter, zip, pad, chapter_label) => {
 
   return versesHtml
 }
-const generateHtmlContent = async (project, chapters, isRtl) => {
+
+const generateHtmlContent = async (project, chapters, isRtl, singleChapter = null) => {
   const propertiesPath = path.join(projectUrl, project.id, 'properties.json')
   const properties = readJsonFile(propertiesPath)
   const chapter_label = properties.chapter_label || 'Story'
-
   const hasTitle = Boolean(properties.title && properties.title.trim())
   const hasIntro = Boolean(properties.intro && properties.intro.trim())
 
@@ -1585,7 +1594,30 @@ const generateHtmlContent = async (project, chapters, isRtl) => {
 
   const pad = (num) => String(num).padStart(2, '0')
 
-  const book = Object.entries(chapters)
+  let chaptersEntries = []
+  if (chapters && typeof chapters === 'object') {
+    chaptersEntries = Object.entries(chapters)
+  } else if (singleChapter) {
+    const chaptersDataPath = path.join(
+      projectUrl,
+      project.id,
+      'chapters',
+      `${singleChapter}.json`
+    )
+    const allChapters = readJsonFile(chaptersDataPath)
+    const chapterData = allChapters[String(parseInt(singleChapter, 10))]
+    if (!chapterData) {
+      throw new Error(`Глава ${singleChapter} не найдена`)
+    }
+    chaptersEntries = [[String(singleChapter), chapterData]]
+  } else {
+    throw new Error('Нет данных о главах')
+  }
+  const filteredChapters = singleChapter
+    ? chaptersEntries.filter(([chapterNum]) => chapterNum === String(singleChapter))
+    : chaptersEntries
+
+  const book = filteredChapters
     .sort((a, b) => Number(a[0]) - Number(b[0]))
     .map(([chapterNum, verses]) => ({
       chapterNum,
@@ -1632,9 +1664,9 @@ const generateHtmlContent = async (project, chapters, isRtl) => {
 
   return `
     <html lang="ar" dir="${isRtl ? 'rtl' : 'ltr'}">
-    <title>${properties.title}</title>
       <head>
         <meta charset="UTF-8">
+        <title>${properties.title}</title>
         <style>
           @page { size: A4; }
           @page :left { margin-left: 25mm; }
@@ -1679,14 +1711,12 @@ const generateHtmlContent = async (project, chapters, isRtl) => {
             max-width: 100%;
             height: auto;
           }
-
           .page-break {
             display: block;
             height: 0;
             line-height: 0;
             page-break-after: always;
           }
-
           .header-container {
             position: relative;
             height: 20mm; 
@@ -1700,7 +1730,6 @@ const generateHtmlContent = async (project, chapters, isRtl) => {
             margin-top: 20px;
             text-align: ${isRtl ? 'left' : 'right'};
           }
-
           @media print {
             .title-page,
             .intro-page {
