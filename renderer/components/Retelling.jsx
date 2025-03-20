@@ -1,15 +1,16 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { useRouter } from 'next/router'
 
-import { inactiveState } from '@/helpers/atoms'
+import { checkedVersesBibleState, inactiveState } from '@/helpers/atoms'
 import { useTranslation } from '@/next-i18next'
-import Back from 'public/icons/left.svg'
 import { useRecoilState, useSetRecoilState } from 'recoil'
 
 import Recorder from './Recorder'
 
-export default function Retelling() {
+import Back from 'public/icons/left.svg'
+
+export default function Retelling({ config }) {
   const { t } = useTranslation()
   const [option, setOption] = useState(null)
   const [isRecordingOriginal, setIsRecordingOriginal] = useState(false)
@@ -95,7 +96,11 @@ export default function Retelling() {
               />
             </>
           ) : (
-            <RetellPartner />
+            <RetellPartner
+              id={config.id}
+              chapter={config.chapter}
+              typeProject={config.typeProject}
+            />
           )}
         </div>
       )}
@@ -119,9 +124,34 @@ function RecorderSection({ isRecording, voice, setIsRecording, setVoice, label }
   )
 }
 
-function RetellPartner() {
+function RetellPartner({ id, chapter, typeProject }) {
   const [inactive, setInactive] = useRecoilState(inactiveState)
   const { t } = useTranslation()
+  const setCheckedVersesBible = useSetRecoilState(checkedVersesBibleState)
+
+  // Храним список номеров стихов в useRef, чтобы не триггерить ререндер
+  const savedVersesRef = useRef([])
+
+  useEffect(() => {
+    setCheckedVersesBible(['0'])
+  }, [setCheckedVersesBible])
+
+  // Загружаем данные, но не устанавливаем в checkedVersesBible сразу
+  useEffect(() => {
+    const savedVerses = Object.entries(
+      window.electronAPI.getChapter(id, chapter, typeProject)
+    )
+      .map(([k, v]) => ({ num: k, verse: v.text, enabled: v.enabled }))
+      .filter((v) => v.enabled)
+
+    // Сохраняем номера стихов в useRef
+    savedVersesRef.current = savedVerses.map((el) => el.num.toString())
+  }, [id, chapter, typeProject])
+
+  // Функция для установки checkedVersesBible при клике
+  const handleSetCheckedVerses = () => {
+    // setCheckedVersesBible(savedVersesRef.current)
+  }
 
   return (
     <div className="my-auto w-full px-2 pb-4">
@@ -139,13 +169,13 @@ function RetellPartner() {
             <div className="flex">
               <button
                 className="btn-base mr-2 bg-th-secondary-300 text-th-text-secondary-100 hover:opacity-70"
-                onClick={() => setInactive(true)}
+                onClick={handleSetCheckedVerses}
               >
                 {t('InOriginalLanguage')}
               </button>
               <button
                 className="btn-base bg-th-secondary-300 text-th-text-secondary-100 hover:opacity-70"
-                onClick={() => setInactive(true)}
+                onClick={handleSetCheckedVerses}
               >
                 {t('InTargetLanguage')}
               </button>
