@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react'
 
-import { useScroll } from '@/hooks/useScroll'
-
 import { obsCheckAdditionalVerses } from './Bible'
 import RtlTextArea from './RtlTextArea'
 
@@ -26,18 +24,13 @@ function Editor({
       return [...prev]
     })
   }
-  useScroll({
-    toolName: 'translate',
-    idPrefix: 'translate',
-  })
 
   return (
     <div>
       {verseObjects.map((verseObject, idx) => (
         <div
           key={verseObject.num}
-          className={`flex py-2 ${isRtl ? 'flex-row-reverse' : ''}`}
-          id={`translate${verseObject.num}`}
+          className={`my-3 flex ${isRtl ? 'flex-row-reverse' : ''}`}
         >
           <div>{obsCheckAdditionalVerses(verseObject.num)}</div>
           <RtlTextArea
