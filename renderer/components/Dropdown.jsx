@@ -89,7 +89,7 @@ function StepGoal({ showModalStepGoal, closeModal, description }) {
     <Modal isOpen={showModalStepGoal} closeHandle={closeModal} title={t('Goal')}>
       <div className="my-6 max-h-[50vh] overflow-y-auto px-4 py-3">
         <p className="whitespace-pre-line text-base text-th-secondary-10">
-          {description.replaceAll('\n\n', '\n')}
+          {description?.replaceAll('\n\n', '\n')}
         </p>
       </div>
       <div className="text-center">

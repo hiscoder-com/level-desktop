@@ -22,13 +22,24 @@ function ProjectsList({ projectsList, setProjectsList }) {
   const [editedProperties, setEditedProperties] = useState({})
   const [isConfirmDelete, setIsConfirmDelete] = useState(false)
   const [showIntro, setShowIntro] = useState(true)
+  const [draggedIndex, setDraggedIndex] = useState(null)
 
   useEffect(() => {
     const loadProjects = () => {
       try {
         const projects = window.electronAPI.getProjects()
         if (projects) {
-          setProjectsList(projects)
+          const savedOrder = localStorage.getItem('projectsOrder')
+          if (savedOrder) {
+            const savedIds = JSON.parse(savedOrder).map((p) => p.id)
+            const orderedProjects = savedIds
+              .map((id) => projects.find((p) => p.id === id))
+              .filter((p) => p)
+            const newProjects = projects.filter((p) => !savedIds.includes(p.id))
+            setProjectsList([...orderedProjects, ...newProjects])
+          } else {
+            setProjectsList(projects)
+          }
         } else {
           throw new Error('No projects found')
         }
@@ -148,6 +159,29 @@ function ProjectsList({ projectsList, setProjectsList }) {
     })
   }
 
+  const onDragStart = (e, index) => {
+    setDraggedIndex(index)
+    e.dataTransfer.effectAllowed = 'move'
+  }
+
+  const onDragOver = (e) => {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
+  }
+
+  const onDrop = (e, dropIndex) => {
+    e.preventDefault()
+    if (draggedIndex === null || draggedIndex === dropIndex) return
+
+    const updatedProjects = Array.from(projectsList)
+    const [removed] = updatedProjects.splice(draggedIndex, 1)
+    updatedProjects.splice(dropIndex, 0, removed)
+    setProjectsList(updatedProjects)
+    setDraggedIndex(null)
+
+    localStorage.setItem('projectsOrder', JSON.stringify(updatedProjects))
+  }
+
   return (
     <>
       <div className="h-7 rounded-t-lg bg-th-primary-100"></div>
@@ -167,9 +201,13 @@ function ProjectsList({ projectsList, setProjectsList }) {
           </tr>
         </thead>
         <tbody className="bg-th-secondary-10">
-          {projectsList.map((project) => (
+          {projectsList.map((project, index) => (
             <tr
               key={project.id}
+              draggable
+              onDragStart={(e) => onDragStart(e, index)}
+              onDragOver={onDragOver}
+              onDrop={(e) => onDrop(e, index)}
               className="cursor-pointer border-b border-th-secondary-200 text-th-primary-100 hover:bg-th-secondary-20"
               onClick={() => router.push(`/account/project/${project.id}`)}
             >

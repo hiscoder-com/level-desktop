@@ -218,17 +218,15 @@ function Panel({
         }))
       }
     >
-      <TabList
-        className={`-mb-2 flex overflow-auto text-xs ${!isSingleTab ? 'space-x-3 px-3' : ''} `}
-      >
+      <TabList className="-mb-2 flex space-x-3 overflow-auto px-3 text-xs">
         {tools?.map((tool, idx) => (
           <Tab
             key={tool.name + idx}
             className={({ selected }) =>
               classNames(
-                'overflow-hidden text-ellipsis whitespace-nowrap p-1 text-xs md:p-2 md:text-sm lg:pb-3 lg:text-base',
+                'h-12 overflow-hidden text-ellipsis whitespace-nowrap p-1 pt-2 text-xs md:p-2 md:text-sm lg:pb-5 lg:text-base',
                 isSingleTab ? 'flex' : 'flex-1',
-                selected ? (isSingleTab ? 'tab-single' : 'tab-active') : 'tab-inactive'
+                selected ? 'tab-active' : 'tab-inactive'
               )
             }
           >
