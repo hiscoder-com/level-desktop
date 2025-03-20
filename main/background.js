@@ -1043,7 +1043,6 @@ async function handleAddProject(url, event) {
 
   const createPropertiesFile = async (projectId, properties) => {
     try {
-      console.log(properties, 1046)
       const projectPath = path.join(projectUrl, projectId)
       const propertiesPath = path.join(projectPath, 'properties.json')
       await fs.promises.writeFile(propertiesPath, JSON.stringify(properties, null, 2))

@@ -94,7 +94,6 @@ function Verses({ verseObjects, handleSaveScroll, currentScrollVerse = 1 }) {
 
 function VersesExtended({ verseObjects, handleSaveScroll, currentScrollVerse = 1 }) {
   const checkedVersesBible = useRecoilValue(checkedVersesBibleState)
-  console.log(checkedVersesBible, 96)
   return (
     <>
       {verseObjects?.map((verseObject) => {
