@@ -1,6 +1,6 @@
 import Link from 'next/link'
 
-import { stepConfigState } from 'helpers/atoms'
+import { stepConfigState } from '@/helpers/atoms'
 import { useRecoilValue } from 'recoil'
 
 import Dropdown from './Dropdown'
