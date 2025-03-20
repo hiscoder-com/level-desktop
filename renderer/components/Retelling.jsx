@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 
 import { useRouter } from 'next/router'
 
-import { checkedVersesBibleState, inactiveState } from '@/helpers/atoms'
+import { checkedVersesBibleState } from '@/helpers/atoms'
 import { useTranslation } from '@/next-i18next'
 import { useRecoilState, useSetRecoilState } from 'recoil'
 
@@ -17,27 +17,31 @@ export default function Retelling({ config }) {
   const [isRecordingTarget, setIsRecordingTarget] = useState(false)
   const [voiceOriginal, setVoiceOriginal] = useState([])
   const [voiceTarget, setVoiceTarget] = useState([])
-  const setInactive = useSetRecoilState(inactiveState)
   const router = useRouter()
+  const setCheckedVersesBible = useSetRecoilState(checkedVersesBibleState)
 
   useEffect(() => {
-    const handleRouteChange = () => {
-      setInactive(false)
-    }
+    setCheckedVersesBible(['0'])
+  }, [setCheckedVersesBible])
 
+  const handleResetCheckedVerses = () => {
+    setCheckedVersesBible(['0'])
+  }
+
+  useEffect(() => {
     router.events.on('routeChangeStart', handleRouteChange)
 
     return () => {
       router.events.off('routeChangeStart', handleRouteChange)
     }
-  }, [router, setInactive])
+  }, [router])
 
   const handleOption = (selectedOption) => {
     setOption(selectedOption)
   }
 
   const resetState = () => {
-    setInactive(false)
+    handleResetCheckedVerses()
     setOption(null)
     setVoiceOriginal([])
     setVoiceTarget([])
@@ -86,6 +90,7 @@ export default function Retelling({ config }) {
                 setIsRecording={setIsRecordingOriginal}
                 setVoice={setVoiceOriginal}
                 label={t('OriginalRecording')}
+                config={config}
               />
               <RecorderSection
                 isRecording={isRecordingTarget}
@@ -93,6 +98,7 @@ export default function Retelling({ config }) {
                 setIsRecording={setIsRecordingTarget}
                 setVoice={setVoiceTarget}
                 label={t('TargetRecording')}
+                config={config}
               />
             </>
           ) : (
@@ -108,11 +114,23 @@ export default function Retelling({ config }) {
   )
 }
 
-function RecorderSection({ isRecording, voice, setIsRecording, setVoice, label }) {
+function RecorderSection({
+  isRecording,
+  voice,
+  setIsRecording,
+  setVoice,
+  label,
+  config,
+}) {
   return (
     <div className="w-full px-2 pb-4">
       <p className="mb-4">{label}</p>
-      <Recorder setIsRecording={setIsRecording} voice={voice} setVoice={setVoice} />
+      <Recorder
+        setIsRecording={setIsRecording}
+        voice={voice}
+        setVoice={setVoice}
+        config={config}
+      />
       <div
         className={`border-b-4 px-2 pb-4 ${
           isRecording || voice.length > 0
@@ -125,18 +143,14 @@ function RecorderSection({ isRecording, voice, setIsRecording, setVoice, label }
 }
 
 function RetellPartner({ id, chapter, typeProject }) {
-  const [inactive, setInactive] = useRecoilState(inactiveState)
   const { t } = useTranslation()
   const setCheckedVersesBible = useSetRecoilState(checkedVersesBibleState)
 
-  // Храним список номеров стихов в useRef, чтобы не триггерить ререндер
   const savedVersesRef = useRef([])
-
-  useEffect(() => {
+  const handleResetCheckedVerses = () => {
     setCheckedVersesBible(['0'])
-  }, [setCheckedVersesBible])
+  }
 
-  // Загружаем данные, но не устанавливаем в checkedVersesBible сразу
   useEffect(() => {
     const savedVerses = Object.entries(
       window.electronAPI.getChapter(id, chapter, typeProject)
@@ -144,13 +158,11 @@ function RetellPartner({ id, chapter, typeProject }) {
       .map(([k, v]) => ({ num: k, verse: v.text, enabled: v.enabled }))
       .filter((v) => v.enabled)
 
-    // Сохраняем номера стихов в useRef
     savedVersesRef.current = savedVerses.map((el) => el.num.toString())
   }, [id, chapter, typeProject])
 
-  // Функция для установки checkedVersesBible при клике
   const handleSetCheckedVerses = () => {
-    // setCheckedVersesBible(savedVersesRef.current)
+    setCheckedVersesBible(savedVersesRef.current)
   }
 
   return (
@@ -159,7 +171,7 @@ function RetellPartner({ id, chapter, typeProject }) {
         {inactive ? (
           <button
             className="btn-base mr-2 bg-th-secondary-300 text-th-text-secondary-100 hover:opacity-70"
-            onClick={() => setInactive(false)}
+            onClick={handleResetCheckedVerses}
           >
             {t('FinishRetelling')}
           </button>
