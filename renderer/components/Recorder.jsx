@@ -28,11 +28,11 @@ export default function Recorder({ setIsRecording, voice, setVoice, config }) {
   const setCheckedVersesBible = useSetRecoilState(checkedVersesBibleState)
 
   useEffect(() => {
-    setCheckedVersesBible(['0'])
+    setCheckedVersesBible([])
   }, [setCheckedVersesBible])
 
   const handleResetCheckedVerses = () => {
-    setCheckedVersesBible(['0'])
+    setCheckedVersesBible([])
   }
 
   useEffect(() => {

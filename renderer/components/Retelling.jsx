@@ -21,11 +21,11 @@ export default function Retelling({ config }) {
   const setCheckedVersesBible = useSetRecoilState(checkedVersesBibleState)
 
   useEffect(() => {
-    setCheckedVersesBible(['0'])
+    setCheckedVersesBible([])
   }, [setCheckedVersesBible])
 
   const handleResetCheckedVerses = () => {
-    setCheckedVersesBible(['0'])
+    setCheckedVersesBible([])
   }
 
   useEffect(() => {
@@ -153,7 +153,7 @@ function RetellPartner({ id, chapter, typeProject }) {
 
   const savedVersesRef = useRef([])
   const handleResetCheckedVerses = () => {
-    setCheckedVersesBible(['0'])
+    setCheckedVersesBible([])
     setInactive(false)
   }
 
