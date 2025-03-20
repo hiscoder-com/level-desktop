@@ -31,7 +31,7 @@ export default function AppBar({ isStep = false, isShowAppBar = false }) {
                   <div className="hidden rounded-3xl bg-th-secondary-10 px-5 py-2.5 md:flex">
                     <Timer time={stepConfig.time} />
                   </div>
-                  <Dropdown description={stepConfig?.description} />
+                  <Dropdown description={stepConfig?.intro} />
                 </div>
               </div>
             </div>
