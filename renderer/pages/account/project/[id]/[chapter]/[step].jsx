@@ -218,9 +218,7 @@ function Panel({
         }))
       }
     >
-      <TabList
-        className={`-mb-2 flex overflow-auto text-xs ${!isSingleTab ? 'space-x-3 px-3' : ''} `}
-      >
+      <TabList className="-mb-2 flex space-x-3 overflow-auto px-3 text-xs">
         {tools?.map((tool, idx) => (
           <Tab
             key={tool.name + idx}
