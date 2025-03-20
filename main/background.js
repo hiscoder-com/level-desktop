@@ -1518,11 +1518,7 @@ const generateChapterTitleHtml = async (chapter, zip, chapter_label, pad) => {
   const titleVerse = chapter.verseObjects.find((v) => v.verse === 0)
   if (!titleVerse) return ''
 
-  return `
-    <div class="chapter-title">
-      <h2>${chapter_label} ${chapter.chapterNum}</h2>
-    </div>
-  `
+  return `<div class="chapter-title"><h2>${chapter_label} ${chapter.chapterNum}</h2></div>`
 }
 
 const generateChapterContentHtml = async (chapter, zip, pad, chapter_label) => {
@@ -1612,6 +1608,7 @@ const generateHtmlContent = async (project, chapters, isRtl, singleChapter = nul
   } else {
     throw new Error('Нет данных о главах')
   }
+
   const filteredChapters = singleChapter
     ? chaptersEntries.filter(([chapterNum]) => chapterNum === String(singleChapter))
     : chaptersEntries
@@ -1632,6 +1629,7 @@ const generateHtmlContent = async (project, chapters, isRtl, singleChapter = nul
   const zipPath = path.join(projectUrl, project.id, 'obs-images-360px.zip')
   const zip = await loadZipArchive(zipPath)
 
+  let isFirstChapter = true
   const chaptersHtmlArray = await Promise.all(
     book.map(async (chapter) => {
       const chapterTitleHtml = await generateChapterTitleHtml(
@@ -1647,19 +1645,38 @@ const generateHtmlContent = async (project, chapters, isRtl, singleChapter = nul
         chapter_label
       )
 
-      return `
-        <div class="chapter">
-          ${chapterTitleHtml}
-          ${chapterTitleHtml ? '<div class="page-break"></div>' : ''}
-          ${versesHtml}
-          ${versesHtml ? '<div class="page-break"></div>' : ''}
-        </div>
-      `
+      let chapterContent = ''
+      if (!isFirstChapter && !(titlePage || introPage)) {
+        chapterContent += '<div class="page-break"></div>'
+      }
+      if (chapterTitleHtml) {
+        chapterContent += chapterTitleHtml
+        isFirstChapter = false
+      }
+
+      if (versesHtml) {
+        if (!isFirstChapter) {
+          chapterContent += '<div class="page-break"></div>' + versesHtml
+        } else {
+          chapterContent += versesHtml
+        }
+      }
+
+      return `<div class="chapter">${chapterContent}</div>`
     })
   )
 
-  const chaptersSection =
-    chaptersHtmlArray.length > 0 ? `${chaptersHtmlArray.join('')}` : ''
+  const pages = []
+  if (titlePage) {
+    pages.push(titlePage)
+  }
+  if (introPage) {
+    pages.push(introPage)
+  }
+  if (chaptersHtmlArray.length > 0) {
+    pages.push(chaptersHtmlArray.join(''))
+  }
+  const content = pages.join('<div class="page-break"></div>')
 
   return `
     <html lang="ar" dir="${isRtl ? 'rtl' : 'ltr'}">
@@ -1735,15 +1752,14 @@ const generateHtmlContent = async (project, chapters, isRtl, singleChapter = nul
               height: auto !important;
               min-height: auto !important;
             }
+            body > :last-child {
+              page-break-after: auto;
+            }
           }
         </style>
       </head>
       <body>
-        ${titlePage}
-        ${hasTitle && hasIntro ? '<div class="page-break"></div>' : ''}
-        ${introPage}
-        ${(hasTitle || hasIntro) && chaptersHtmlArray.length > 0 ? '<div class="page-break"></div>' : ''}
-        ${chaptersSection}
+        ${content}
       </body>
     </html>
   `
