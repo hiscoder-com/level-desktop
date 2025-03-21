@@ -172,11 +172,26 @@ process.once('loaded', () => {
     initCurrentUser: (userId, email) =>
       ipcRenderer.invoke('init-current-user', userId, email),
 
-    exportToPdfObs: (chapters, project, isRtl) =>
-      ipcRenderer.invoke('export-to-pdf-obs', chapters, project, isRtl),
+    exportToPdfObs: (chapters, project, isRtl, includeImages, doubleSided) =>
+      ipcRenderer.invoke(
+        'export-to-pdf-obs',
+        chapters,
+        project,
+        isRtl,
+        null,
+        includeImages,
+        doubleSided
+      ),
 
     exportToPdfObsChapter: (chapters, project, isRtl, singleChapter) =>
-      ipcRenderer.invoke('export-to-pdf-obs', chapters, project, isRtl, singleChapter),
+      ipcRenderer.invoke(
+        'export-to-pdf-obs',
+        chapters,
+        project,
+        isRtl,
+        singleChapter,
+        true
+      ),
 
     readOBSZipFile: (id, chapter) => ipcRenderer.invoke('read-obs-zip', { id, chapter }),
   })

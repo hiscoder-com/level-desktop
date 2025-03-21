@@ -1431,7 +1431,15 @@ const { shell } = require('electron')
 
 ipcMain.handle(
   'export-to-pdf-obs',
-  async (_, chapters, project, isRtl, singleChapter = null) => {
+  async (
+    _,
+    chapters,
+    project,
+    isRtl,
+    singleChapter = null,
+    includeImages = true,
+    doubleSided
+  ) => {
     try {
       if ((!chapters && !singleChapter) || !project || !project.book?.code) {
         throw new Error('Invalid project or chapters data')
@@ -1459,7 +1467,9 @@ ipcMain.handle(
         project,
         chapters,
         isRtl,
-        singleChapter
+        singleChapter,
+        includeImages,
+        doubleSided
       )
 
       const browser = await puppeteer.launch()
@@ -1521,7 +1531,13 @@ const generateChapterTitleHtml = async (chapter, zip, chapter_label, pad) => {
   return `<div class="chapter-title"><h2>${chapter_label} ${chapter.chapterNum}</h2></div>`
 }
 
-const generateChapterContentHtml = async (chapter, zip, pad, chapter_label) => {
+const generateChapterContentHtml = async (
+  chapter,
+  zip,
+  pad,
+  chapter_label,
+  includeImages = true
+) => {
   let imageCount = 0
   let versesHtml = `
     <div class="header-container">
@@ -1530,13 +1546,19 @@ const generateChapterContentHtml = async (chapter, zip, pad, chapter_label) => {
   `
   const verses = chapter.verseObjects.filter((v) => v.verse !== 0)
 
-  const versesWithImages = await Promise.all(
-    verses.map(async (v) => {
-      const imageFileName = `obs-en-${pad(chapter.chapterNum)}-${pad(v.verse)}`
-      const imageSrc = await getImageFromZip(zip, imageFileName)
-      return { ...v, imageSrc }
-    })
-  )
+  let versesWithImages = []
+  console.log(includeImages, 1550)
+  if (includeImages) {
+    versesWithImages = await Promise.all(
+      verses.map(async (v) => {
+        const imageFileName = `obs-en-${pad(chapter.chapterNum)}-${pad(v.verse)}`
+        const imageSrc = await getImageFromZip(zip, imageFileName)
+        return { ...v, imageSrc }
+      })
+    )
+  } else {
+    versesWithImages = verses.map((v) => ({ ...v, imageSrc: null }))
+  }
 
   let lastImageIndex = -1
   versesWithImages.forEach((v, idx) => {
@@ -1549,12 +1571,12 @@ const generateChapterContentHtml = async (chapter, zip, pad, chapter_label) => {
     const v = versesWithImages[i]
     versesHtml += `
       <div class="verse ${v.enabled ? 'enabled' : 'disabled'}">
-        ${v.imageSrc ? `<img src="${v.imageSrc}" alt="Image for chapter ${chapter.chapterNum}, verse ${v.verse}">` : ''}
+        ${v.imageSrc && includeImages ? `<img src="${v.imageSrc}" alt="Image for chapter ${chapter.chapterNum}, verse ${v.verse}">` : ''}
         <p>${v.text}</p>
       </div>
     `
 
-    if (v.imageSrc) {
+    if (v.imageSrc && includeImages) {
       imageCount++
     }
 
@@ -1572,7 +1594,14 @@ const generateChapterContentHtml = async (chapter, zip, pad, chapter_label) => {
   return versesHtml
 }
 
-const generateHtmlContent = async (project, chapters, isRtl, singleChapter = null) => {
+const generateHtmlContent = async (
+  project,
+  chapters,
+  isRtl,
+  singleChapter = null,
+  includeImages,
+  doubleSided
+) => {
   const propertiesPath = path.join(projectUrl, project.id, 'properties.json')
   const properties = readJsonFile(propertiesPath)
   const chapter_label = properties.chapter_label || 'Story'
@@ -1649,7 +1678,8 @@ const generateHtmlContent = async (project, chapters, isRtl, singleChapter = nul
         chapter,
         zip,
         pad,
-        chapter_label
+        chapter_label,
+        includeImages
       )
 
       let chapterContent = ''
@@ -1688,15 +1718,23 @@ const generateHtmlContent = async (project, chapters, isRtl, singleChapter = nul
   }
   const content = pages.join('<div class="page-break"></div>')
 
+  const pageStyle = doubleSided
+    ? `
+    @page { size: A4; }
+    @page :left { margin-left: 25mm; margin-right: 15mm; }
+    @page :right { margin-left: 15mm; margin-right: 25mm; }
+  `
+    : `
+    @page { size: A4; margin-left: 25mm; margin-right: 15mm;}
+  `
+
   return `
     <html lang="ar" dir="${isRtl ? 'rtl' : 'ltr'}">
       <head>
         <meta charset="UTF-8">
         <title>${properties.title}</title>
         <style>
-          @page { size: A4; }
-          @page :left { margin-left: 25mm; }
-          @page :right { margin-right: 25mm; }
+          ${pageStyle}
           body {
             font-family: 'Amiri', serif;
             direction: ${isRtl ? 'rtl' : 'ltr'};

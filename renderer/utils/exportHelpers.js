@@ -57,16 +57,28 @@ export const exportToPdf = (t, chapters, project) => {
   }
 }
 
-export const exportToPdfObs = async (t, chapters, project, isRtl) => {
+export const exportToPdfObs = async (
+  t,
+  chapters,
+  project,
+  isRtl,
+  includeImages,
+  doubleSided
+) => {
   const loadingToast = toast.loading(t('projects:GeneratingPDF'))
-
   try {
-    const filePath = await window.electron.exportToPdfObs(chapters, project, isRtl)
+    const filePath = await window.electron.exportToPdfObs(
+      chapters,
+      project,
+      isRtl,
+      includeImages,
+      doubleSided
+    )
     if (!filePath) throw new Error('Failed to generate PDF')
     toast.dismiss(loadingToast)
     toast.success(t('projects:PDFCreatedSuccessfully'))
   } catch (error) {
-    toast.dismiss(loadingToast) // Закрываем тост
+    toast.dismiss(loadingToast)
     toast.error(t('projects:FailedToCreatePDF'))
   }
 }
