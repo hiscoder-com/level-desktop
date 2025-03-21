@@ -1578,6 +1578,7 @@ const generateHtmlContent = async (project, chapters, isRtl, singleChapter = nul
   const chapter_label = properties.chapter_label || 'Story'
   const hasTitle = Boolean(properties.title && properties.title.trim())
   const hasIntro = Boolean(properties.intro && properties.intro.trim())
+  const hasBack = Boolean(properties.back && properties.back.trim())
 
   const titlePage = hasTitle
     ? `<div class="title-page"><h1>${properties.title.trim()}</h1></div>`
@@ -1585,6 +1586,10 @@ const generateHtmlContent = async (project, chapters, isRtl, singleChapter = nul
 
   const introPage = hasIntro
     ? `<div class="intro-page">${marked(properties.intro.trim())}</div>`
+    : ''
+
+  const backPage = hasBack
+    ? `<div class="intro-page">${marked(properties.back.trim())}</div>`
     : ''
 
   const pad = (num) => String(num).padStart(2, '0')
@@ -1630,8 +1635,10 @@ const generateHtmlContent = async (project, chapters, isRtl, singleChapter = nul
   const zip = await loadZipArchive(zipPath)
 
   let isFirstChapter = true
+
+  const limitedBook = book.slice(0, 3) //Для отладки только 3 главы
   const chaptersHtmlArray = await Promise.all(
-    book.map(async (chapter) => {
+    limitedBook.map(async (chapter) => {
       const chapterTitleHtml = await generateChapterTitleHtml(
         chapter,
         zip,
@@ -1675,6 +1682,9 @@ const generateHtmlContent = async (project, chapters, isRtl, singleChapter = nul
   }
   if (chaptersHtmlArray.length > 0) {
     pages.push(chaptersHtmlArray.join(''))
+  }
+  if (backPage) {
+    pages.push(backPage)
   }
   const content = pages.join('<div class="page-break"></div>')
 
