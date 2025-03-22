@@ -1528,7 +1528,7 @@ const generateChapterTitleHtml = async (chapter, zip, chapter_label, pad) => {
   const titleVerse = chapter.verseObjects.find((v) => v.verse === 0)
   if (!titleVerse) return ''
 
-  return `<div class="chapter-title"><h2>${chapter_label} ${chapter.chapterNum}</h2></div>`
+  return `<div class="chapter-title"><h2>${titleVerse?.text || `${chapter_label} ${chapter.chapterNum}`}</h2></div>`
 }
 
 const generateChapterContentHtml = async (
@@ -1539,22 +1539,26 @@ const generateChapterContentHtml = async (
   includeImages = true
 ) => {
   let imageCount = 0
+  const titleStory = chapter.verseObjects.find((v) => v.verse === 0)
+  const linkStory = chapter.verseObjects.find((v) => v.verse === 200)
+
   let versesHtml = `
     <div class="header-container">
-      <span class="chapter-header">${chapter_label} ${chapter.chapterNum}</span>
+      <span class="chapter-header">${titleStory?.text || `${chapter_label} ${chapter.chapterNum}`}</span>
     </div>
   `
   const verses = chapter.verseObjects.filter((v) => v.verse !== 0)
 
   let versesWithImages = []
-  console.log(includeImages, 1550)
   if (includeImages) {
     versesWithImages = await Promise.all(
-      verses.map(async (v) => {
-        const imageFileName = `obs-en-${pad(chapter.chapterNum)}-${pad(v.verse)}`
-        const imageSrc = await getImageFromZip(zip, imageFileName)
-        return { ...v, imageSrc }
-      })
+      verses
+        .filter((v) => v.verse !== 200)
+        .map(async (v) => {
+          const imageFileName = `obs-en-${pad(chapter.chapterNum)}-${pad(v.verse)}`
+          const imageSrc = await getImageFromZip(zip, imageFileName)
+          return { ...v, imageSrc }
+        })
     )
   } else {
     versesWithImages = verses.map((v) => ({ ...v, imageSrc: null }))
@@ -1584,12 +1588,13 @@ const generateChapterContentHtml = async (
       versesHtml += `
         <div class="page-break"></div>
         <div class="header-container">
-          <span class="chapter-header">${chapter_label} ${chapter.chapterNum}</span>
+          <span class="chapter-header">${titleStory?.text || `${chapter_label} ${chapter.chapterNum}`}</span>
         </div>
       `
       imageCount = 0
     }
   }
+  versesHtml += linkStory?.text ? `<p>${linkStory?.text}</p>` : ''
 
   return versesHtml
 }
@@ -1765,7 +1770,6 @@ const generateHtmlContent = async (
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
             text-align: center;
           }
           .verse { font-size: 16px; margin-bottom: 5px; }
