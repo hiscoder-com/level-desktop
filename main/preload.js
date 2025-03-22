@@ -71,8 +71,17 @@ process.once('loaded', () => {
     getNotes: (type) => ipcRenderer.sendSync('get-notes', type),
     getNotesWithData: (projectid, type) =>
       ipcRenderer.sendSync('get-notes-with-data', projectid, type),
-    addNote: (projectid, noteid, isfolder, sorting, type) =>
-      ipcRenderer.sendSync('add-note', projectid, noteid, isfolder, sorting, type),
+    addNote: (projectid, noteid, isfolder, sorting, type, parentId = null) =>
+      ipcRenderer.sendSync(
+        'add-note',
+        projectid,
+        noteid,
+        isfolder,
+        sorting,
+        type,
+        parentId
+      ),
+
     updateNote: (projectid, note, type) =>
       ipcRenderer.sendSync('update-note', projectid, note, type),
     renameNote: (projectid, title, noteid, type) =>
