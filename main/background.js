@@ -1477,17 +1477,15 @@ ipcMain.handle(
       await page.setContent(htmlContent, { waitUntil: 'load' })
       await page.pdf({ path: filePath, format: 'A4' })
       await browser.close()
-
-      // Для отладки: открыть сгенерированный файл
       await shell.openPath(filePath)
 
       return filePath
     } catch (error) {
+      console.error('PDF export error:', error)
       throw error
     }
   }
 )
-
 const readJsonFile = (filePath) => {
   try {
     const content = fs.readFileSync(filePath, 'utf8')
@@ -1546,29 +1544,26 @@ const generateChapterContentHtml = async (
     <div class="header-container">
       <span class="chapter-header">${titleStory?.text || `${chapter_label} ${chapter.chapterNum}`}</span>
     </div>
+    <div class="chapter" id="chapter-${String(chapter.chapterNum).padStart(2, '0')}">
   `
+
   const verses = chapter.verseObjects.filter((v) => v.verse !== 0)
 
-  let versesWithImages = []
-  if (includeImages) {
-    versesWithImages = await Promise.all(
-      verses
-        .filter((v) => v.verse !== 200)
-        .map(async (v) => {
-          const imageFileName = `obs-en-${pad(chapter.chapterNum)}-${pad(v.verse)}`
-          const imageSrc = await getImageFromZip(zip, imageFileName)
-          return { ...v, imageSrc }
-        })
-    )
-  } else {
-    versesWithImages = verses.map((v) => ({ ...v, imageSrc: null }))
-  }
+  let versesWithImages = includeImages
+    ? await Promise.all(
+        verses
+          .filter((v) => v.verse !== 200)
+          .map(async (v) => {
+            const imageFileName = `obs-en-${pad(chapter.chapterNum)}-${pad(v.verse)}`
+            const imageSrc = await getImageFromZip(zip, imageFileName)
+            return { ...v, imageSrc }
+          })
+      )
+    : verses.map((v) => ({ ...v, imageSrc: null }))
 
   let lastImageIndex = -1
   versesWithImages.forEach((v, idx) => {
-    if (v.imageSrc) {
-      lastImageIndex = idx
-    }
+    if (v.imageSrc) lastImageIndex = idx
   })
 
   for (let i = 0; i < versesWithImages.length; i++) {
@@ -1594,9 +1589,27 @@ const generateChapterContentHtml = async (
       imageCount = 0
     }
   }
-  versesHtml += linkStory?.text ? `<p>${linkStory?.text}</p>` : ''
+
+  versesHtml += `</div>${linkStory?.text ? `<p>${linkStory?.text}</p>` : ''}`
 
   return versesHtml
+}
+
+const generateTableOfContents = (chapters) => {
+  let tocHtml = '<div class="toc-page"><h2>Оглавление</h2><ul>'
+  chapters
+    .sort((a, b) => Number(a.chapterNum) - Number(b.chapterNum))
+    .forEach((chapter) => {
+      const chapterId = `chapter-${String(chapter.chapterNum).padStart(2, '0')}`
+      tocHtml += `
+        <li>
+          <a href="#${chapterId}">${chapter.chapterNum}. ${chapter.title || 'Глава ' + chapter.chapterNum}</a>
+          <span class="dot-leader"></span>
+          <span class="page-number">...</span>
+        </li>`
+    })
+  tocHtml += '</ul></div>'
+  return tocHtml
 }
 
 const generateHtmlContent = async (
@@ -1656,6 +1669,10 @@ const generateHtmlContent = async (
     .sort((a, b) => Number(a[0]) - Number(b[0]))
     .map(([chapterNum, verses]) => ({
       chapterNum,
+      title:
+        verses['0'] && verses['0'].text
+          ? verses['0'].text
+          : `${chapter_label} ${chapterNum}`,
       verseObjects: Object.entries(verses)
         .map(([verse, data]) => ({
           verse: Number(verse),
@@ -1669,8 +1686,10 @@ const generateHtmlContent = async (
   const zip = await loadZipArchive(zipPath)
 
   let isFirstChapter = true
+  const limitedBook = book.slice(0, 3)
 
-  const limitedBook = book.slice(0, 3) //Для отладки только 3 главы
+  const tocHtml = generateTableOfContents(limitedBook)
+
   const chaptersHtmlArray = await Promise.all(
     limitedBook.map(async (chapter) => {
       const chapterTitleHtml = await generateChapterTitleHtml(
@@ -1688,6 +1707,9 @@ const generateHtmlContent = async (
       )
 
       let chapterContent = ''
+      const chapterId = `chapter-${pad(chapter.chapterNum)}`
+      chapterContent += `<a id="${chapterId}"></a>`
+
       if (!isFirstChapter && !(titlePage || introPage)) {
         chapterContent += '<div class="page-break"></div>'
       }
@@ -1695,13 +1717,9 @@ const generateHtmlContent = async (
         chapterContent += chapterTitleHtml
         isFirstChapter = false
       }
-
       if (versesHtml) {
-        if (!isFirstChapter) {
-          chapterContent += '<div class="page-break"></div>' + versesHtml
-        } else {
-          chapterContent += versesHtml
-        }
+        chapterContent +=
+          (!isFirstChapter ? '<div class="page-break"></div>' : '') + versesHtml
       }
 
       return `<div class="chapter">${chapterContent}</div>`
@@ -1709,29 +1727,23 @@ const generateHtmlContent = async (
   )
 
   const pages = []
-  if (titlePage) {
-    pages.push(titlePage)
-  }
-  if (introPage) {
-    pages.push(introPage)
-  }
-  if (chaptersHtmlArray.length > 0) {
-    pages.push(chaptersHtmlArray.join(''))
-  }
-  if (backPage) {
-    pages.push(backPage)
-  }
+  if (titlePage) pages.push(titlePage)
+  if (introPage) pages.push(introPage)
+  pages.push(tocHtml)
+  if (chaptersHtmlArray.length > 0) pages.push(chaptersHtmlArray.join(''))
+  if (backPage) pages.push(backPage)
+
   const content = pages.join('<div class="page-break"></div>')
 
   const pageStyle = doubleSided
     ? `
-    @page { size: A4; }
-    @page :left { margin-left: 25mm; margin-right: 15mm; }
-    @page :right { margin-left: 15mm; margin-right: 25mm; }
-  `
+      @page { size: A4; }
+      @page :left { margin-left: 25mm; margin-right: 15mm; }
+      @page :right { margin-left: 15mm; margin-right: 25mm; }
+    `
     : `
-    @page { size: A4; margin-left: 25mm; margin-right: 15mm;}
-  `
+      @page { size: A4; margin-left: 25mm; margin-right: 15mm; }
+    `
 
   return `
     <html lang="ar" dir="${isRtl ? 'rtl' : 'ltr'}">
