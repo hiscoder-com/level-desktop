@@ -23,7 +23,7 @@
     "@headlessui/react": "2.1.5",
     "@supabase/auth-helpers-nextjs": "^0.10.0",
     "@supabase/supabase-js": "^2.46.1",
-    "@texttree/notepad-rcl": "^2.6.4",
+    "@texttree/notepad-rcl": "^3.0.0",
     "@texttree/obs-format-convert-rcl": "^0.5.0",
     "@texttree/tn-quote-helpers": "^0.1.1",
     "@texttree/translation-words-helpers": "^0.2.4",
