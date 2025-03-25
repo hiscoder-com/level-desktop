@@ -14,7 +14,6 @@ import toast from 'react-hot-toast'
 import LoadingPage from './LoadingPage'
 import Modal from './Modal'
 import RtlInput from './RtlInput'
-import TreeView from './TreeView'
 
 import CloseFolder from 'public/icons/close-folder.svg'
 import Close from 'public/icons/close.svg'
@@ -47,6 +46,13 @@ const ContextMenu = dynamic(
 )
 const Redactor = dynamic(
   () => import('@texttree/notepad-rcl').then((mod) => mod.Redactor),
+  {
+    ssr: false,
+  }
+)
+
+const TreeView = dynamic(
+  () => import('@texttree/notepad-rcl').then((mod) => mod.TreeView),
   {
     ssr: false,
   }
