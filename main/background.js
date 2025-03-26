@@ -1554,13 +1554,14 @@ const generateTableOfContents = (chapters) => {
   chapters
     .sort((a, b) => Number(a.chapterNum) - Number(b.chapterNum))
     .forEach((chapter) => {
+      const titleStory = chapter.verseObjects.find((v) => v.verse === 0)
       const chapterId = `chapter-${String(chapter.chapterNum).padStart(2, '0')}`
       tocHtml += `
         <li>
           <a href="#${chapterId}" class="toc-link">
-            <span class="chapter-title">${chapter.chapterNum}. ${chapter.title || 'Глава ' + chapter.chapterNum}</span>
+           <span class="chapter-title">${titleStory?.text || `${chapter.title || 'Chapter'} ${chapter.chapterNum}`}</span>
             <span class="dot-leader"></span>
-            <span class="page-number" data-chapter="${chapterId}">[номер страницы]</span>
+            <span class="page-number" data-chapter="${chapterId}">[page number]</span>
           </a>
         </li>
       `
@@ -1898,7 +1899,7 @@ ipcMain.handle(
       })
 
       const updatedHtml = originalHtml.replace(
-        /<span class="page-number" data-chapter="([^"]+)">\[номер страницы\]<\/span>/g,
+        /<span class="page-number" data-chapter="([^"]+)">\[page number\]<\/span>/g,
         (match, chapterId) => {
           const pageNum = chapterPages[chapterId] || '...'
           return `<span class="page-number" data-chapter="${chapterId}">${pageNum}</span>`
