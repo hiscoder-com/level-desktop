@@ -25,7 +25,6 @@ const DownloadButtons = ({ project, includeImages: includeImagesProp }) => {
   const handlePdfExport = async () => {
     try {
       const chapters = window.electronAPI.getBook(project.id)
-      console.log('includeImages:', includeImages, 'doubleSided:', doubleSided)
       await exportToPdfObs(t, chapters, project, isRtl, includeImages, doubleSided)
       setShowPdfOptionsModal(false)
     } catch (error) {
@@ -92,7 +91,7 @@ const DownloadButtons = ({ project, includeImages: includeImagesProp }) => {
 
       {showPdfOptionsModal && (
         <Modal
-          title={t('Настройки печати PDF')} // Нужен перевод
+          title={t('projects:PrintingSettings')}
           isOpen={showPdfOptionsModal}
           closeHandle={() => setShowPdfOptionsModal(false)}
           className={{ contentBody: 'max-h-[70vh] overflow-y-auto px-6' }}
@@ -103,10 +102,10 @@ const DownloadButtons = ({ project, includeImages: includeImagesProp }) => {
                 className="btn-secondary flex-1"
                 onClick={() => setShowPdfOptionsModal(false)}
               >
-                {t('Отмена')}
+                {t('projects:Cancel')}
               </button>
               <button className="btn-red flex-1" onClick={handlePdfExport}>
-                {t('Печать')}
+                {t('projects:Print')}
               </button>
             </div>
           }
@@ -131,8 +130,7 @@ const DownloadButtons = ({ project, includeImages: includeImagesProp }) => {
                   } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
                 />
               </Switch>
-              {/* Нужен перевод*/}
-              <span className="ml-3">{t('Печать без картинок')}</span>
+              <span className="ml-3">{t('projects:PrintWithoutPics')}</span>
             </div>
 
             <div className="flex items-center gap-4">
@@ -149,8 +147,7 @@ const DownloadButtons = ({ project, includeImages: includeImagesProp }) => {
                   } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
                 />
               </Switch>
-              {/* Нужен перевод*/}
-              <span className="ml-3">{t('Односторонняя печать')}</span>
+              <span className="ml-3">{t('projects:OneSidedPrinting')}</span>
             </div>
           </div>
         </Modal>
