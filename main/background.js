@@ -1429,63 +1429,6 @@ ipcMain.handle('check-file-exists', async (event, fileName) => {
 //Удалить после отладки
 const { shell } = require('electron')
 
-ipcMain.handle(
-  'export-to-pdf-obs',
-  async (
-    _,
-    chapters,
-    project,
-    isRtl,
-    singleChapter = null,
-    includeImages = true,
-    doubleSided
-  ) => {
-    try {
-      if ((!chapters && !singleChapter) || !project || !project.book?.code) {
-        throw new Error('Invalid project or chapters data')
-      }
-      project.name = project.title || project.name
-
-      const formattedDate = new Date().toISOString().split('T')[0]
-      const defaultFileName = `${project.name}_${project.book.code}_${formattedDate}.pdf`
-
-      // Для отладки: сохраняем файл в папке загрузок
-      const filePath = path.join(app.getPath('downloads'), defaultFileName)
-
-      // Если нужно показывать диалог сохранения, можно раскомментировать этот код:
-      // const result = await dialog.showSaveDialog({
-      //   defaultPath: path.join(app.getPath('desktop'), defaultFileName),
-      //   filters: [{ name: 'PDF Files', extensions: ['pdf'] }],
-      // })
-      // if (result.canceled) {
-      //   return
-      // }
-      // const filePath = result.filePath
-
-      // Генерация HTML с учётом выбранной главы (или всех глав, если singleChapter === null)
-      const htmlContent = await generateHtmlContent(
-        project,
-        chapters,
-        isRtl,
-        singleChapter,
-        includeImages,
-        doubleSided
-      )
-
-      const browser = await puppeteer.launch()
-      const page = await browser.newPage()
-      await page.setContent(htmlContent, { waitUntil: 'load' })
-      await page.pdf({ path: filePath, format: 'A4' })
-      await browser.close()
-      await shell.openPath(filePath)
-
-      return filePath
-    } catch (error) {
-      console.error('PDF export error:', error)
-      throw error
-    }
-  }
-)
 const readJsonFile = (filePath) => {
   try {
     const content = fs.readFileSync(filePath, 'utf8')
@@ -1517,7 +1460,7 @@ const getImageFromZip = async (zip, imageFileName) => {
       console.error(`Error receiving image data ${imageFileName}.jpg:`, err)
     }
   } else {
-    console.error(`The image was not found in the archive.: ${imageFileName}.jpg`)
+    console.error(`The image was not found in the archive: ${imageFileName}.jpg`)
   }
   return ''
 }
@@ -1549,17 +1492,20 @@ const generateChapterContentHtml = async (
 
   const verses = chapter.verseObjects.filter((v) => v.verse !== 0)
 
-  let versesWithImages = includeImages
-    ? await Promise.all(
-        verses
-          .filter((v) => v.verse !== 200)
-          .map(async (v) => {
-            const imageFileName = `obs-en-${pad(chapter.chapterNum)}-${pad(v.verse)}`
-            const imageSrc = await getImageFromZip(zip, imageFileName)
-            return { ...v, imageSrc }
-          })
-      )
-    : verses.map((v) => ({ ...v, imageSrc: null }))
+  let versesWithImages = []
+  if (includeImages) {
+    versesWithImages = await Promise.all(
+      verses
+        .filter((v) => v.verse !== 200)
+        .map(async (v) => {
+          const imageFileName = `obs-en-${pad(chapter.chapterNum)}-${pad(v.verse)}`
+          const imageSrc = await getImageFromZip(zip, imageFileName)
+          return { ...v, imageSrc }
+        })
+    )
+  } else {
+    versesWithImages = verses.map((v) => ({ ...v, imageSrc: null }))
+  }
 
   let lastImageIndex = -1
   versesWithImages.forEach((v, idx) => {
@@ -1570,7 +1516,11 @@ const generateChapterContentHtml = async (
     const v = versesWithImages[i]
     versesHtml += `
       <div class="verse ${v.enabled ? 'enabled' : 'disabled'}">
-        ${v.imageSrc && includeImages ? `<img src="${v.imageSrc}" alt="Image for chapter ${chapter.chapterNum}, verse ${v.verse}">` : ''}
+        ${
+          v.imageSrc && includeImages
+            ? `<img src="${v.imageSrc}" alt="Image for chapter ${chapter.chapterNum}, verse ${v.verse}">`
+            : ''
+        }
         <p>${v.text}</p>
       </div>
     `
@@ -1596,19 +1546,26 @@ const generateChapterContentHtml = async (
 }
 
 const generateTableOfContents = (chapters) => {
-  let tocHtml = '<div class="toc-page"><h2>Оглавление</h2><ul>'
+  let tocHtml = `
+    <div class="toc-page">
+      <h2>Table of Contents</h2>
+      <ul class="toc-list">
+  `
   chapters
     .sort((a, b) => Number(a.chapterNum) - Number(b.chapterNum))
     .forEach((chapter) => {
       const chapterId = `chapter-${String(chapter.chapterNum).padStart(2, '0')}`
       tocHtml += `
         <li>
-          <a href="#${chapterId}">${chapter.chapterNum}. ${chapter.title || 'Глава ' + chapter.chapterNum}</a>
-          <span class="dot-leader"></span>
-          <span class="page-number">...</span>
-        </li>`
+          <a href="#${chapterId}" class="toc-link">
+            <span class="chapter-title">${chapter.chapterNum}. ${chapter.title || 'Глава ' + chapter.chapterNum}</span>
+            <span class="dot-leader"></span>
+            <span class="page-number" data-chapter="${chapterId}">[номер страницы]</span>
+          </a>
+        </li>
+      `
     })
-  tocHtml += '</ul></div>'
+  tocHtml += `</ul></div>`
   return tocHtml
 }
 
@@ -1654,25 +1611,22 @@ const generateHtmlContent = async (
     const allChapters = readJsonFile(chaptersDataPath)
     const chapterData = allChapters[String(parseInt(singleChapter, 10))]
     if (!chapterData) {
-      throw new Error(`Глава ${singleChapter} не найдена`)
+      throw new Error(`Chapter ${singleChapter} not found`)
     }
     chaptersEntries = [[String(singleChapter), chapterData]]
   } else {
-    throw new Error('Нет данных о главах')
+    throw new Error('There is no data about the chapters')
   }
 
   const filteredChapters = singleChapter
-    ? chaptersEntries.filter(([chapterNum]) => chapterNum === String(singleChapter))
+    ? chaptersEntries.filter(([num]) => num === String(singleChapter))
     : chaptersEntries
 
   const book = filteredChapters
     .sort((a, b) => Number(a[0]) - Number(b[0]))
-    .map(([chapterNum, verses]) => ({
-      chapterNum,
-      title:
-        verses['0'] && verses['0'].text
-          ? verses['0'].text
-          : `${chapter_label} ${chapterNum}`,
+    .map(([num, verses]) => ({
+      chapterNum: num,
+      title: verses['0']?.text || `${chapter_label} ${num}`,
       verseObjects: Object.entries(verses)
         .map(([verse, data]) => ({
           verse: Number(verse),
@@ -1685,11 +1639,12 @@ const generateHtmlContent = async (
   const zipPath = path.join(projectUrl, project.id, 'obs-images-360px.zip')
   const zip = await loadZipArchive(zipPath)
 
-  let isFirstChapter = true
+  // Выбираем ограниченный список глав (пример: первые 3)
+  // Уберите .slice(0, 3), если хотите все главы
   const limitedBook = book.slice(0, 3)
-
   const tocHtml = generateTableOfContents(limitedBook)
 
+  let isFirstChapter = true
   const chaptersHtmlArray = await Promise.all(
     limitedBook.map(async (chapter) => {
       const chapterTitleHtml = await generateChapterTitleHtml(
@@ -1708,6 +1663,7 @@ const generateHtmlContent = async (
 
       let chapterContent = ''
       const chapterId = `chapter-${pad(chapter.chapterNum)}`
+
       chapterContent += `<a id="${chapterId}"></a>`
 
       if (!isFirstChapter && !(titlePage || introPage)) {
@@ -1745,8 +1701,56 @@ const generateHtmlContent = async (
       @page { size: A4; margin-left: 25mm; margin-right: 15mm; }
     `
 
+  const tocStyles = `
+   .toc-page {
+    margin: 20px;
+    }
+
+   .toc-page h2 {
+    text-align: center;
+    font-size: 20px;
+    margin-bottom: 1em;
+    font-weight: bold;
+    }
+
+  .toc-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .toc-list li {
+   margin-bottom: 5px;
+  }
+
+  .toc-link {
+    display: flex;         
+    align-items: center;   
+    text-decoration: none; 
+    color: inherit;       
+  }
+
+  .chapter-title {
+   white-space: nowrap;   
+   margin-right: 8px;
+  }
+
+  .dot-leader {
+    flex: 1;               
+    border-bottom: 1px dotted #000;
+    margin: 0 8px;
+  }
+
+  .page-number {
+   width: 40px;           
+   text-align: right;
+    white-space: nowrap;
+  }
+
+  `
+
   return `
-    <html lang="ar" dir="${isRtl ? 'rtl' : 'ltr'}">
+    <html lang="${isRtl ? 'ar' : 'en'}" dir="${isRtl ? 'rtl' : 'ltr'}">
       <head>
         <meta charset="UTF-8">
         <title>${properties.title}</title>
@@ -1784,7 +1788,10 @@ const generateHtmlContent = async (
             justify-content: center;
             text-align: center;
           }
-          .verse { font-size: 16px; margin-bottom: 5px; }
+          .verse {
+            font-size: 16px;
+            margin-bottom: 5px;
+          }
           .verse img {
             display: block;
             margin-bottom: 5px;
@@ -1820,6 +1827,8 @@ const generateHtmlContent = async (
               page-break-after: auto;
             }
           }
+
+          ${tocStyles}
         </style>
       </head>
       <body>
@@ -1828,6 +1837,87 @@ const generateHtmlContent = async (
     </html>
   `
 }
+
+ipcMain.handle(
+  'export-to-pdf-obs',
+  async (
+    _,
+    chapters,
+    project,
+    isRtl,
+    singleChapter = null,
+    includeImages = true,
+    doubleSided
+  ) => {
+    try {
+      if ((!chapters && !singleChapter) || !project || !project.book?.code) {
+        throw new Error('Invalid project or chapters data')
+      }
+      project.name = project.title || project.name
+
+      const formattedDate = new Date().toISOString().split('T')[0]
+      const defaultFileName = `${project.name}_${project.book.code}_${formattedDate}.pdf`
+      const filePath = path.join(
+        require('electron').app.getPath('downloads'),
+        defaultFileName
+      )
+
+      const originalHtml = await generateHtmlContent(
+        project,
+        chapters,
+        isRtl,
+        singleChapter,
+        includeImages,
+        doubleSided
+      )
+
+      const browser = await puppeteer.launch({})
+      const page = await browser.newPage()
+
+      await page.setContent(originalHtml, { waitUntil: 'load' })
+
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+
+      const chapterPages = await page.evaluate(() => {
+        const result = {}
+        const pageHeight = window.innerHeight
+        function calculatePageNumber(element) {
+          const rect = element.getBoundingClientRect()
+          return Math.ceil((rect.top + window.scrollY) / pageHeight)
+        }
+        const spans = document.querySelectorAll('.page-number')
+        for (let i = 0; i < spans.length; i++) {
+          const span = spans[i]
+          const chapterId = span.getAttribute('data-chapter')
+          const chapterElement = document.getElementById(chapterId)
+          if (chapterElement) {
+            result[chapterId] = calculatePageNumber(chapterElement)
+          }
+        }
+        return result
+      })
+
+      const updatedHtml = originalHtml.replace(
+        /<span class="page-number" data-chapter="([^"]+)">\[номер страницы\]<\/span>/g,
+        (match, chapterId) => {
+          const pageNum = chapterPages[chapterId] || '...'
+          return `<span class="page-number" data-chapter="${chapterId}">${pageNum}</span>`
+        }
+      )
+
+      await page.setContent(updatedHtml, { waitUntil: 'load' })
+
+      await page.pdf({ path: filePath, format: 'A4' })
+      await browser.close()
+      await shell.openPath(filePath)
+
+      return filePath
+    } catch (error) {
+      console.error('PDF export error:', error)
+      throw error
+    }
+  }
+)
 
 const checkFileExists = (fileName) => {
   return new Promise((resolve, reject) => {
