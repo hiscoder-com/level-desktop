@@ -411,12 +411,7 @@ ipcMain.on('add-note', (event, projectid, noteid, isfolder, sorting, type, paren
   }
 
   let notePath = path.join(projectUrl, projectid, type)
-  if (parentId) {
-    notePath = path.join(notePath, parentId.toString())
-    if (!fs.existsSync(notePath)) {
-      fs.mkdirSync(notePath, { recursive: true })
-    }
-  }
+
   fs.writeFileSync(path.join(notePath, noteid + '.json'), JSON.stringify(data, null, 2), {
     encoding: 'utf-8',
   })
