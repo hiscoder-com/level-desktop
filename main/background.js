@@ -386,14 +386,14 @@ ipcMain.on('get-notes-with-data', (event, projectid, type) => {
   event.sender.send('notify', 'Loaded')
 })
 
-ipcMain.on('add-note', (event, projectid, noteid, isfolder, sorting, type) => {
+ipcMain.on('add-note', (event, projectid, noteid, isfolder, sorting, type, parentId) => {
   const notesLS = getNotesWithType(type)
   const date = new Date()
   const title = date.toLocaleString()
   notesLS.set(noteid, {
     id: noteid,
     title,
-    parent_id: null,
+    parent_id: parentId || null,
     is_folder: isfolder,
     created_at: date.getTime(),
     sorting,
@@ -407,11 +407,17 @@ ipcMain.on('add-note', (event, projectid, noteid, isfolder, sorting, type) => {
       version: '2.29.1',
     },
   }
-  fs.writeFileSync(
-    path.join(projectUrl, projectid, type, noteid + '.json'),
-    JSON.stringify(data, null, 2),
-    { encoding: 'utf-8' }
-  )
+
+  let notePath = path.join(projectUrl, projectid, type)
+  if (parentId) {
+    notePath = path.join(notePath, parentId.toString())
+    if (!fs.existsSync(notePath)) {
+      fs.mkdirSync(notePath, { recursive: true })
+    }
+  }
+  fs.writeFileSync(path.join(notePath, noteid + '.json'), JSON.stringify(data, null, 2), {
+    encoding: 'utf-8',
+  })
   event.returnValue = noteid
   event.sender.send('notify', 'Updated')
 })

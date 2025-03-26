@@ -90,8 +90,9 @@ export default function TeamNotes({ config: { id, language } }) {
   const notes = Object.values(notesObject)
   const [dataForTreeView, setDataForTreeView] = useState(convertNotesToTree(notes))
   const [term, setTerm] = useState('')
-
   const isRtl = language?.is_rtl || false
+  const [parentId, setParentId] = useState(false)
+
   const saveNote = () => {
     window.electronAPI.updateNote(id, activeNote, 'team-notes')
   }
@@ -329,10 +330,16 @@ export default function TeamNotes({ config: { id, language } }) {
   }
 
   const addNote = (isFolder = false) => {
-    const sorting = getMaxSorting(notes)
+    let sorting
+    if (parentId) {
+      const childNotes = notes.filter((note) => note.parent_id === parentId)
+      sorting = getMaxSorting(childNotes)
+    } else {
+      sorting = getMaxSorting(notes)
+    }
 
     const noteId = generateUniqueId(notes)
-    window.electronAPI.addNote(id, noteId, isFolder, sorting, 'team-notes')
+    window.electronAPI.addNote(id, noteId, isFolder, sorting, 'team-notes', parentId)
     mutate()
   }
 
@@ -590,6 +597,7 @@ export default function TeamNotes({ config: { id, language } }) {
                   handleDragDrop={handleDragDrop}
                   openByDefault={false}
                   isRtl={isRtl}
+                  setParentId={setParentId}
                 />
                 <ContextMenu
                   setIsVisible={setIsShowMenu}

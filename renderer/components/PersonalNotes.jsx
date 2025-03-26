@@ -50,6 +50,7 @@ const Redactor = dynamic(
     ssr: false,
   }
 )
+
 const TreeView = dynamic(
   () => import('@texttree/notepad-rcl').then((mod) => mod.TreeView),
   {
@@ -89,6 +90,7 @@ export default function PersonalNotes({ config: { id, language } }) {
   const [dataForTreeView, setDataForTreeView] = useState(convertNotesToTree(notes))
   const [term, setTerm] = useState('')
   const isRtl = language?.is_rtl || false
+  const [parentId, setParentId] = useState(false)
 
   const saveNote = () => {
     window.electronAPI.updateNote(id, activeNote, 'personal-notes')
@@ -325,10 +327,16 @@ export default function PersonalNotes({ config: { id, language } }) {
   }
 
   const addNote = (isFolder = false) => {
-    const sorting = getMaxSorting(notes)
+    let sorting
+    if (parentId) {
+      const childNotes = notes.filter((note) => note.parent_id === parentId)
+      sorting = getMaxSorting(childNotes)
+    } else {
+      sorting = getMaxSorting(notes)
+    }
 
     const noteId = generateUniqueId(notes)
-    window.electronAPI.addNote(id, noteId, isFolder, sorting, 'personal-notes')
+    window.electronAPI.addNote(id, noteId, isFolder, sorting, 'personal-notes', parentId)
     mutate()
   }
 
@@ -584,6 +592,7 @@ export default function PersonalNotes({ config: { id, language } }) {
                   handleDragDrop={handleDragDrop}
                   openByDefault={false}
                   isRtl={isRtl}
+                  setParentId={setParentId}
                 />
                 <ContextMenu
                   setIsVisible={setIsShowMenu}
