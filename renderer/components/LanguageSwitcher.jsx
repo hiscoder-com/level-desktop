@@ -17,7 +17,11 @@ function LanguageSwitcher({ currentPath }) {
   const handleLocaleChange = async (loc) => {
     window.ipc.setLocale(loc)
 
-    if (!currentPath.startsWith('/account')) {
+    if (
+      currentPath !== '/account' &&
+      currentPath !== '/account/merger' &&
+      currentPath !== '/account/project/import'
+    ) {
       const resetMessage = t1('projects:resetMessage')
       await showToastWarningWithBlock(resetMessage, 5000, true)
     } else {
