@@ -68,6 +68,7 @@ export const exportToPdfObs = async (
   const loadingToast = toast.loading(t('projects:GeneratingPDF'))
   try {
     const filePath = await window.electron.exportToPdfObs(
+      t,
       chapters,
       project,
       isRtl,

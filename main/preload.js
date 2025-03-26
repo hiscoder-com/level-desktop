@@ -172,9 +172,12 @@ process.once('loaded', () => {
     initCurrentUser: (userId, email) =>
       ipcRenderer.invoke('init-current-user', userId, email),
 
-    exportToPdfObs: (chapters, project, isRtl, includeImages, doubleSided) =>
+    exportToPdfObs: (t, chapters, project, isRtl, includeImages, doubleSided) =>
       ipcRenderer.invoke(
         'export-to-pdf-obs',
+        {
+          translation: t('projects:TableOfContents'),
+        },
         chapters,
         project,
         isRtl,
@@ -186,6 +189,9 @@ process.once('loaded', () => {
     exportToPdfObsChapter: (chapters, project, isRtl, singleChapter) =>
       ipcRenderer.invoke(
         'export-to-pdf-obs',
+        {
+          translation: t('projects:TableOfContents'),
+        },
         chapters,
         project,
         isRtl,

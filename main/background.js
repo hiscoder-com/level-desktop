@@ -1545,10 +1545,10 @@ const generateChapterContentHtml = async (
   return versesHtml
 }
 
-const generateTableOfContents = (chapters) => {
+const generateTableOfContents = (translationTableOfContent, chapters) => {
   let tocHtml = `
     <div class="toc-page">
-      <h2>Table of Contents</h2>
+      <h2>${translationTableOfContent}</h2>
       <ul class="toc-list">
   `
   chapters
@@ -1571,6 +1571,7 @@ const generateTableOfContents = (chapters) => {
 }
 
 const generateHtmlContent = async (
+  translationTableOfContent,
   project,
   chapters,
   isRtl,
@@ -1643,7 +1644,7 @@ const generateHtmlContent = async (
   // Выбираем ограниченный список глав (пример: первые 3)
   // Уберите .slice(0, 3), если хотите все главы
   const limitedBook = book.slice(0, 3)
-  const tocHtml = generateTableOfContents(limitedBook)
+  const tocHtml = generateTableOfContents(translationTableOfContent, limitedBook)
 
   let isFirstChapter = true
   const chaptersHtmlArray = await Promise.all(
@@ -1708,7 +1709,7 @@ const generateHtmlContent = async (
     }
 
    .toc-page h2 {
-    text-align: center;
+    text-align: ${isRtl ? 'right' : 'left'};
     font-size: 20px;
     margin-bottom: 1em;
     font-weight: bold;
@@ -1843,6 +1844,7 @@ ipcMain.handle(
   'export-to-pdf-obs',
   async (
     _,
+    t,
     chapters,
     project,
     isRtl,
@@ -1851,6 +1853,8 @@ ipcMain.handle(
     doubleSided
   ) => {
     try {
+      const translationTableOfContent = t.translation
+
       if ((!chapters && !singleChapter) || !project || !project.book?.code) {
         throw new Error('Invalid project or chapters data')
       }
@@ -1864,6 +1868,7 @@ ipcMain.handle(
       )
 
       const originalHtml = await generateHtmlContent(
+        translationTableOfContent,
         project,
         chapters,
         isRtl,
