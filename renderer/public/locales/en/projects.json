@@ -79,6 +79,7 @@
   "Projects": "Projects",
   "ProjectSettings": "Project Settings",
   "RemoveProject": "Remove Project",
+  "resetMessage": "To apply changes, reload the application",
   "Resume": "Resume",
   "SaveProject": "Save the project",
   "SelectArchiveProject": "Select archive with project",

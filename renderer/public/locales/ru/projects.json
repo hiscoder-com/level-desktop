@@ -79,6 +79,7 @@
   "Projects": "Проекты",
   "ProjectSettings": "Настройки проекта",
   "RemoveProject": "Удалить проект",
+  "resetMessage": "Для применения изменений перезагрузите программу",
   "Resume": "Резюме",
   "SaveProject": "Сохранить проект",
   "SelectArchiveProject": "Выбрать архив с проектом",

@@ -166,7 +166,7 @@ export default function Sidebar() {
             >
               <div className="flex w-full items-center justify-between gap-12">
                 <div>{t('projects:Language')}</div>
-                <LanguageSwitcher />
+                <LanguageSwitcher currentPath={router.pathname} />
               </div>
             </div>
           </div>

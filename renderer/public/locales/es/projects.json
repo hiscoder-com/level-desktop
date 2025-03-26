@@ -79,6 +79,7 @@
   "Projects": "Proyectos",
   "ProjectSettings": "Configuración del proyecto",
   "RemoveProject": "Eliminar proyecto",
+  "resetMessage": "Para aplicar los cambios, recargue la aplicación",
   "Resume": "Resumen",
   "SaveProject": "Save the project",
   "SelectArchiveProject": "Seleccionar archivo con proyecto",
