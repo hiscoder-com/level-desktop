@@ -27,7 +27,11 @@ function Bible({ config, toolName }) {
   const setCurrentScrollVerse = useSetRecoilState(currentVerse)
 
   useEffect(() => {
-    setCurrentScrollVerse(1)
+    if (typeProject === 'obs') {
+      setCurrentScrollVerse(0)
+    } else {
+      setCurrentScrollVerse(1)
+    }
   }, [setCurrentScrollVerse])
 
   const { data, isLoading, error } = useGetTranslatedResource({

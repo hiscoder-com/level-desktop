@@ -2,7 +2,7 @@
   "private": true,
   "name": "level",
   "description": "App for step-by-step Bible translation",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "author": {
     "name": "Hiscoder",
     "email": "info@hiscoder.com"
@@ -39,8 +39,10 @@
     "i18next-electron-fs-backend": "^3.0.2",
     "jszip": "^3.10.1",
     "localforage": "^1.10.0",
+    "marked": "^15.0.7",
     "next-i18next": "^15.3.0",
     "prop-types": "^15.8.1",
+    "puppeteer": "^24.2.0",
     "react-hot-toast": "^2.4.1",
     "react-i18next": "^14.1.0",
     "react-markdown": "^9.0.1",

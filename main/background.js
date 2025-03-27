@@ -13,6 +13,8 @@ import { app, dialog, ipcMain } from 'electron'
 import serve from 'electron-serve'
 import Store from 'electron-store'
 import JSZip from 'jszip'
+import { marked } from 'marked'
+import puppeteer from 'puppeteer'
 import { toJSON } from 'usfm-js'
 import { v4 as uuid } from 'uuid'
 
@@ -409,12 +411,7 @@ ipcMain.on('add-note', (event, projectid, noteid, isfolder, sorting, type, paren
   }
 
   let notePath = path.join(projectUrl, projectid, type)
-  if (parentId) {
-    notePath = path.join(notePath, parentId.toString())
-    if (!fs.existsSync(notePath)) {
-      fs.mkdirSync(notePath, { recursive: true })
-    }
-  }
+
   fs.writeFileSync(path.join(notePath, noteid + '.json'), JSON.stringify(data, null, 2), {
     encoding: 'utf-8',
   })
@@ -1140,6 +1137,7 @@ async function handleAddProject(url, event) {
       project.method = config.method
       project.fileName = fileName
       project.typeProject = config.typeProject
+      project.language = config.language
       await createPropertiesFile(id, defaultProperties)
 
       const currentUser = storeUsers.get('currentUser')
@@ -1429,6 +1427,504 @@ ipcMain.handle('get-path-file', async (event, fileName) => {
 ipcMain.handle('check-file-exists', async (event, fileName) => {
   return checkFileExists(fileName)
 })
+//Удалить после отладки
+const { shell } = require('electron')
+
+const readJsonFile = (filePath) => {
+  try {
+    const content = fs.readFileSync(filePath, 'utf8')
+    return JSON.parse(content)
+  } catch (err) {
+    console.error(`Error reading the JSON file ${filePath}:`, err)
+    return {}
+  }
+}
+
+const loadZipArchive = async (zipPath) => {
+  try {
+    const zipData = fs.readFileSync(zipPath)
+    return await JSZip.loadAsync(zipData)
+  } catch (err) {
+    console.error(`ZIP archive download error${zipPath}:`, err)
+    return null
+  }
+}
+
+const getImageFromZip = async (zip, imageFileName) => {
+  if (!zip) return ''
+  const file = zip.file(`${imageFileName}.jpg`)
+  if (file) {
+    try {
+      const base64Data = await file.async('base64')
+      return `data:image/jpeg;base64,${base64Data}`
+    } catch (err) {
+      console.error(`Error receiving image data ${imageFileName}.jpg:`, err)
+    }
+  } else {
+    console.error(`The image was not found in the archive: ${imageFileName}.jpg`)
+  }
+  return ''
+}
+
+const generateChapterTitleHtml = async (chapter, zip, chapter_label, pad) => {
+  const titleVerse = chapter.verseObjects.find((v) => v.verse === 0)
+  if (!titleVerse) return ''
+
+  return `<div class="chapter-title"><h2>${titleVerse?.text || `${chapter_label} ${chapter.chapterNum}`}</h2></div>`
+}
+
+const generateChapterContentHtml = async (
+  chapter,
+  zip,
+  pad,
+  chapter_label,
+  includeImages = true
+) => {
+  let imageCount = 0
+  const titleStory = chapter.verseObjects.find((v) => v.verse === 0)
+  const linkStory = chapter.verseObjects.find((v) => v.verse === 200)
+
+  let versesHtml = `
+    <div class="header-container">
+      <span class="chapter-header">${titleStory?.text || `${chapter_label} ${chapter.chapterNum}`}</span>
+    </div>
+    <div class="chapter" id="chapter-${String(chapter.chapterNum).padStart(2, '0')}">
+  `
+
+  const verses = chapter.verseObjects.filter((v) => v.verse !== 0)
+
+  let versesWithImages = []
+  if (includeImages) {
+    versesWithImages = await Promise.all(
+      verses
+        .filter((v) => v.verse !== 200)
+        .map(async (v) => {
+          const imageFileName = `obs-en-${pad(chapter.chapterNum)}-${pad(v.verse)}`
+          const imageSrc = await getImageFromZip(zip, imageFileName)
+          return { ...v, imageSrc }
+        })
+    )
+  } else {
+    versesWithImages = verses.map((v) => ({ ...v, imageSrc: null }))
+  }
+
+  let lastImageIndex = -1
+  versesWithImages.forEach((v, idx) => {
+    if (v.imageSrc) lastImageIndex = idx
+  })
+
+  for (let i = 0; i < versesWithImages.length; i++) {
+    const v = versesWithImages[i]
+    versesHtml += `
+      <div class="verse ${v.enabled ? 'enabled' : 'disabled'}">
+        ${
+          v.imageSrc && includeImages
+            ? `<img src="${v.imageSrc}" alt="Image for chapter ${chapter.chapterNum}, verse ${v.verse}">`
+            : ''
+        }
+        <p>${v.text}</p>
+      </div>
+    `
+
+    if (v.imageSrc && includeImages) {
+      imageCount++
+    }
+
+    if (imageCount >= 2 && i < versesWithImages.length - 1 && i < lastImageIndex) {
+      versesHtml += `
+        <div class="page-break"></div>
+        <div class="header-container">
+          <span class="chapter-header">${titleStory?.text || `${chapter_label} ${chapter.chapterNum}`}</span>
+        </div>
+      `
+      imageCount = 0
+    }
+  }
+
+  versesHtml += `</div>${linkStory?.text ? `<p>${linkStory?.text}</p>` : ''}`
+
+  return versesHtml
+}
+
+const generateTableOfContents = (translationTableOfContent, chapters) => {
+  let tocHtml = `
+    <div class="toc-page">
+      <h2>${translationTableOfContent}</h2>
+      <ul class="toc-list">
+  `
+  chapters
+    .sort((a, b) => Number(a.chapterNum) - Number(b.chapterNum))
+    .forEach((chapter) => {
+      const titleStory = chapter.verseObjects.find((v) => v.verse === 0)
+      const chapterId = `chapter-${String(chapter.chapterNum).padStart(2, '0')}`
+      tocHtml += `
+        <li>
+          <a href="#${chapterId}" class="toc-link">
+           <span class="chapter-title">${titleStory?.text || `${chapter.title || 'Chapter'} ${chapter.chapterNum}`}</span>
+            <span class="dot-leader"></span>
+            <span class="page-number" data-chapter="${chapterId}">[page number]</span>
+          </a>
+        </li>
+      `
+    })
+  tocHtml += `</ul></div>`
+  return tocHtml
+}
+
+const generateHtmlContent = async (
+  translationTableOfContent,
+  project,
+  chapters,
+  isRtl,
+  singleChapter = null,
+  includeImages,
+  doubleSided
+) => {
+  const propertiesPath = path.join(projectUrl, project.id, 'properties.json')
+  const properties = readJsonFile(propertiesPath)
+  const chapter_label = properties.chapter_label || 'Story'
+  const hasTitle = Boolean(properties.title && properties.title.trim())
+  const hasIntro = Boolean(properties.intro && properties.intro.trim())
+  const hasBack = Boolean(properties.back && properties.back.trim())
+
+  const titlePage = hasTitle
+    ? `<div class="title-page"><h1>${properties.title.trim()}</h1></div>`
+    : ''
+
+  const introPage = hasIntro
+    ? `<div class="intro-page">${marked(properties.intro.trim())}</div>`
+    : ''
+
+  const backPage = hasBack
+    ? `<div class="intro-page">${marked(properties.back.trim())}</div>`
+    : ''
+
+  const pad = (num) => String(num).padStart(2, '0')
+
+  let chaptersEntries = []
+  if (chapters && typeof chapters === 'object') {
+    chaptersEntries = Object.entries(chapters)
+  } else if (singleChapter) {
+    const chaptersDataPath = path.join(
+      projectUrl,
+      project.id,
+      'chapters',
+      `${singleChapter}.json`
+    )
+    const allChapters = readJsonFile(chaptersDataPath)
+    const chapterData = allChapters[String(parseInt(singleChapter, 10))]
+    if (!chapterData) {
+      throw new Error(`Chapter ${singleChapter} not found`)
+    }
+    chaptersEntries = [[String(singleChapter), chapterData]]
+  } else {
+    throw new Error('There is no data about the chapters')
+  }
+
+  const filteredChapters = singleChapter
+    ? chaptersEntries.filter(([num]) => num === String(singleChapter))
+    : chaptersEntries
+
+  const book = filteredChapters
+    .sort((a, b) => Number(a[0]) - Number(b[0]))
+    .map(([num, verses]) => ({
+      chapterNum: num,
+      title: verses['0']?.text || `${chapter_label} ${num}`,
+      verseObjects: Object.entries(verses)
+        .map(([verse, data]) => ({
+          verse: Number(verse),
+          text: data.text,
+          enabled: data.enabled,
+        }))
+        .sort((a, b) => a.verse - b.verse),
+    }))
+
+  const zipPath = path.join(projectUrl, project.id, 'obs-images-360px.zip')
+  const zip = await loadZipArchive(zipPath)
+
+  // Выбираем ограниченный список глав (пример: первые 3)
+  // Уберите .slice(0, 3), если хотите все главы
+  const limitedBook = book.slice(0, 3)
+  const tocHtml = generateTableOfContents(translationTableOfContent, limitedBook)
+
+  let isFirstChapter = true
+  const chaptersHtmlArray = await Promise.all(
+    limitedBook.map(async (chapter) => {
+      const chapterTitleHtml = await generateChapterTitleHtml(
+        chapter,
+        zip,
+        chapter_label,
+        pad
+      )
+      const versesHtml = await generateChapterContentHtml(
+        chapter,
+        zip,
+        pad,
+        chapter_label,
+        includeImages
+      )
+
+      let chapterContent = ''
+      const chapterId = `chapter-${pad(chapter.chapterNum)}`
+
+      chapterContent += `<a id="${chapterId}"></a>`
+
+      if (!isFirstChapter && !(titlePage || introPage)) {
+        chapterContent += '<div class="page-break"></div>'
+      }
+      if (chapterTitleHtml) {
+        chapterContent += chapterTitleHtml
+        isFirstChapter = false
+      }
+      if (versesHtml) {
+        chapterContent +=
+          (!isFirstChapter ? '<div class="page-break"></div>' : '') + versesHtml
+      }
+
+      return `<div class="chapter">${chapterContent}</div>`
+    })
+  )
+
+  const pages = []
+  if (titlePage) pages.push(titlePage)
+  if (introPage) pages.push(introPage)
+  pages.push(tocHtml)
+  if (chaptersHtmlArray.length > 0) pages.push(chaptersHtmlArray.join(''))
+  if (backPage) pages.push(backPage)
+
+  const content = pages.join('<div class="page-break"></div>')
+
+  const pageStyle = doubleSided
+    ? `
+      @page { size: A4; }
+      @page :left { margin-left: 25mm; margin-right: 15mm; }
+      @page :right { margin-left: 15mm; margin-right: 25mm; }
+    `
+    : `
+      @page { size: A4; margin-left: 25mm; margin-right: 15mm; }
+    `
+
+  const tocStyles = `
+   .toc-page {
+    margin: 20px;
+    }
+
+   .toc-page h2 {
+    text-align: ${isRtl ? 'right' : 'left'};
+    font-size: 20px;
+    margin-bottom: 1em;
+    font-weight: bold;
+    }
+
+  .toc-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .toc-list li {
+   margin-bottom: 5px;
+  }
+
+  .toc-link {
+    display: flex;         
+    align-items: center;   
+    text-decoration: none; 
+    color: inherit;       
+  }
+
+  .chapter-title {
+   white-space: nowrap;   
+   margin-right: 8px;
+  }
+
+  .dot-leader {
+    flex: 1;               
+    border-bottom: 1px dotted #000;
+    margin: 0 8px;
+  }
+
+  .page-number {
+   width: 40px;           
+   text-align: right;
+    white-space: nowrap;
+  }
+
+  `
+
+  return `
+    <html lang="${isRtl ? 'ar' : 'en'}" dir="${isRtl ? 'rtl' : 'ltr'}">
+      <head>
+        <meta charset="UTF-8">
+        <title>${properties.title}</title>
+        <style>
+          ${pageStyle}
+          body {
+            font-family: 'Amiri', serif;
+            direction: ${isRtl ? 'rtl' : 'ltr'};
+            text-align: ${isRtl ? 'right' : 'left'};
+            padding: 20px;
+          }
+          h1 { font-size: 24px; margin-bottom: 10px; }
+          h2 { font-size: 20px; margin-bottom: 10px; }
+
+          .title-page {
+            padding-top: 40vh; 
+            text-align: center;
+            height: 100vh;
+            box-sizing: border-box;
+          }
+          .title-page h1 {
+            margin: 0;
+          }
+          .intro-page {
+            padding: 40px;
+            min-height: 100vh;
+          }
+          .chapter {
+            margin-bottom: 20px;
+          }
+          .chapter-title {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+          }
+          .verse {
+            font-size: 16px;
+            margin-bottom: 5px;
+          }
+          .verse img {
+            display: block;
+            margin-bottom: 5px;
+            max-width: 100%;
+            height: auto;
+          }
+          .page-break {
+            display: block;
+            height: 0;
+            line-height: 0;
+            page-break-after: always;
+          }
+          .header-container {
+            position: relative;
+            height: 20mm; 
+          }
+          .chapter-header {
+            position: absolute;
+            top: 0;
+            ${isRtl ? 'left' : 'right'}: 0;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 20px;
+            text-align: ${isRtl ? 'left' : 'right'};
+          }
+          @media print {
+            .title-page,
+            .intro-page {
+              height: auto !important;
+              min-height: auto !important;
+            }
+            body > :last-child {
+              page-break-after: auto;
+            }
+          }
+
+          ${tocStyles}
+        </style>
+      </head>
+      <body>
+        ${content}
+      </body>
+    </html>
+  `
+}
+
+ipcMain.handle(
+  'export-to-pdf-obs',
+  async (
+    _,
+    t,
+    chapters,
+    project,
+    isRtl,
+    singleChapter = null,
+    includeImages = true,
+    doubleSided
+  ) => {
+    try {
+      const translationTableOfContent = t.translation
+
+      if ((!chapters && !singleChapter) || !project || !project.book?.code) {
+        throw new Error('Invalid project or chapters data')
+      }
+      project.name = project.title || project.name
+
+      const formattedDate = new Date().toISOString().split('T')[0]
+      const defaultFileName = `${project.name}_${project.book.code}_${formattedDate}.pdf`
+      const filePath = path.join(
+        require('electron').app.getPath('downloads'),
+        defaultFileName
+      )
+
+      const originalHtml = await generateHtmlContent(
+        translationTableOfContent,
+        project,
+        chapters,
+        isRtl,
+        singleChapter,
+        includeImages,
+        doubleSided
+      )
+
+      const browser = await puppeteer.launch({})
+      const page = await browser.newPage()
+
+      await page.setContent(originalHtml, { waitUntil: 'load' })
+
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+
+      const chapterPages = await page.evaluate(() => {
+        const result = {}
+        const pageHeight = window.innerHeight
+        function calculatePageNumber(element) {
+          const rect = element.getBoundingClientRect()
+          return Math.ceil((rect.top + window.scrollY) / pageHeight)
+        }
+        const spans = document.querySelectorAll('.page-number')
+        for (let i = 0; i < spans.length; i++) {
+          const span = spans[i]
+          const chapterId = span.getAttribute('data-chapter')
+          const chapterElement = document.getElementById(chapterId)
+          if (chapterElement) {
+            result[chapterId] = calculatePageNumber(chapterElement)
+          }
+        }
+        return result
+      })
+
+      const updatedHtml = originalHtml.replace(
+        /<span class="page-number" data-chapter="([^"]+)">\[page number\]<\/span>/g,
+        (match, chapterId) => {
+          const pageNum = chapterPages[chapterId] || '...'
+          return `<span class="page-number" data-chapter="${chapterId}">${pageNum}</span>`
+        }
+      )
+
+      await page.setContent(updatedHtml, { waitUntil: 'load' })
+
+      await page.pdf({ path: filePath, format: 'A4' })
+      await browser.close()
+      await shell.openPath(filePath)
+
+      return filePath
+    } catch (error) {
+      console.error('PDF export error:', error)
+      throw error
+    }
+  }
+)
 
 const checkFileExists = (fileName) => {
   return new Promise((resolve, reject) => {

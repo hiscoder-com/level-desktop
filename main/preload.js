@@ -180,6 +180,34 @@ process.once('loaded', () => {
   contextBridge.exposeInMainWorld('electron', {
     initCurrentUser: (userId, email) =>
       ipcRenderer.invoke('init-current-user', userId, email),
+
+    exportToPdfObs: (t, chapters, project, isRtl, includeImages, doubleSided) =>
+      ipcRenderer.invoke(
+        'export-to-pdf-obs',
+        {
+          translation: t('projects:TableOfContents'),
+        },
+        chapters,
+        project,
+        isRtl,
+        null,
+        includeImages,
+        doubleSided
+      ),
+
+    exportToPdfObsChapter: (t, chapters, project, isRtl, singleChapter) =>
+      ipcRenderer.invoke(
+        'export-to-pdf-obs',
+        {
+          translation: t('projects:TableOfContents'),
+        },
+        chapters,
+        project,
+        isRtl,
+        singleChapter,
+        true
+      ),
+
     readOBSZipFile: (id, chapter) => ipcRenderer.invoke('read-obs-zip', { id, chapter }),
   })
 })
