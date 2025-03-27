@@ -65,6 +65,7 @@ function ChapterList({ id, chapters, steps, mutate, book, project }) {
     }
     try {
       const filePath = await window.electron.exportToPdfObsChapter(
+        t,
         chapters,
         project,
         isRtl,
@@ -76,6 +77,7 @@ function ChapterList({ id, chapters, steps, mutate, book, project }) {
     } catch (error) {
       toast.dismiss(loadingToast)
       toast.error(t('projects:FailedToCreatePDF'))
+      console.error(error)
     }
   }
 

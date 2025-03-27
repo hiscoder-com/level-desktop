@@ -195,7 +195,7 @@ process.once('loaded', () => {
         doubleSided
       ),
 
-    exportToPdfObsChapter: (chapters, project, isRtl, singleChapter) =>
+    exportToPdfObsChapter: (t, chapters, project, isRtl, singleChapter) =>
       ipcRenderer.invoke(
         'export-to-pdf-obs',
         {
