@@ -5,6 +5,7 @@ import { useRouter } from 'next/router'
 
 import { useTranslation } from '@/next-i18next'
 import { JsonToPdf } from '@texttree/obs-format-convert-rcl'
+import toast from 'react-hot-toast'
 
 import Left from 'public/icons/left.svg'
 import TechSteps from 'public/icons/techsteps.svg'
@@ -50,14 +51,57 @@ function ChapterList({ id, chapters, steps, mutate, book, project }) {
       mutate()
     }
   }
+
+  const exportToPdfObsChapter = async (
+    chapters,
+    project,
+    isRtl,
+    singleChapter = null
+  ) => {
+    const loadingToast = toast.loading(t('projects:GeneratingPDF'))
+
+    if (singleChapter !== null) {
+      singleChapter = String(singleChapter).padStart(2, '0')
+    }
+    try {
+      const filePath = await window.electron.exportToPdfObsChapter(
+        t,
+        chapters,
+        project,
+        isRtl,
+        singleChapter
+      )
+      if (!filePath) throw new Error('Failed to generate PDF')
+      toast.dismiss(loadingToast)
+      toast.success(t('projects:PDFCreatedSuccessfully'))
+    } catch (error) {
+      toast.dismiss(loadingToast)
+      toast.error(t('projects:FailedToCreatePDF'))
+      console.error(error)
+    }
+  }
+
   const handleDownloadChapter = (chapter, typeProject = '') => {
+    const project = window.electronAPI.getProject(id)
+    if (typeProject === 'obs') {
+      const projects = window.electronAPI.getProjects()
+
+      const project = projects.find((proj) => proj.id === id)
+      const chapters = window.electronAPI.getBook(project.id)
+      const isRtl = project?.language?.is_rtl || false
+      exportToPdfObsChapter(chapters, project, isRtl, chapter)
+      return
+    }
+
     const savedVerses = Object.entries(
       window.electronAPI.getChapter(id, chapter, typeProject)
     ).map(([k, v]) => ({ verse: k, text: v.text, enabled: v.enabled }))
 
-    const project = window.electronAPI.getProject(id)
     const currentDate = new Date().toISOString().split('T')[0]
-    const fileName = `${project.project.project_code}_${project.book.name}_c_${chapter}_${currentDate}`
+    const projectCode = project.project.project_code
+      ? `${project.project.project_code}_`
+      : ''
+    const fileName = `${projectCode}${project.book.name}_c_${chapter}_${currentDate}`
 
     JsonToPdf({
       data: [{ title: 'Chapter ' + chapter, verseObjects: savedVerses }],
@@ -157,7 +201,7 @@ function ChapterList({ id, chapters, steps, mutate, book, project }) {
                     className="rounded-md bg-th-primary-100 p-1 text-th-secondary-10 hover:opacity-70"
                     onClick={(e) => {
                       e.stopPropagation()
-                      handleDownloadChapter(chapter)
+                      handleDownloadChapter(chapter, project.typeProject)
                     }}
                   >
                     PDF

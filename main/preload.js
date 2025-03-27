@@ -71,8 +71,17 @@ process.once('loaded', () => {
     getNotes: (type) => ipcRenderer.sendSync('get-notes', type),
     getNotesWithData: (projectid, type) =>
       ipcRenderer.sendSync('get-notes-with-data', projectid, type),
-    addNote: (projectid, noteid, isfolder, sorting, type) =>
-      ipcRenderer.sendSync('add-note', projectid, noteid, isfolder, sorting, type),
+    addNote: (projectid, noteid, isfolder, sorting, type, parentId = null) =>
+      ipcRenderer.sendSync(
+        'add-note',
+        projectid,
+        noteid,
+        isfolder,
+        sorting,
+        type,
+        parentId
+      ),
+
     updateNote: (projectid, note, type) =>
       ipcRenderer.sendSync('update-note', projectid, note, type),
     renameNote: (projectid, title, noteid, type) =>
@@ -171,6 +180,34 @@ process.once('loaded', () => {
   contextBridge.exposeInMainWorld('electron', {
     initCurrentUser: (userId, email) =>
       ipcRenderer.invoke('init-current-user', userId, email),
+
+    exportToPdfObs: (t, chapters, project, isRtl, includeImages, doubleSided) =>
+      ipcRenderer.invoke(
+        'export-to-pdf-obs',
+        {
+          translation: t('projects:TableOfContents'),
+        },
+        chapters,
+        project,
+        isRtl,
+        null,
+        includeImages,
+        doubleSided
+      ),
+
+    exportToPdfObsChapter: (t, chapters, project, isRtl, singleChapter) =>
+      ipcRenderer.invoke(
+        'export-to-pdf-obs',
+        {
+          translation: t('projects:TableOfContents'),
+        },
+        chapters,
+        project,
+        isRtl,
+        singleChapter,
+        true
+      ),
+
     readOBSZipFile: (id, chapter) => ipcRenderer.invoke('read-obs-zip', { id, chapter }),
   })
 })
