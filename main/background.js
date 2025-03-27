@@ -149,9 +149,8 @@ function writeLog(message) {
 
 ;(async () => {
   try {
-    const isFirstLaunchFile = storeLS.get('first-launch')
-
-    if (!isFirstLaunchFile) {
+    const isBibleUploaded = storeLS.get('upload-default-bible-project')
+    if (!isBibleUploaded) {
       const fakeEvent = {
         sender: {
           send: (channel, message) => {
@@ -159,20 +158,45 @@ function writeLog(message) {
           },
         },
       }
-      const zipFilePath = path.join(
+      const bibleZipPath = path.join(
         process.resourcesPath,
         'resources',
         'default',
-        'project.zip'
+        'project_bible.zip'
       )
-      if (fs.existsSync(zipFilePath)) {
-        await handleAddProject(zipFilePath, fakeEvent)
-        writeLog('handleAddProject finished successfully')
+      if (fs.existsSync(bibleZipPath)) {
+        await handleAddProject(bibleZipPath, fakeEvent)
+        writeLog('Bible project added successfully')
+        storeLS.set('upload-default-bible-project', true)
+        writeLog('Set upload-default-bible-project to true')
       } else {
-        writeLog(`ZIP file not found: ${zipFilePath}`)
+        writeLog(`Bible ZIP file not found: ${bibleZipPath}`)
       }
-      storeLS.set('first-launch', true)
-      writeLog('Set first-launch to true')
+    }
+
+    const isObsUploaded = storeLS.get('upload-default-obs-project')
+    if (!isObsUploaded) {
+      const fakeEvent = {
+        sender: {
+          send: (channel, message) => {
+            writeLog(`Channel: ${channel}, Message: ${message}`)
+          },
+        },
+      }
+      const obsZipPath = path.join(
+        process.resourcesPath,
+        'resources',
+        'default',
+        'project_obs.zip'
+      )
+      if (fs.existsSync(obsZipPath)) {
+        await handleAddProject(obsZipPath, fakeEvent)
+        writeLog('OBS project added successfully')
+        storeLS.set('upload-default-obs-project', true)
+        writeLog('Set upload-default-obs-project to true')
+      } else {
+        writeLog(`OBS ZIP file not found: ${obsZipPath}`)
+      }
     }
   } catch (error) {
     writeLog(`Error occurred: ${error.message}`)
