@@ -57,7 +57,11 @@ function Bible({ config, toolName }) {
       {isLoading ? (
         <Placeholder />
       ) : isDraft ? (
-        <VersesExtended verseObjects={data} handleSaveScroll={handleSaveScroll} />
+        <VersesExtended
+          verseObjects={data}
+          handleSaveScroll={handleSaveScroll}
+          currentScrollVerse={currentScrollVerse}
+        />
       ) : (
         <Verses
           verseObjects={data}
